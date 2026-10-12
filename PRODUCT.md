@@ -1,11 +1,11 @@
-# Qloo Agentic Hackathon 2026: Build "Door Scout", a Tenant-Mix Agent That Tells Landlords What an Empty Storefront Should Become
+# Qloo Agentic Hackathon 2026: Build "Karum", a Tenant-Mix Agent That Tells Landlords What an Empty Storefront Should Become
 
-Build **Door Scout**, an agent for retail landlords, leasing brokers and mall operators. You give it one vacant unit and its neighbours. It reads the taste of the surrounding block from Qloo, scores candidate tenant brands on two things, catchment fit and co-tenancy complement, and then writes the leasing memo and the outreach. The decision is a multi-year lease, not a dinner choice. It depends on Qloo's locality, place and cross-domain brand signals. And neither the 2025 winners nor the 2026 entries I could find attempted it.
+Build **Karum**, an agent for retail landlords, leasing brokers and mall operators. You give it one vacant unit and its neighbours. It reads the taste of the surrounding block from Qloo, scores candidate tenant brands on two things, catchment fit and co-tenancy complement, and then writes the leasing memo and the outreach. The decision is a multi-year lease, not a dinner choice. It depends on Qloo's locality, place and cross-domain brand signals. And neither the 2025 winners nor the 2026 entries I could find attempted it.
 
 ## TL;DR
-- **What to build:** Door Scout, a "what should this vacancy become?" leasing agent. It combines Qloo's place, brand, tag and location signals to rank tenants by catchment fit and by complement with existing neighbours, then produces an evidence-backed memo and outreach. Qloo Indispensability 9/10, Previous-Hackathon Similarity 5/10 (closest is GeoTaste), judge score 80/100.
+- **What to build:** Karum, a "what should this vacancy become?" leasing agent. It combines Qloo's place, brand, tag and location signals to rank tenants by catchment fit and by complement with existing neighbours, then produces an evidence-backed memo and outreach. Qloo Indispensability 9/10, Previous-Hackathon Similarity 5/10 (closest is GeoTaste), judge score 80/100.
 - **Why this and not the usual ideas:** the 2025 winners (GeoTaste 1st; Alloy, Resonance AI and Zesty as honorable mentions) all put Qloo inside a business decision rather than a consumer recommendation. The 2026 field is already filling up. On GitHub I found entries for venue booking (Booker, Advance, Undercard), synthetic focus groups (Quorum), partnership discovery (Cold-Open, Deal Desk), café marketing (Hayy), relocation (TasteBridge, Home2Here) and MCP wrappers. Avoid all of these.
-- **The main risk, and how to manage it:** spend the first 3–4 days with the hackathon key confirming place and brand coverage and location filtering for 3 demo cities. If Qloo cannot separate two neighbourhoods' taste profiles in a way a judge can see, kill Door Scout and fall back to the Tier-A runner-up (an independent-retailer buying agent).
+- **The main risk, and how to manage it:** spend the first 3–4 days with the hackathon key confirming place and brand coverage and location filtering for 3 demo cities. If Qloo cannot separate two neighbourhoods' taste profiles in a way a judge can see, kill Karum and fall back to the Tier-A runner-up (an independent-retailer buying agent).
 
 ---
 
@@ -168,11 +168,11 @@ For contrast, music-side tools charge for far lower-stakes help: Booking-Agent.i
 Format: idea, then decision or customer, then verdict.
 
 **Location and real estate**
-1. Door Scout, vacant-unit tenant mix for landlords: **Tier A**
-2. Mall re-merchandising plan for a whole floor: merged into Door Scout v2
+1. Karum, vacant-unit tenant mix for landlords: **Tier A**
+2. Mall re-merchandising plan for a whole floor: merged into Karum v2
 3. Pop-up slot programmer for short-term retail space: Tier B (thin wallet)
-4. Food-hall stall curation: Tier B (folded into Door Scout)
-5. High-street BID "missing tenants" report for councils: Door Scout variant
+4. Food-hall stall curation: Tier B (folded into Karum)
+5. High-street BID "missing tenants" report for councils: Karum variant
 6. Franchise territory picker: reject (GeoTaste overlap ~8)
 7. Hotel ground-floor and lobby programming: **Tier A**
 8. Coworking amenity programming: reject (low stakes)
@@ -227,9 +227,9 @@ Format: idea, then decision or customer, then verdict.
 45. Hiring and culture fit: reject (ethics; decorative)
 46. Dating: reject (crowded, ethics)
 47. Education reading lists: reject (low stakes)
-48. Unrecommendation for merchants ("what not to stock"): merged into Door Scout and the buying agent as the negative-space feature
+48. Unrecommendation for merchants ("what not to stock"): merged into Karum and the buying agent as the negative-space feature
 
-### 8. Counterfactual test for Door Scout
+### 8. Counterfactual test for Karum
 
 Query: "Vacant 1,200 sq ft unit at [address], neighbours: [natural-wine bar], [record store], [ramen shop]. What should go here?"
 
@@ -241,8 +241,8 @@ Query: "Vacant 1,200 sq ft unit at [address], neighbours: [natural-wine bar], [r
 ---
 
 # EXECUTIVE VERDICT
-**Best Idea:** Door Scout, the vacancy-to-tenant leasing agent for landlords, brokers and mall operators.
-**One-Line Pitch:** Door Scout reads what a block's people actually love and tells a landlord which tenant to sign, which ones to avoid, and why, then drafts the pitch to land them.
+**Best Idea:** Karum, the vacancy-to-tenant leasing agent for landlords, brokers and mall operators.
+**One-Line Pitch:** Karum reads what a block's people actually love and tells a landlord which tenant to sign, which ones to avoid, and why, then drafts the pitch to land them.
 **Qloo Indispensability:** 9/10
 **Qloo Novelty:** 7/10
 **Previous-Hackathon Similarity:** 5/10
@@ -258,7 +258,7 @@ Query: "Vacant 1,200 sq ft unit at [address], neighbours: [natural-wine bar], [r
 
 | # | Idea | Tier | Qloo Tech (20) | Agentic (15) | Novelty (15) | Problem (15) | Demo (15) | Business (10) | Design (5) | Feasibility (5) | **Total /100** | Indisp. /10 | Similarity /10 | Solo /5 | Duo /5 | Tech Risk /10 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | **Door Scout**, tenant-mix leasing agent | A | 17 | 11 | 11 | 13 | 12 | 8 | 4 | 4 | **80** | 9 | 5 (GeoTaste) | 4 | 5 | 5 |
+| 1 | **Karum**, tenant-mix leasing agent | A | 17 | 11 | 11 | 13 | 12 | 8 | 4 | 4 | **80** | 9 | 5 (GeoTaste) | 4 | 5 | 5 |
 | 2 | **Shelfwise**, indie bookstore/record-store buying agent (location-aware "what to stock / what to cut") | A | 15 | 11 | 12 | 10 | 10 | 5 | 4 | 5 | **72** | 8 | 2 (PersonaReads is consumer) | 5 | 5 | 4 |
 | 3 | **Rollout**, indie film platform-release planner (cities, theatres, comp titles, partner brands) | A | 15 | 11 | 10 | 11 | 11 | 6 | 3 | 3 | **70** | 8 | 4 (Advance 2026 does this for tours) | 3 | 4 | 6 |
 | 4 | **House Program**, boutique-hotel ground-floor and lobby programming | A | 14 | 10 | 11 | 10 | 11 | 6 | 4 | 4 | **70** | 8 | 4 (GeoTaste) | 4 | 5 | 5 |
@@ -313,10 +313,10 @@ The connecting idea across all five is that **compatibility between a fixed phys
 # THE IDEA I SHOULD BUILD (full product specification)
 
 ### Product name
-**Door Scout.**
+**Karum.**
 
 ### One-line pitch
-"Door Scout reads what a block's people actually love and tells a landlord which tenant to sign, which ones to avoid, and why, then drafts the pitch to land them."
+"Karum reads what a block's people actually love and tells a landlord which tenant to sign, which ones to avoid, and why, then drafts the pitch to land them."
 
 ### The problem
 A vacant storefront costs the owner rent every month. Choosing the wrong tenant locks in a weak lease for years and can drag down neighbours' sales (and percentage rent). Today the decision rests on broker intuition, the highest bidder, and footfall and demographic data that say who walks by but not what those people want. District managers are "often without sufficient resources and guidance."
@@ -376,7 +376,7 @@ Remove Qloo and the product collapses to the generic LLM answer in counterfactua
 - **Result:** "Recommended: an independent eyewear brand (catchment fit 0.9x, complement 0.8x, no competitor within 500 m). Do not lease: a third coffee concept (cannibalisation), a mass-market fast-fashion chain (low affinity with neighbours' audiences)." Memo and outreach emails follow, with every number traceable. (Values here are illustrative; the demo must show live outputs.)
 
 ### The "magic moment"
-The judge types three real neighbouring venues on a block they know. Door Scout rejects the obvious answer the judge was thinking of (another café) with the reason "already saturated within 400 m." It then surfaces a non-food brand, such as an eyewear or stationery label, and shows the chain of evidence: these three venues' audiences, the affinity for that brand, and its absence nearby. The judge's reaction should be: *"A normal LLM would have said 'café'."* A side-by-side "LLM-only answer" panel makes the contrast explicit.
+The judge types three real neighbouring venues on a block they know. Karum rejects the obvious answer the judge was thinking of (another café) with the reason "already saturated within 400 m." It then surfaces a non-food brand, such as an eyewear or stationery label, and shows the chain of evidence: these three venues' audiences, the affinity for that brand, and its absence nearby. The judge's reaction should be: *"A normal LLM would have said 'café'."* A side-by-side "LLM-only answer" panel makes the contrast explicit.
 
 ### User interface
 1. **Start screen:** address field, "add neighbours" (autocomplete via `/search`), constraints chips. A "Try a sample block" button lets judges start without effort.
@@ -390,7 +390,7 @@ The judge types three real neighbouring venues on a block they know. Door Scout 
 
 ### Before vs. after
 - **Before (generic LLM):** "Consider a café, boutique fitness or a plant shop." No evidence, the same answer for every hip block, and it recommends competitors of the existing tenants.
-- **After (Door Scout):** a ranked, block-specific shortlist with saturation checks, a co-tenancy rationale traced to real venues' audiences, a list of what to avoid, and ready-to-send outreach.
+- **After (Karum):** a ranked, block-specific shortlist with saturation checks, a co-tenancy rationale traced to real venues' audiences, a list of what to avoid, and ready-to-send outreach.
 
 ### Technical architecture (deliberately simple)
 - **Frontend:** Next.js (App Router) with Tailwind, MapLibre GL using free OSM/CARTO tiles, and react-pdf for the memo.
@@ -407,13 +407,13 @@ The judge types three real neighbouring venues on a block they know. Door Scout 
 
 # 3-MINUTE JUDGE DEMO (exact sequence of interactions)
 
-1. **0:00–0:20 (problem):** the landing card reads "A wrong tenant is a 5–10 year mistake. Brokers guess. Door Scout reads the block." Click **Try sample: Bedford Ave, Brooklyn**.
+1. **0:00–0:20 (problem):** the landing card reads "A wrong tenant is a 5–10 year mistake. Brokers guess. Karum reads the block." Click **Try sample: Bedford Ave, Brooklyn**.
 2. **0:20–0:50 (resolution):** three neighbours auto-resolve with Qloo IDs and categories. The judge sees the confirmations. Optionally swap in a venue the judge knows.
 3. **0:50–1:30 (agent at work):** the trace streams through block taste tags, the brand-affinity query, the saturation check, and a probe follow-up. The map fills with neighbours and competitors.
 4. **1:30–2:10 (magic moment):** the shortlist appears. The "Do not lease: third coffee concept, saturated within 400 m" card sits next to the #1 non-obvious brand. Open its evidence drawer: neighbour audiences → affinity → no competitor nearby.
 5. **2:10–2:30 (counterfactual):** toggle the "LLM-only answer" to show the generic "café, fitness, plants."
 6. **2:30–2:50 (action):** click **Generate memo**, then **Draft outreach to Brand #1**. The PDF and email appear, each citing the evidence.
-7. **2:50–3:00 (close):** "Every vacancy in the world has this question. Door Scout answers it with what people actually love."
+7. **2:50–3:00 (close):** "Every vacancy in the world has this question. Karum answers it with what people actually love."
 
 Also offer a second sample block in another city, plus a free-entry mode, so judges who explore beyond the script still get results.
 
@@ -438,12 +438,12 @@ Also offer a second sample block in another city, plus a free-entry mode, so jud
 - Demographic sanity check
 - Agent follow-up probes
 - Saved vacancies
-- Leave-one-out evaluation page: hide a real, highly rated existing tenant and see whether Door Scout ranks its category above the LLM's picks. This copies Advance's credibility move and gives you a quantitative Impact claim.
+- Leave-one-out evaluation page: hide a real, highly rated existing tenant and see whether Karum ranks its category above the LLM's picks. This copies Advance's credibility move and gives you a quantitative Impact claim.
 
 **Nice to have**
 - Monthly re-run diff alerts
 - A brand-side view ("which vacancies fit my brand")
-- An MCP endpoint so other agents can call Door Scout
+- An MCP endpoint so other agents can call Karum
 
 **Absolutely do not build**
 - Login walls on the demo
@@ -518,10 +518,10 @@ A weekend rebuild with Qloo plus an LLM would give the first screen, not the cal
   - Abrams sees venue-economics thinking.
   - Seligman sees responsible, evidence-traced agent behaviour.
 - **Versus each winner:**
-  - **GeoTaste:** Door Scout adds co-tenancy, cannibalisation, a concrete action (outreach) and an evaluation.
-  - **Resonance AI:** Door Scout has a commercial buyer and measurable outcomes.
-  - **Zesty:** Door Scout puts negative space inside a monetisable decision.
-  - **Alloy:** Door Scout addresses a far larger, more frequent and cheaper-to-serve decision, with spatial evidence that is easier to verify.
+  - **GeoTaste:** Karum adds co-tenancy, cannibalisation, a concrete action (outreach) and an evaluation.
+  - **Resonance AI:** Karum has a commercial buyer and measurable outcomes.
+  - **Zesty:** Karum puts negative space inside a monetisable decision.
+  - **Alloy:** Karum addresses a far larger, more frequent and cheaper-to-serve decision, with spatial evidence that is easier to verify.
 
 # WHY THIS COULD FAIL (brutally honest)
 
@@ -552,7 +552,7 @@ A weekend rebuild with Qloo plus an LLM would give the first screen, not the cal
 
 # FINAL RECOMMENDATION (decisive)
 
-Build **Door Scout**. Request the Qloo hackathon key today and read the official rules page tonight. Spend Oct 4–8 on the coverage notebook and treat the Oct 8 kill/go gate as binding. If it passes, build exactly the Must-Build list, with the "do not lease" card and the LLM-only comparison as the centrepiece of the magic moment. Ship a public, no-login demo with two pre-warmed blocks by Oct 26, and submit by Oct 29.
+Build **Karum**. Request the Qloo hackathon key today and read the official rules page tonight. Spend Oct 4–8 on the coverage notebook and treat the Oct 8 kill/go gate as binding. If it passes, build exactly the Must-Build list, with the "do not lease" card and the LLM-only comparison as the centrepiece of the magic moment. Ship a public, no-login demo with two pre-warmed blocks by Oct 26, and submit by Oct 29.
 
 Stay out of music booking, focus groups, sponsorship and relocation; the 2026 field already has entries there. If the gate fails, pivot to Shelfwise the same day without re-planning. The architecture carries over.
 

@@ -1,4 +1,4 @@
-# Door Scout implementation plan
+# Karum implementation plan
 
 This is the build checklist for the whole system, not only infra. The product is the vacancy-to-tenant leasing agent in [PRODUCT.md](PRODUCT.md). The shape is the five-repo split in [TECH.md](TECH.md): Flutter client, Go gateway, `service-taste`, `service-ai`, and this infra repo for protos, Compose, and Cloud Run.
 
@@ -365,10 +365,10 @@ When a Routes key is set, the gateway orders the vacancy and the confirmed neigh
 
 ### 33. Leave-one-out harness
 
-A CLI in infra or the gateway assembles about twenty blocks, each with a known strong tenant category held out of the neighbour list. It runs Door Scout and `LlmOnlyBaseline` on each block and scores whether the hidden category ranks above the baseline’s picks. Write the table, including the blocks that lose. If fewer than twelve of twenty win, change the rubric in `ScoreCandidates` before any UI polish.
+A CLI in infra or the gateway assembles about twenty blocks, each with a known strong tenant category held out of the neighbour list. It runs Karum and `LlmOnlyBaseline` on each block and scores whether the hidden category ranks above the baseline’s picks. Write the table, including the blocks that lose. If fewer than twelve of twenty win, change the rubric in `ScoreCandidates` before any UI polish.
 
 - [ ] Assemble about twenty blocks with a known strong tenant hidden
-- [ ] CLI-run Door Scout and the LLM-only baseline on each
+- [ ] CLI-run Karum and the LLM-only baseline on each
 - [ ] Score whether the hidden category ranks above the baseline picks
 - [ ] Write the table, including the failures
 - [ ] If fewer than twelve of twenty win, fix the rubric before UI polish
