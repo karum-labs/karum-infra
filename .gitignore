@@ -1,0 +1,23 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+credentials*.json
+service-account*.json
+
+# Generated proto stubs (emitted by `make generate`, not committed)
+proto/gen/
+
+# Tool / build caches
+.buf/
+*.out
+coverage.out
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store

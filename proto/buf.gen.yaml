@@ -1,0 +1,31 @@
+# Buf code-generation configuration.
+#
+# `buf generate` emits Go stubs for the gateway and Python stubs for the two
+# microservices from the same proto source of truth. CI runs this inside Docker
+# so laptop and CI stubs match.
+version: v2
+
+plugins:
+  # Go stubs for karum-server (the gRPC gateway client).
+  - remote: buf.build/protocolbuffers/go
+    out: gen/go
+    opt: paths=source_relative
+
+  # gRPC service definitions for Go (client + server interfaces).
+  - remote: buf.build/grpc/go
+    out: gen/go
+    opt: paths=source_relative
+
+  # Python stubs for karum-service-taste and karum-service-ai.
+  - remote: buf.build/protocolbuffers/python
+    out: gen/python
+
+  # gRPC service definitions for Python.
+  - remote: buf.build/grpc/python
+    out: gen/python
+
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: github.com/kaarum/karum-infra/gen/go

@@ -1,0 +1,22 @@
+# Buf module configuration for the shared Karum protos.
+#
+# The module root is this `proto/` directory. Directory layout mirrors the proto
+# package: karum.health.v1 lives at karum/health/v1/*.proto.
+version: v2
+
+modules:
+  - path: .
+
+lint:
+  use:
+    - STANDARD
+  except:
+    # Package version suffix (v1) is already enforced by DIRECTORY_SAME_PACKAGE;
+    # we keep RPC request/response naming conventional.
+    - RPC_REQUEST_RESPONSE_UNIQUE
+    - RPC_REQUEST_STANDARD_NAME
+    - RPC_RESPONSE_STANDARD_NAME
+
+breaking:
+  use:
+    - FILE

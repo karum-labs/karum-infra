@@ -1,0 +1,61 @@
+name: Protos
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "proto/**"
+      - ".github/workflows/proto.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "proto/**"
+      - ".github/workflows/proto.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Buf Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: "1.73.0"
+
+      - name: Lint protos
+        run: buf lint
+        working-directory: proto
+
+  breaking:
+    name: Breaking Change Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Need full history to diff against main.
+          fetch-depth: 0
+
+      - name: Set up buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: "1.73.0"
+
+      # Skip the check on the very first push to main, when there is no
+      # previous commit to compare against.
+      - name: Check breaking changes against main
+        run: |
+          if git rev-parse --verify origin/main >/dev/null 2>&1; then
+            buf breaking --against '.git#branch=main'
+          else
+            echo "No origin/main to compare against; skipping."
+          fi
+        working-directory: proto

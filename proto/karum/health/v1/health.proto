@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+// Package karum.health.v1 is the placeholder shared contract that both
+// microservices implement over gRPC. It exists so `buf generate` and
+// `buf breaking` have a real module to validate from the first commit; the
+// domain protos (vacancy, tags, scoring, taste RPCs, AI RPCs) are added in a
+// later pass per PLAN.md epics 4-6.
+package karum.health.v1;
+
+option go_package = "github.com/kaarum/karum-infra/gen/go/karum/health/v1;healthv1";
+
+// HealthService is implemented by every Karum microservice so the gateway and
+// Compose can probe a process over gRPC as well as HTTP.
+service HealthService {
+  // Check returns the serving status of a single process.
+  rpc Check(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+// HealthCheckRequest asks for the status of one named service.
+message HealthCheckRequest {
+  // service is the stable process name, e.g. "service-taste". An empty value
+  // asks for the overall server status.
+  string service = 1;
+}
+
+// HealthCheckResponse reports the serving status.
+message HealthCheckResponse {
+  // ServingStatus is the current status of the requested service.
+  enum ServingStatus {
+    // SERVING_STATUS_UNSPECIFIED is unset; never sent on the wire.
+    SERVING_STATUS_UNSPECIFIED = 0;
+    // SERVING_STATUS_SERVING means the process is healthy and accepting traffic.
+    SERVING_STATUS_SERVING = 1;
+    // SERVING_STATUS_NOT_SERVING means the process is unhealthy or still booting.
+    SERVING_STATUS_NOT_SERVING = 2;
+    // SERVING_STATUS_DEGRADED means the process is serving but an upstream
+    // dependency is unavailable; it is running its deterministic fallback.
+    SERVING_STATUS_DEGRADED = 3;
+  }
+
+  // status is the serving status of the requested service.
+  ServingStatus status = 1;
+
+  // mode reports how the process is operating: live, fixture, or degraded.
+  // Mirrors the HTTP /health payload so both probes agree.
+  string mode = 2;
+
+  // version is the build version of the serving process.
+  string version = 3;
+}

@@ -1,0 +1,152 @@
+# Karum local stack.
+#
+# Brings up the Go gateway, the two microservices, Redis, and Postgres with
+# healthchecks and a deterministic startup order, so gRPC clients never dial a
+# process that is still booting.
+#
+# Every service builds from its sibling repo directory (../<repo>), so this
+# file expects the five repos to sit next to each other:
+#
+#   kaarum/
+#     kaarum-infra/      (this repo)
+#     karum-client/
+#     karum-server/      -> gateway
+#     karum-service-taste/
+#     karum-service-ai/
+#
+# Usage (from this repo's root):
+#   cp .env.example .env   # optional; defaults boot in fixture mode
+#   docker compose up --build
+#
+# See the README for host ports, where logs go, and how Flutter web points at
+# the gateway.
+
+name: karum
+
+services:
+  # --- Redis: cache for Qloo responses and geocodes. ----------------------
+  redis:
+    image: redis:7-alpine
+    # Persist across restarts within the compose lifecycle.
+    restart: unless-stopped
+    # Only expose to other services, not the host, unless debugging.
+    ports: []
+    healthcheck:
+      # redis-cli ping returns PONG; -e quiets the banner.
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # --- Postgres: vacancies, runs, evidence snapshots, drafts. -------------
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-karum}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-karum}
+      POSTGRES_DB: ${POSTGRES_DB:-karum}
+    # Named volume so data survives `docker compose down` (without -v).
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-karum} -d ${POSTGRES_DB:-karum}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  # --- service-taste: Qloo integration, caching, taste scoring. ----------
+  service-taste:
+    build:
+      context: ../karum-service-taste
+    restart: unless-stopped
+    environment:
+      # Fixture mode makes no outbound Qloo calls; set TASTE_QLOO_API_KEY and
+      # TASTE_MODE=live to hit the real API. The key stays server-side only.
+      TASTE_PORT: "8081"
+      TASTE_MODE: ${TASTE_MODE:-fixture}
+      TASTE_QLOO_API_KEY: ${TASTE_QLOO_API_KEY:-}
+      TASTE_QLOO_BASE_URL: ${TASTE_QLOO_BASE_URL:-https://hackathon.api.qloo.com}
+      TASTE_REDIS_ADDR: redis:6379
+      TASTE_LOG_LEVEL: ${TASTE_LOG_LEVEL:-INFO}
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      # The slim image ships python; probe /health with the stdlib.
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8081/health', timeout=3).status==200 else 1)",
+        ]
+      interval: 5s
+      timeout: 4s
+      retries: 5
+      start_period: 8s
+
+  # --- service-ai: Vertex AI, search grounding, pitch drafting. -----------
+  service-ai:
+    build:
+      context: ../karum-service-ai
+    restart: unless-stopped
+    environment:
+      AI_PORT: "8082"
+      AI_MODE: ${AI_MODE:-fixture}
+      AI_GCP_PROJECT_ID: ${AI_GCP_PROJECT_ID:-}
+      AI_GCP_LOCATION: ${AI_GCP_LOCATION:-us-central1}
+      AI_GEMINI_MODEL: ${AI_GEMINI_MODEL:-gemini-2.5-flash}
+      AI_LOG_LEVEL: ${AI_LOG_LEVEL:-INFO}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8082/health', timeout=3).status==200 else 1)",
+        ]
+      interval: 5s
+      timeout: 4s
+      retries: 5
+      start_period: 8s
+
+  # --- gateway: Go + Gin API gateway. ------------------------------------
+  gateway:
+    build:
+      context: ../karum-server
+    restart: unless-stopped
+    # Publish the gateway to the host so the Flutter web app can reach it.
+    ports:
+      - "${GATEWAY_PORT:-8080}:8080"
+    environment:
+      GATEWAY_PORT: "8080"
+      GATEWAY_MODE: ${GATEWAY_MODE:-fixture}
+      GATEWAY_VERSION: ${GATEWAY_VERSION:-local}
+      # Point the gateway at the compose service names, not localhost.
+      TASTE_ADDR: service-taste:8081
+      AI_ADDR: service-ai:8082
+      REDIS_ADDR: redis:6379
+      POSTGRES_DSN: postgres://${POSTGRES_USER:-karum}:${POSTGRES_PASSWORD:-karum}@postgres:5432/${POSTGRES_DB:-karum}?sslmode=disable
+    depends_on:
+      service-taste:
+        condition: service_healthy
+      service-ai:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      # The runtime image is distroless (no shell/curl), so the binary probes
+      # its own /health endpoint via the -healthcheck flag.
+      test: ["CMD", "/gateway", "-healthcheck"]
+      interval: 5s
+      timeout: 4s
+      retries: 5
+      start_period: 8s
+
+volumes:
+  postgres-data:
