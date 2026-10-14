@@ -115,6 +115,10 @@ These apply across all five repos:
 - Degraded autopilot is visible both as the job state and in `GET /health`.
 - Evidence snapshots are frozen when a run completes; later cache updates do not rewrite history.
 
+## Ownership
+
+Karum is a two-person build — the full record is in [`DECISIONS.md`](DECISIONS.md). **Side A** owns taste, score, agent, and eval; **side B** owns UI, map, drafts, deploy, and Devpost. This repo is shared between them: `proto/` is side A's contract with side B's sign-off, while Compose, Cloud Run, the Makefile, and the fixture pack are side B's. Any change under `proto/` needs a word from both sides first.
+
 ## Licence
 
 MIT. See [`LICENSE`](LICENSE).

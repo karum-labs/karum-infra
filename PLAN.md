@@ -4,7 +4,7 @@ This is the build checklist for the whole system, not only infra. The product is
 
 Today is 12 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Submit on 29 Oct. The old Oct 4–8 coverage window has passed, so the checklist follows dependencies, with fixtures unblocking the team until the hackathon key is verified.
 
-**Status — 14 Oct 2026.** Completed items are ticked below. The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix so they match their remotes (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done so far: repository scaffolding (MIT licences, READMEs, gitignores, CI on each repo), toolchain pins, a `GET /health` endpoint on all three backends, the shared `karum/health/v1` proto placeholder with buf lint and breaking checks, and the five-service Compose stack booting green on fixtures. Epics 2 onward — the Qloo spike, domain protos, scoring, drafts, and the product screens — are untouched.
+**Status — 14 Oct 2026.** Completed items are ticked below. The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix so they match their remotes (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done so far: repository scaffolding (MIT licences, READMEs, gitignores, CI on each repo), toolchain pins, a `GET /health` endpoint on all three backends, the shared `karum/health/v1` proto placeholder with buf lint and breaking checks, and the five-service Compose stack booting green on fixtures. **Section 0 closed 14 Oct:** the decision record lives in [DECISIONS.md](DECISIONS.md) (service map, stack deltas, non-goals, kill rules with the Shelfwise fallback, two-person split), every README carries an ownership note, and the gitleaks secret scan runs in all five repos. Epics 2 onward — the Qloo spike, domain protos, scoring, drafts, and the product screens — are untouched.
 
 ```mermaid
 flowchart TD
@@ -39,11 +39,11 @@ Each epic below has a short implementation note, then five checklist items alrea
 
 Write a one-page service map that assigns every PRODUCT.md must-build to infra, `server`, `service-taste`, `service-ai`, or `client`. Record the stack deltas already chosen: Flutter web, server-rendered PDF, map tiles in the client, Places as pin enrichment, Routes as an optional broker site visit. List the non-goals (login wall on the demo, payments, footfall, scraping, multi-floor planner, custom ML, undocumented Qloo parameters) and the kill rules plus Shelfwise fallback, which keeps the same gRPC boundaries if the coverage gate fails. Name the split: taste, score, agent, and eval on one side; UI, map, drafts, deploy, and Devpost on the other.
 
-- [ ] Write a one-page service map that assigns every PRODUCT.md must-build feature to one service
-- [ ] Record the stack adaptations: Flutter web instead of Next.js, server-rendered PDF, Map tiles in the client, Places as pin enrichment, Routes as an optional broker site visit
-- [ ] Record the out-of-scope list: login wall on the demo, payments, footfall feeds, listing-site scraping, multi-floor mall planner, custom ML, undocumented Qloo parameters
-- [ ] Record the kill rules and the Shelfwise fallback so a failed coverage gate has a named exit that keeps the same service boundaries
-- [ ] Name the two-person split: taste, score, agent, and eval on one side; UI, map, drafts, deploy, and Devpost on the other
+- [x] Write a one-page service map that assigns every PRODUCT.md must-build feature to one service — recorded in [`DECISIONS.md`](DECISIONS.md) §1
+- [x] Record the stack adaptations: Flutter web instead of Next.js, server-rendered PDF, Map tiles in the client, Places as pin enrichment, Routes as an optional broker site visit — `DECISIONS.md` §2
+- [x] Record the out-of-scope list: login wall on the demo, payments, footfall feeds, listing-site scraping, multi-floor mall planner, custom ML, undocumented Qloo parameters — `DECISIONS.md` §3
+- [x] Record the kill rules and the Shelfwise fallback so a failed coverage gate has a named exit that keeps the same service boundaries — `DECISIONS.md` §4, all seven criteria plus the fallback
+- [x] Name the two-person split: taste, score, agent, and eval on one side; UI, map, drafts, deploy, and Devpost on the other — `DECISIONS.md` §5
 
 ### 2. Repositories and legal surface
 
@@ -52,8 +52,8 @@ Create `client`, `server`, `service-taste`, and `service-ai` as siblings of this
 - [x] Create `client`, `server`, `service-taste`, and `service-ai` next to infra, each with an MIT `LICENSE` — done as `karum-client`, `karum-server`, `karum-service-taste`, `karum-service-ai`, all private on `karum-labs`
 - [x] Add a README run path and a licence line suitable for the host's About section
 - [x] Add gitignores for env files, keys, notebook outputs, and build artifacts
-- [ ] Add an ownership note matching the two-person split
-- [x] Add a secret scan so Qloo and GCP credentials cannot be committed — gitleaks config and workflow live in infra; the same workflow still needs adding to the four service repos
+- [x] Add an ownership note matching the two-person split — an `## Ownership` section naming each repo's side now sits in all five READMEs, pointing at `DECISIONS.md`
+- [x] Add a secret scan so Qloo and GCP credentials cannot be committed — gitleaks config and workflow live in infra and are now byte-identical copies in all four service repos
 
 ### 3. Toolchains
 
