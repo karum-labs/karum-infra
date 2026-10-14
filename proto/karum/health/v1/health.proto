@@ -7,7 +7,7 @@ syntax = "proto3";
 // later pass per PLAN.md epics 4-6.
 package karum.health.v1;
 
-option go_package = "github.com/kaarum/karum-infra/gen/go/karum/health/v1;healthv1";
+option go_package = "github.com/karum-labs/karum-infra/gen/go/karum/health/v1;healthv1";
 
 // HealthService is implemented by every Karum microservice so the gateway and
 // Compose can probe a process over gRPC as well as HTTP.

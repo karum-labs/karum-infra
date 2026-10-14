@@ -4,6 +4,8 @@ This is the build checklist for the whole system, not only infra. The product is
 
 Today is 12 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Submit on 29 Oct. The old Oct 4–8 coverage window has passed, so the checklist follows dependencies, with fixtures unblocking the team until the hackathon key is verified.
 
+**Status — 14 Oct 2026.** Completed items are ticked below. The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix so they match their remotes (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done so far: repository scaffolding (MIT licences, READMEs, gitignores, CI on each repo), toolchain pins, a `GET /health` endpoint on all three backends, the shared `karum/health/v1` proto placeholder with buf lint and breaking checks, and the five-service Compose stack booting green on fixtures. Epics 2 onward — the Qloo spike, domain protos, scoring, drafts, and the product screens — are untouched.
+
 ```mermaid
 flowchart TD
   client[Flutter client]
@@ -47,21 +49,21 @@ Write a one-page service map that assigns every PRODUCT.md must-build to infra, 
 
 Create `client`, `server`, `service-taste`, and `service-ai` as siblings of this repo, each with an MIT `LICENSE` and a README whose run path and licence line can be pasted into the host About section. Add gitignores for `.env`, key files, notebook outputs, and build artifacts, plus an ownership note that matches the two-person split. Add a secret scan (gitleaks or equivalent) so a committed Qloo `X-Api-Key` or GCP credential fails before it lands on the remote.
 
-- [ ] Create `client`, `server`, `service-taste`, and `service-ai` next to infra, each with an MIT `LICENSE`
-- [ ] Add a README run path and a licence line suitable for the host's About section
-- [ ] Add gitignores for env files, keys, notebook outputs, and build artifacts
+- [x] Create `client`, `server`, `service-taste`, and `service-ai` next to infra, each with an MIT `LICENSE` — done as `karum-client`, `karum-server`, `karum-service-taste`, `karum-service-ai`, all private on `karum-labs`
+- [x] Add a README run path and a licence line suitable for the host's About section
+- [x] Add gitignores for env files, keys, notebook outputs, and build artifacts
 - [ ] Add an ownership note matching the two-person split
-- [ ] Add a secret scan so Qloo and GCP credentials cannot be committed
+- [x] Add a secret scan so Qloo and GCP credentials cannot be committed — gitleaks config and workflow live in infra; the same workflow still needs adding to the four service repos
 
 ### 3. Toolchains
 
 Pin Go, Python, and Flutter versions in infra so the other four repos read one source of truth. Check in gofmt, ruff, and `flutter analyze` config, plus buf lint and `buf breaking` against `main` for `infra/proto`. The infra Makefile exposes `up`, `down`, `test`, `prewarm`, and `eval`. Each repo’s CI runs its linter and unit tests on push.
 
-- [ ] Pin Go, Python, and Flutter versions in infra
-- [ ] Add gofmt, ruff, and `flutter analyze` config
-- [ ] Add buf lint and breaking-change checks for protos
-- [ ] Add an infra Makefile with `up`, `down`, `test`, `prewarm`, and `eval`
-- [ ] Add CI that runs lint and unit tests on each repo
+- [x] Pin Go, Python, and Flutter versions in infra — `versions.env` (Go 1.26.0, Python 3.13, uv 0.13.1, Flutter 3.47.6, Dart 3.13.5, buf 1.73.0)
+- [x] Add gofmt, ruff, and `flutter analyze` config — enforced in each repo's CI
+- [x] Add buf lint and breaking-change checks for protos — both run in `proto.yml`
+- [x] Add an infra Makefile with `up`, `down`, `test`, `prewarm`, and `eval` — `prewarm` and `eval` are TODO stubs until fixtures exist
+- [x] Add CI that runs lint and unit tests on each repo
 
 ## 1. Contracts and local platform
 
@@ -72,7 +74,7 @@ In `infra/proto`, define the messages every service shares: vacancy, constraint,
 - [ ] Define vacancy, constraint, geopoint, entity ref, tag, sub-score, ranked candidate, do-not-lease, evidence call, and trace event
 - [ ] Define job states: resolving, awaiting confirmation, running, ready, degraded, failed
 - [ ] Define error codes: unresolved, empty, rate limited, implausible brand, upstream, validation
-- [ ] Version the proto package and enforce buf breaking checks against main
+- [x] Version the proto package and enforce buf breaking checks against main — `buf breaking` runs in CI; only the `karum/health/v1` placeholder exists so far, domain messages still to define
 - [ ] Mark each field as a Qloo fact or a model inference in the proto comments
 
 ### 5. Taste RPCs
@@ -109,11 +111,11 @@ Define the `service-ai` gRPC service. `ProbeShortlist` checks contradictions and
 
 `docker compose` brings up the Go gateway, taste, AI, Redis, and Postgres, with healthchecks and a fixed startup order so gRPC clients do not dial a process that is still booting. `.env.example` lists every variable and which process reads it. One Make target posts the sample vacancy in fixture mode and prints the shortlist JSON. Document host ports, where logs go, and the Flutter base-URL setting that points web at the gateway.
 
-- [ ] Compose gateway, taste, AI, Redis, and Postgres
-- [ ] Add healthchecks and a deterministic startup order
-- [ ] Add `.env.example` listing every variable and which process reads it
+- [x] Compose gateway, taste, AI, Redis, and Postgres — all five containers boot healthy
+- [x] Add healthchecks and a deterministic startup order — `service_healthy` gates plus a `-healthcheck` flag for the distroless gateway
+- [x] Add `.env.example` listing every variable and which process reads it
 - [ ] Add one command that runs the sample vacancy on fixtures and prints the shortlist JSON
-- [ ] Document ports, logs, and how Flutter web points at the gateway
+- [x] Document ports, logs, and how Flutter web points at the gateway
 
 ## 2. Coverage gate
 
@@ -379,11 +381,11 @@ A CLI in infra or the gateway assembles about twenty blocks, each with a known s
 
 Ship Flutter web as the judge target and keep the same screens on desktop. The shared theme defines type scale, cards, chips, banners, and drawers, and every screen implements loading, empty, and error states against the gateway’s job states. Sample and free-entry analyses run with no account. The gateway base URL is a compile-time or env config so local Compose and the production host are a switch, not a code change.
 
-- [ ] Ship Flutter web as the judge target, with the same screens on desktop
-- [ ] Add theme, type scale, cards, chips, banners, and drawers
-- [ ] Add loading, empty, and error states on every screen
+- [x] Ship Flutter web as the judge target, with the same screens on desktop — web + windows targets build and analyse clean
+- [ ] Add theme, type scale, cards, chips, banners, and drawers — theme, type scale, cards, chips, and the mode banner exist; drawers still to add
+- [x] Add loading, empty, and error states on every screen — shared widgets wired into the app shell
 - [ ] Let a sample and a free-entry analysis run with no account
-- [ ] Configure the gateway base URL for local and production
+- [x] Configure the gateway base URL for local and production — `--dart-define=GATEWAY_URL`
 
 ### 35. Accessibility and layout
 
@@ -534,7 +536,7 @@ Expose one MCP tool whose input is an address plus neighbours and whose output i
 - [ ] Expose one tool that accepts an address and neighbours and returns the shortlist JSON
 - [ ] Call the gateway so evidence rules stay in one place
 - [ ] Protect it with a documented, rate-limited demo token
-- [ ] State in the README that the judge path is the web app
+- [x] State in the README that the judge path is the web app
 - [ ] Ship the flag off until the core demo is green
 
 ## 8. Proof and failure
@@ -575,7 +577,7 @@ An `unresolved` or `empty` result is rendered as a miss in the API and in the UI
 
 Write Dockerfiles for the Go gateway, taste, and AI, and publish the Flutter web build on the public demo host. Infra holds the Cloud Run service manifests and the env wiring that points each service at the others. Secrets live in a secret manager; a preview revision can boot in fixture mode with no Qloo key. CORS allows only the client origin, and the Qloo key is injected into taste, never into the browser.
 
-- [ ] Dockerfiles for gateway, taste, and AI
+- [x] Dockerfiles for gateway, taste, and AI — all three build and run in Compose (distroless gateway, uv multi-stage Python images)
 - [ ] Publish the Flutter web build on the public demo host
 - [ ] Add Cloud Run manifests and env wiring in infra
 - [ ] Store secrets in a secret manager, and allow preview to run on fixtures
@@ -605,7 +607,7 @@ Generate a trace id on `POST /api/v1/analyses` and propagate it from Flutter thr
 
 The public README covers the five-repo layout, the Compose run path, the honesty rules, and the MIT licence line. Devpost text maps the build onto the four judging criteria and includes the leave-one-out table. Screenshots show the sample shortlist, a do-not-lease card, the evidence drawer, and the baseline toggle. Check team size, originality, and API-key terms against the rules page before submit. Submit at least 24 hours before 30 Oct 2026, 11:45pm EDT.
 
-- [ ] README with architecture, local run, honesty rules, and licence
+- [x] README with architecture, local run, honesty rules, and licence — lives in the infra README; adapt it for the public submission when the demo ships
 - [ ] Devpost text mapped to the four judging criteria, including the eval result
 - [ ] Screenshots of the sample, the do-not-lease card, the evidence drawer, and the baseline toggle
 - [ ] Check team size, originality, and key terms against the rules page

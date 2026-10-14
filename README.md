@@ -1,4 +1,4 @@
-# kaarum-infra
+# karum-infra
 
 Shared **protos, local Docker Compose, toolchain pins, and Cloud Run manifests** for [Karum](#readme) — a tenant-mix leasing agent that tells retail landlords what an empty storefront should become.
 
@@ -8,11 +8,11 @@ Karum reads the cultural taste of a surrounding block via **Qloo**, scores candi
 
 | Repo | Role |
 | --- | --- |
-| **`kaarum-infra`** (this repo) | Shared protos, Compose, Cloud Run, fixture pack, Makefile, toolchain pins |
-| [`karum-client`](https://github.com/kaarum/karum-client) | Flutter UI (web is the judge target; same screens on desktop) |
-| [`karum-server`](https://github.com/kaarum/karum-server) | Go + Gin API gateway — geocoding, job orchestration, SSE, persistence |
-| [`karum-service-taste`](https://github.com/kaarum/karum-service-taste) | Qloo integration, entity resolution, caching, taste scoring |
-| [`karum-service-ai`](https://github.com/kaarum/karum-service-ai) | Vertex AI, Google Search grounding, pitch drafting |
+| **`karum-infra`** (this repo) | Shared protos, Compose, Cloud Run, fixture pack, Makefile, toolchain pins |
+| [`karum-client`](https://github.com/karum-labs/karum-client) | Flutter UI (web is the judge target; same screens on desktop) |
+| [`karum-server`](https://github.com/karum-labs/karum-server) | Go + Gin API gateway — geocoding, job orchestration, SSE, persistence |
+| [`karum-service-taste`](https://github.com/karum-labs/karum-service-taste) | Qloo integration, entity resolution, caching, taste scoring |
+| [`karum-service-ai`](https://github.com/karum-labs/karum-service-ai) | Vertex AI, Google Search grounding, pitch drafting |
 
 ```text
 [ Flutter Client ]

@@ -28,4 +28,4 @@ managed:
   enabled: true
   override:
     - file_option: go_package_prefix
-      value: github.com/kaarum/karum-infra/gen/go
+      value: github.com/karum-labs/karum-infra/gen/go

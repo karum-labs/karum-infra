@@ -7,8 +7,8 @@
 # Every service builds from its sibling repo directory (../<repo>), so this
 # file expects the five repos to sit next to each other:
 #
-#   kaarum/
-#     kaarum-infra/      (this repo)
+#   karum/
+#     karum-infra/      (this repo)
 #     karum-client/
 #     karum-server/      -> gateway
 #     karum-service-taste/
