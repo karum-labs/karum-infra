@@ -1,0 +1,11 @@
+{
+	// Keep saves in line with what CI enforces (buf lint / prettier-free
+	// YAML is formatted by the Red Hat extension).
+	"editor.formatOnSave": true,
+	"[yaml]": {
+		"editor.defaultFormatter": "redhat.vscode-yaml"
+	},
+	"[markdown]": {
+		"editor.wordWrap": "on"
+	}
+}

@@ -49,13 +49,20 @@ jobs:
         with:
           version: "1.73.0"
 
-      # Skip the check on the very first push to main, when there is no
-      # previous commit to compare against.
-      - name: Check breaking changes against main
+      # Compare against the commit the push replaced, or the PR base. The
+      # helper script materialises that commit with `git worktree` because
+      # buf's `.git#branch=...` reference resolves to the repository root
+      # while the buf module lives in proto/. It skips cleanly when no base
+      # is available — e.g. the very first push to a branch.
+      - name: Check breaking changes against base
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          if git rev-parse --verify origin/main >/dev/null 2>&1; then
-            buf breaking --against '.git#branch=main'
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            BASE="$PR_BASE_SHA"
           else
-            echo "No origin/main to compare against; skipping."
+            BASE="$BEFORE_SHA"
           fi
-        working-directory: proto
+          python3 scripts/breaking.py --base "$BASE"

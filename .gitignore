@@ -17,7 +17,17 @@ coverage.out
 
 # IDE / editor
 .idea/
-.vscode/
+
+# VS Code: share the team settings with the repo, keep personal launch
+# configurations and tasks out of it.
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# Scratch space created by local tooling; never commit it.
+.freebuff/
 *.swp
 *.swo
 .DS_Store

@@ -11,7 +11,7 @@ BUF ?= buf
 
 ## help: list available targets.
 help:
-	@grep -E '^## ' $(MAKEFILE_LIST) | sed 's/## //'
+	@python -c "import re,sys;print(*re.findall(r'^## (.*)',open(sys.argv[1],encoding='utf-8').read(),re.M),sep=chr(10))" "$(firstword $(MAKEFILE_LIST))"
 
 ## up: build and start the full stack in the background, then wait for healthy.
 up:
@@ -47,9 +47,9 @@ eval:
 lint-proto:
 	cd proto && $(BUF) lint
 
-## breaking: check the protos against the main branch for breaking changes.
+## breaking: check the protos against origin/main for breaking changes.
 breaking:
-	cd proto && $(BUF) breaking --against '.git#branch=main'
+	@python scripts/breaking.py --buf "$(BUF)"
 
 ## generate: emit Go and Python stubs from the shared protos.
 generate:
