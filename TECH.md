@@ -4,7 +4,7 @@ Yes, you can split them into two separate microservices and two distinct reposit
 
 ```text
 ├── infra/            # Shared Protobufs, Docker Compose, and Cloud Run manifests
-├── client/           # Flutter UI (mobile / desktop / web)
+├── client/           # Flutter web UI (judge target; same screens on desktop — no mobile app)
 ├── server/           # Go + Gin API Gateway (routes traffic, orchestrates jobs)
 ├── service-taste/    # Microservice 1: Qloo API integration, caching, & taste scoring
 └── service-ai/       # Microservice 2: Vertex AI, Google Search Grounding, & pitch drafting

@@ -393,17 +393,20 @@ The judge types three real neighbouring venues on a block they know. Karum rejec
 - **After (Karum):** a ranked, block-specific shortlist with saturation checks, a co-tenancy rationale traced to real venues' audiences, a list of what to avoid, and ready-to-send outreach.
 
 ### Technical architecture (deliberately simple)
-- **Frontend:** Next.js (App Router) with Tailwind, MapLibre GL using free OSM/CARTO tiles, and react-pdf for the memo.
-- **Backend:** Next.js route handlers (or a single FastAPI service if you prefer Python). The Qloo key stays server-side only.
+
+> **Superseded — the build uses Flutter web.** This Next.js sketch was the pre-build idea. The settled stack is a **Flutter web client** (the judge target; the same screens also run on desktop), a Go + Gin API gateway, and Python gRPC microservices across five repos. The memo PDF is server-rendered by the gateway (no react-pdf), map tiles are drawn directly in the Flutter client, and deployment is Cloud Run, not Vercel. The full record is in [DECISIONS.md](DECISIONS.md) §2 and [TECH.md](TECH.md). The bullets below are kept only as the original brief.
+
+- **Frontend:** ~~Next.js (App Router) with Tailwind, MapLibre GL using free OSM/CARTO tiles, and react-pdf for the memo.~~ **Flutter web** draws OSM/CARTO tiles in-app; the memo PDF is rendered server-side.
+- **Backend:** ~~Next.js route handlers (or a single FastAPI service if you prefer Python).~~ Go + Gin API gateway plus the Python microservices; the Qloo key stays server-side only.
 - **Model:** any tool-calling LLM (Claude, GPT or Gemini), with a deterministic "autopilot" fallback strategy for when the LLM fails. TasteBridge uses this same pattern.
-- **Agent framework:** a hand-rolled tool loop, or the Vercel AI SDK. Avoid heavy frameworks.
+- **Agent framework:** a hand-rolled tool loop. Avoid heavy frameworks. (The Vercel AI SDK from the original sketch does not apply to the Go/Python backend.)
 - **Qloo:** a typed client with retries. Every call is logged into a trace object sent to the UI.
 - **Database:** SQLite or Supabase Postgres for saved vacancies and cached Qloo responses.
 - **External APIs:** a geocoder (Nominatim or Mapbox free tier); optional email via Resend.
-- **Deployment:** Vercel or Cloudflare. Keep a public, no-login demo mode, because judges need unrestricted access.
+- **Deployment:** Cloud Run, with a static host for the Flutter web build. Keep a public, no-login demo mode, because judges need unrestricted access.
 - **Authentication:** none for the demo; magic-link login for saved vacancies.
 - **Caching:** cache Qloo responses by parameter hash for 24h, and pre-warm the sample blocks.
-- **Monitoring:** Vercel logs plus a `/health` endpoint that reports Qloo live or fallback mode. Per-IP rate limiting.
+- **Monitoring:** Cloud Run logs plus a `/health` endpoint that reports Qloo live or fallback mode. Per-IP rate limiting.
 
 # 3-MINUTE JUDGE DEMO (exact sequence of interactions)
 
