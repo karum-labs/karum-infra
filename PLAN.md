@@ -99,7 +99,7 @@ Define the `service-ai` gRPC service. `ProbeShortlist` checks contradictions and
 
 ### 7. Stubs and fixtures
 
-`buf generate` emits Go stubs for the gateway and Python stubs for taste and AI, and CI runs that generate step inside Docker so laptop and CI stubs match. Ship a redacted fixture pack of recorded Qloo and model payloads for two sample blocks. Fixture mode serves those recordings and makes no outbound network calls. A contract test round-trips the sample messages through both generated stubs.
+`buf generate` emits Go stubs for the gateway and Python stubs for taste and AI, and CI runs that generate step inside Docker so laptop and CI stubs match. Ship a redacted fixture pack of recorded Qloo and model payloads for two sample blocks — **redacted, not raw**: Qloo's terms forbid storing their response data in a public repository, and the Devpost submission requires public repos, so strip anything Qloo considers their data down to the fields Karum consumes (see [QLOO_APIS.md](QLOO_APIS.md) §1). Fixture mode serves those recordings and makes no outbound network calls. A contract test round-trips the sample messages through both generated stubs.
 
 - [ ] Generate Go and Python stubs from `infra/proto` in CI
 - [ ] Generate inside Docker so local and CI stubs match
@@ -121,13 +121,13 @@ Define the `service-ai` gRPC service. `ProbeShortlist` checks contradictions and
 
 ### 9. Qloo spike
 
-Hit `https://hackathon.api.qloo.com` with the `X-Api-Key` header and confirm which of search, tags, insights, heatmap, and compare the key is allowed to call. Spike place, brand, tag, and demographics responses, and compare `filter.location.query` against radius so the real granularity is written down before scoring code assumes a radius. Record heatmap and compare as available or unavailable. Save the redacted raw JSON as the first fixture files the later replay tests load.
+Hit `https://hackathon.api.qloo.com` with the `X-Api-Key` header and work the spike checklist in [QLOO_APIS.md](QLOO_APIS.md) §5. Settle the open questions before any client code: which location parameter narrows `urn:entity:brand` (Qloo's entity-type guide omits location for brands while the location use case advertises it); whether `urn:tag`, `urn:demographics`, and `urn:heatmap` return data or a 403; whether `feature.explainability=true` is accepted and what shape it returns; and that `filter.location.radius=400` genuinely filters at 400 m, which settles the kill-rule-1 granularity question. Mind the unit split — `/search` takes `filter.radius` in miles, Insights takes `filter.location.radius` in metres, WKT is longitude-first while a bare pair is latitude-first. Record 429 headers and quota headroom, and the density of `filter.popularity` and `filter.price_level` for retail brands in the demo cities. Save the redacted raw JSON as the first fixture files the later replay tests load.
 
-- [ ] Confirm the hackathon base URL, header, and allowed endpoints
-- [ ] Spike search, tags, and insights for place, brand, tag, and demographics
-- [ ] Spike location query versus radius and write down the real granularity
-- [ ] Spike heatmap and compare and record available or unavailable
-- [ ] Save redacted raw responses as the first fixtures
+- [ ] Confirm the hackathon base URL, header, and allowed endpoints — all documented endpoints are live; `/recs` and `/recommendations` are forbidden
+- [ ] Spike search, tags, and insights for place, brand, tag, and demographics — check `urn:tag` / `urn:demographics` / `urn:heatmap` for 403s
+- [ ] Spike location filtering: brand candidates at point/radius granularity and the `filter.location.radius` behaviour, writing down the real granularity
+- [ ] Spike heatmap, compare, and `feature.explainability`, recording availability and response shape
+- [ ] Save redacted raw responses as the first fixtures — never raw Qloo JSON, since fixtures ship public with the Devpost submission
 
 ### 10. City choice
 
@@ -173,11 +173,11 @@ Build the taste-service HTTP client with one typed method per endpoint the spike
 
 ### 14. Block profile queries
 
-`GetBlockProfile` takes confirmed neighbour entity ids and fans out the verified insights calls: taste tags, brand affinities with the location filter the spike settled, category presence for the saturation check, and demographics for the top candidates. Independent calls run in parallel under a fan-out cap so one block cannot stampede Qloo. The response is the raw-enough payload scoring needs, plus the evidence-call records the drawer will list.
+`GetBlockProfile` takes confirmed neighbour entity ids and fans out the verified insights calls: taste tags, brand affinities with the location filter the spike settled, category presence for the saturation check, and demographics for the top candidates. The brand call sends `feature.explainability=true` so each candidate carries Qloo's own per-input contribution scores for the evidence drawer. Independent calls run in parallel under a fan-out cap so one block cannot stampede Qloo. The response is the raw-enough payload scoring needs, plus the evidence-call records the drawer will list. Recipes: [QLOO_APIS.md](QLOO_APIS.md) §3.
 
 - [ ] Fetch taste tags from confirmed neighbour ids
-- [ ] Fetch brand affinities with the verified location filter
-- [ ] Fetch category presence for the saturation check
+- [ ] Fetch brand affinities with the location filter the spike settled, with `feature.explainability=true`
+- [ ] Fetch category presence for the saturation check — `filter.location` + `filter.location.radius` in metres
 - [ ] Fetch demographics for the top candidates
 - [ ] Run independent calls in parallel under a fan-out cap
 
@@ -449,7 +449,7 @@ Render the five `RankedCandidate`s as cards with three labeled sub-score bars (c
 
 ### 41. Evidence and counterfactual
 
-The evidence drawer lists each `EvidenceCall`: the Qloo endpoint, the parameters, and the result count, plus which neighbour audiences carried the affinity. Style Qloo-fact fields and model-inference fields differently, using the split marked in the proto comments. The LLM-only toggle requests `LlmOnlyBaseline` for the same inputs and labels it ungrounded. Copy-evidence writes the drawer as plain text.
+The evidence drawer lists each `EvidenceCall`: the Qloo endpoint, the parameters, and the result count, plus which neighbour audiences carried the affinity — read straight from `query.explainability` when the spike confirms `feature.explainability=true` (see [QLOO_APIS.md](QLOO_APIS.md) §3.8), falling back to derived attribution only if it is unavailable. Style Qloo-fact fields and model-inference fields differently, using the split marked in the proto comments. The LLM-only toggle requests `LlmOnlyBaseline` for the same inputs and labels it ungrounded. Copy-evidence writes the drawer as plain text.
 
 - [ ] Drawer listing each Qloo call, its parameters, and its result count
 - [ ] Show which neighbour audiences carried the affinity

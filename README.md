@@ -30,6 +30,7 @@ Karum reads the cultural taste of a surrounding block via **Qloo**, scores candi
 ## What lives here
 
 - **`proto/`** — the shared protobuf definitions and buf configuration. `karum.health.v1` is the placeholder contract the two microservices implement; the domain protos (vacancy, tags, scoring, taste RPCs, AI RPCs) land in a later pass.
+- **`QLOO_APIS.md`** — every Qloo endpoint Karum may call with exact parameters, mapped to PLAN epics, plus the spike checklist for the open questions.
 - **`docker-compose.yml`** — the full local stack (gateway, taste, AI, Redis, Postgres) with healthchecks and a deterministic startup order.
 - **`.env.example`** — every environment variable and which process reads it.
 - **`versions.env`** — the single source of truth for Go, Python, Flutter, and buf versions.
