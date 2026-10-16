@@ -2,9 +2,9 @@
 
 This is the build checklist for the whole system, not only infra. The product is the vacancy-to-tenant leasing agent in [PRODUCT.md](PRODUCT.md). The shape is the five-repo split in [TECH.md](TECH.md): Flutter client, Go gateway, `service-taste`, `service-ai`, and this infra repo for protos, Compose, and Cloud Run.
 
-Today is 12 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Submit on 29 Oct. The old Oct 4–8 coverage window has passed, so the checklist follows dependencies, with fixtures unblocking the team until the hackathon key is verified.
+Today is 16 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Submit on 29 Oct. The old Oct 4–8 coverage window has passed, so the checklist follows dependencies, with fixtures unblocking the team until the hackathon key is verified.
 
-**Status — 14 Oct 2026.** Completed items are ticked below. The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix so they match their remotes (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done so far: repository scaffolding (MIT licences, READMEs, gitignores, CI on each repo), toolchain pins, a `GET /health` endpoint on all three backends, the shared `karum/health/v1` proto placeholder with buf lint and breaking checks, and the five-service Compose stack booting green on fixtures. **Section 0 closed 14 Oct:** the decision record lives in [DECISIONS.md](DECISIONS.md) (service map, stack deltas, non-goals, kill rules with the Shelfwise fallback, two-person split), every README carries an ownership note, and the gitleaks secret scan runs in all five repos. Epics 2 onward — the Qloo spike, domain protos, scoring, drafts, and the product screens — are untouched.
+**Status — 16 Oct 2026.** Completed items are ticked below. The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix so they match their remotes (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done so far: repository scaffolding (MIT licences, READMEs, gitignores, CI on each repo), toolchain pins, a `GET /health` endpoint on all three backends, the shared `karum/health/v1` proto placeholder with buf lint and breaking checks, and the five-service Compose stack booting green on fixtures. **Section 0 closed 14 Oct:** the decision record lives in [DECISIONS.md](DECISIONS.md) (service map, stack deltas, non-goals, kill rules with the Shelfwise fallback, two-person split), every README carries an ownership note, and the gitleaks secret scan runs in all five repos. Epics 2 onward — the Qloo spike, domain protos, scoring, drafts, and the product screens — are untouched. **Docs synced 16 Oct:** [QLOO_APIS.md](QLOO_APIS.md) was rebuilt against the 16 Oct docs snapshot — parameter catalogue, a 22-item spike checklist, and the DI-1…DI-20 register — and [PRODUCT.md](PRODUCT.md) was re-aligned; epic 9 below maps onto that checklist, and no completed build item changed status.
 
 ```mermaid
 flowchart TD
@@ -31,7 +31,7 @@ Service ownership:
 - **server:** geocoding, job orchestration, confirmation pause, Places enrichment, optional site-visit route, Postgres, rate limits, SSE
 - **client:** judge-ready Flutter web UI, plus the same screens on desktop
 
-Each epic below has a short implementation note, then five checklist items already in implementation order. After the local stack boots on fixtures, client shell work can run in parallel with taste and AI.
+Each epic below has a short implementation note, then a short checklist in implementation order. After the local stack boots on fixtures, client shell work can run in parallel with taste and AI — start epics 34–38 against fixture mode as soon as the domain protos land (4–7), because the schedule assumes that overlap. If the calendar tightens, cut in this order without touching the three-minute judge path: MCP tool (49), brand-side view (48), saved vacancies and magic-link sign-in (43), the compare chart (16), the site-visit route (32), then diff and scheduled watch (30).
 
 ## 0. Lock the shape
 
@@ -121,12 +121,16 @@ Define the `service-ai` gRPC service. `ProbeShortlist` checks contradictions and
 
 ### 9. Qloo spike
 
-Hit `https://hackathon.api.qloo.com` with the `X-Api-Key` header and work the spike checklist in [QLOO_APIS.md](QLOO_APIS.md) §5. Settle the open questions before any client code: which location parameter narrows `urn:entity:brand` (Qloo's entity-type guide omits location for brands while the location use case advertises it); whether `urn:tag`, `urn:demographics`, and `urn:heatmap` return data or a 403; whether `feature.explainability=true` is accepted and what shape it returns; and that `filter.location.radius=400` genuinely filters at 400 m, which settles the kill-rule-1 granularity question. Mind the unit split — `/search` takes `filter.radius` in miles, Insights takes `filter.location.radius` in metres, WKT is longitude-first while a bare pair is latitude-first. Record 429 headers and quota headroom, and the density of `filter.popularity` and `filter.price_level` for retail brands in the demo cities. Save the redacted raw JSON as the first fixture files the later replay tests load.
+Hit `https://hackathon.api.qloo.com` with the `X-Api-Key` header and work the spike checklist in [QLOO_APIS.md](QLOO_APIS.md) §5 — its 22 items are the script. Time-box it: items 1, 2, 4–8, 10, and 11 gate the must-builds and settle the names client code may use — run them first; 3 and 16 follow for the heatmap and card hydration; 9 and 12–22 run only when a feature depends on them (trending is already out). Settle the open questions before any client code: which location parameter narrows `urn:entity:brand`, probing `filter.location=POINT(<lon> <lat>)`, `signal.location`, `signal.location.query`, `filter.location.query`, then `filter.location.metro` in that order (the entity-type guide omits location for brands while the location use case advertises it — §3.4); whether `urn:tag` and `urn:demographics` return data or a 403 (both enum-absent, DI-2; `urn:entity:destination` is enum-absent too, while `urn:heatmap` is enum-confirmed); whether `feature.explainability=true` is accepted and what shape it returns; and that `filter.location.radius=400` genuinely filters at 400 m, which settles the kill-rule-1 granularity question. Mind the unit split — `/search` takes `filter.radius` in miles, Insights takes `filter.location.radius` in metres, WKT is longitude-first while a bare pair is latitude-first. Expect silently ignored parameters: a 200 is not proof. Record 429 headers and quota headroom, and the density of `filter.popularity` and `filter.price_level` for retail brands in the demo cities. Save the redacted raw JSON as the first fixture files the later replay tests load.
 
-- [ ] Confirm the hackathon base URL, header, and allowed endpoints — all documented endpoints are live; `/recs` and `/recommendations` are forbidden
-- [ ] Spike search, tags, and insights for place, brand, tag, and demographics — check `urn:tag` / `urn:demographics` / `urn:heatmap` for 403s
+- [ ] Confirm the hackathon key is in hand — the request takes a few business days; probe `GET /` for API info and record the monthly quota before the spike leans on it
+- [ ] Confirm the hackathon base URL, header, and allowed endpoints — all documented endpoints are live; `/recs` and `/recommendations` are forbidden; one POST attempt confirms the GET-only surface (spike 10, DI-3)
+- [ ] Spike search, tags, and insights for place, brand, tag, and demographics — `urn:tag` and `urn:demographics` are the 403 risks (enum-absent, DI-2); note `urn:entity:destination` is also enum-absent
 - [ ] Spike location filtering: brand candidates at point/radius granularity and the `filter.location.radius` behaviour, writing down the real granularity
-- [ ] Spike heatmap, compare, and `feature.explainability`, recording availability and response shape
+- [ ] Spike heatmap, compare, and `feature.explainability`, recording availability and response shape — heatmap boundary literals (DI-12) and the compare parameters (spike 19) included
+- [ ] Settle the §9 name-variant conflicts with paired calls: the Resy triple (DI-4), `price_range.from/.to` vs `.min/.max` (DI-5), `operator.filter.exclude.tags` vs `operator.exclude.tags` (DI-13), and legacy `filter.entities` vs `filter.results.entities` (DI-14)
+- [ ] Verify each parameter against a no-parameter baseline before it reaches client code — unsupported parameters are silently ignored, so a 200 is not proof
+- [ ] Record each settled answer: tick the §5 item, close the §9 row with a date, and carry the result into the dependent epic (11–16)
 - [ ] Save redacted raw responses as the first fixtures — never raw Qloo JSON, since fixtures ship public with the Devpost submission
 
 ### 10. City choice
@@ -153,7 +157,7 @@ Build the taste-service HTTP client with one typed method per endpoint the spike
 
 ### 12. Entity resolution
 
-`ResolveEntities` calls `GET /search` for places using the neighbour name plus the vacancy point — `filter.location=<lat>,<lon>` with `filter.radius` in **miles**, disambiguated by `filter.address` (recipe: [QLOO_APIS.md](QLOO_APIS.md) §3.1) — and returns the top five candidates with a confidence. The same RPC searches brands when the caller passes a user shortlist. Low-confidence and ambiguous hits are flagged so the gateway can pause for confirmation instead of guessing an entity id. A total miss is an explicit `unresolved` error, not an empty success. Cache both hits and negative lookups under a short TTL.
+`ResolveEntities` calls `GET /search` for places using the neighbour name plus the vacancy point — `filter.location=<lat>,<lon>` with `filter.radius` in **miles**, disambiguated by `filter.address` (recipe: [QLOO_APIS.md](QLOO_APIS.md) §3.1) — and returns the top five candidates with a derived confidence — rank, distance, and name match, marked as a model inference in the proto because `/search` publishes no score ([QLOO_APIS.md](QLOO_APIS.md) §3.1). The same RPC searches brands when the caller passes a user shortlist. Low-confidence and ambiguous hits are flagged so the gateway can pause for confirmation instead of guessing an entity id. A total miss is an explicit `unresolved` error, not an empty success. Cache both hits and negative lookups under a short TTL.
 
 - [ ] Search places with neighbour name plus vacancy point (`filter.location` + `filter.radius` in miles) and return the top five
 - [ ] Search brands for a user shortlist
@@ -163,7 +167,7 @@ Build the taste-service HTTP client with one typed method per endpoint the spike
 
 ### 13. Tag and constraint resolution
 
-`ResolveTags` maps the product chips (no F&B, fitness, eyewear, and the other sample-block chips) onto tag URNs the spike verified. Free-text constraints are accepted only when tag search returns a confident hit; otherwise the constraint is returned unresolved for the UI to show. An allow-list of tag types limits what scoring and the memo will try to explain. Fixture tests cover every chip the two sample blocks send.
+`ResolveTags` maps the product chips (no F&B, fitness, eyewear, and the other sample-block chips) onto tag URNs the spike verified. Free-text constraints are accepted only when tag search returns a confident hit — the score is derived from the typo/semantic hit and name similarity and marked as an inference, since `/v2/tags` publishes no score ([QLOO_APIS.md](QLOO_APIS.md) §3.2); otherwise the constraint is returned unresolved for the UI to show. An allow-list of tag types limits what scoring and the memo will try to explain. Fixture tests cover every chip the two sample blocks send.
 
 - [ ] Map product chips such as no F&B, fitness, and eyewear to verified tag URNs
 - [ ] Accept free-text constraints only when tag search returns a confident hit
@@ -173,9 +177,9 @@ Build the taste-service HTTP client with one typed method per endpoint the spike
 
 ### 14. Block profile queries
 
-`GetBlockProfile` takes confirmed neighbour entity ids and fans out the verified insights calls: taste tags, brand affinities with the location filter the spike settled, category presence for the saturation check, and demographics for the top candidates. The brand call sends `feature.explainability=true` so each candidate carries Qloo's own per-input contribution scores for the evidence drawer. Independent calls run in parallel under a fan-out cap so one block cannot stampede Qloo. The response is the raw-enough payload scoring needs, plus the evidence-call records the drawer will list. Recipes: [QLOO_APIS.md](QLOO_APIS.md) §3.
+`GetBlockProfile` takes confirmed neighbour entity ids and fans out the verified insights calls: taste tags, brand affinities with the location filter the spike settled, category presence for the saturation check, and demographics for the top candidates. The brand call sends `feature.explainability=true` so each candidate carries Qloo's own per-input contribution scores for the evidence drawer. The saturation call keeps the documented radius semantics — an omitted `filter.location.radius` pads the boundary by the lesser of 10% of the locality diameter or ~2.4 km, and `0` means strictly inside ([QLOO_APIS.md](QLOO_APIS.md) §3.5). If spike 2 confirms the `urn:tag` 403, the block-taste panel degrades to descriptors derived from the resolved entities' payloads, labeled as inference, instead of failing the run ([QLOO_APIS.md](QLOO_APIS.md) §3.3). Independent calls run in parallel under a fan-out cap so one block cannot stampede Qloo. The response is the raw-enough payload scoring needs, plus the evidence-call records the drawer will list. Recipes: [QLOO_APIS.md](QLOO_APIS.md) §3.
 
-- [ ] Fetch taste tags from confirmed neighbour ids
+- [ ] Fetch taste tags from confirmed neighbour ids, with the derived-descriptor fallback if `urn:tag` 403s (spike 2)
 - [ ] Fetch brand affinities with the location filter the spike settled, with `feature.explainability=true`
 - [ ] Fetch category presence for the saturation check — `filter.location` + `filter.location.radius` in metres
 - [ ] Fetch demographics for the top candidates
@@ -193,7 +197,7 @@ Build the taste-service HTTP client with one typed method per endpoint the spike
 
 ### 16. Optional graph extras
 
-`GetHeatmap` runs only when the capability flag is on and a signal tag is present. Qloo accepts any entity or tag as the heatmap signal ([QLOO_APIS.md](QLOO_APIS.md) §3.7) — Karum deliberately anchors on a place-genre tag such as `urn:tag:genre:place:restaurant` as a design choice for interpretability, not because Qloo requires it. `CompareSets` runs the neighbour set against a candidate only when that endpoint was verified in the spike. If either call is missing, the response degrades to the pins plus the radius the saturation check already used. Demographic mismatch warnings attach beside the rubric. With the flag off, neither RPC is invoked and the client hides both widgets.
+`GetHeatmap` runs only when the capability flag is on and a signal tag is present; the flag turns on only when the spike settles the heatmap boundary literals (DI-12, spike 3). Qloo accepts any entity or tag as the heatmap signal ([QLOO_APIS.md](QLOO_APIS.md) §3.7) — Karum deliberately anchors on a place-genre tag such as `urn:tag:genre:place:restaurant` as a design choice for interpretability, not because Qloo requires it. `CompareSets` runs the neighbour set against a candidate only when the spike settled its parameters (spike 19). If either call is missing, the response degrades to the pins plus the radius the saturation check already used. Demographic mismatch warnings attach beside the rubric. With the flag off, neither RPC is invoked and the client hides both widgets. `/v2/trending` (momentum badge and outreach line, [QLOO_APIS.md](QLOO_APIS.md) §3.11) is deliberately out of the MVP — revisit only after the must-build list is green.
 
 - [ ] Call heatmap only when the capability flag is on and a signal tag is present (Karum's choice: a place-genre tag)
 - [ ] Call compare for the neighbour set versus a candidate when that endpoint is verified
@@ -367,7 +371,7 @@ When a Routes key is set, the gateway orders the vacancy and the confirmed neigh
 
 ### 33. Leave-one-out harness
 
-A CLI in infra or the gateway assembles about twenty blocks, each with a known strong tenant category held out of the neighbour list. It runs Karum and `LlmOnlyBaseline` on each block and scores whether the hidden category ranks above the baseline’s picks. Write the table, including the blocks that lose. If fewer than twelve of twenty win, change the rubric in `ScoreCandidates` before any UI polish.
+A CLI in infra or the gateway assembles about twenty blocks, each with a known strong tenant category held out of the neighbour list. It runs Karum and `LlmOnlyBaseline` on each block and scores whether the hidden category ranks above the baseline’s picks. Write the table, including the blocks that lose — time-box the run against the remaining monthly quota, reuse the taste cache, and publish the completed table in the README and Devpost text (epic 56). If fewer than twelve of twenty win, change the rubric in `ScoreCandidates` before any UI polish.
 
 - [ ] Assemble about twenty blocks with a known strong tenant hidden
 - [ ] CLI-run Karum and the LLM-only baseline on each
@@ -399,10 +403,10 @@ The intake-to-memo path is operable from the keyboard, with focus order, labels,
 
 ### 36. Intake
 
-The address field calls the gateway geocode suggestions and requires the user to confirm the selected point before submit. Neighbour typeahead calls `ResolveEntities` and renders matches as confirm chips. Constraint chips cover size, rent, F&B, category include and exclude, and shortlist versus surprise me, and they serialize into the `POST /api/v1/analyses` body. Inline validation mirrors the gateway’s validation limits. Two “Try a sample block” actions post the seeded vacancy ids and skip typing.
+The address field calls the gateway geocode suggestions and requires the user to confirm the selected point before submit. Neighbour typeahead calls `ResolveEntities` through the gateway cache, debounced with a minimum query length so keystrokes cannot burn the quota, and renders matches as confirm chips. Constraint chips cover size, rent, F&B, category include and exclude, and shortlist versus surprise me, and they serialize into the `POST /api/v1/analyses` body. Inline validation mirrors the gateway’s validation limits. Two “Try a sample block” actions post the seeded vacancy ids and skip typing.
 
 - [ ] Address field with geocode suggestions and a selected-point confirmation
-- [ ] Neighbour typeahead backed by resolve, shown as confirm chips
+- [ ] Neighbour typeahead backed by resolve — debounced and cached — shown as confirm chips
 - [ ] Chips for size, rent, F&B, category include and exclude, and shortlist versus surprise me
 - [ ] Inline validation before submit
 - [ ] Two “Try a sample block” actions that skip typing
@@ -439,13 +443,14 @@ Draw pins for the vacancy, confirmed neighbours, and competitor entities, with a
 
 ### 40. Shortlist and do-not-lease
 
-Render the five `RankedCandidate`s as cards with three labeled sub-score bars (catchment fit, co-tenancy complement, cannibalisation penalty) and the shared tags. Call out the recommended pick inside those five; do not re-sort on the client. The do-not-lease column reads the reason codes, including saturation distance when the payload has it. Demographic and retail-presence warnings come from those fields on the card. Display order is the server rank.
+Render the five `RankedCandidate`s as cards with three labeled sub-score bars (catchment fit, co-tenancy complement, cannibalisation penalty) and the shared tags. Call out the recommended pick inside those five; do not re-sort on the client. The do-not-lease column reads the reason codes, including saturation distance when the payload has it. Demographic and retail-presence warnings come from those fields on the card. Display order is the server rank. Any card field the insights payload lacks — image, description — hydrates via `GET /entities` by entity id or external-ID namespace ([QLOO_APIS.md](QLOO_APIS.md) §3.12).
 
 - [ ] Five cards with three labeled sub-score bars and shared tags
 - [ ] Call out the recommended pick separately within the five
 - [ ] Do-not-lease column with the reason, including saturation distance when known
 - [ ] Demographic and retail-presence warnings on the card
 - [ ] Match the server rank exactly
+- [ ] Hydrate missing card fields via `GET /entities` (id or external-ID namespace — spike 16 confirms the round-trip)
 
 ### 41. Evidence and counterfactual
 
@@ -563,10 +568,10 @@ Run the sample block with taste down, AI down, Redis down, and Postgres down, an
 
 ### 52. Honesty rules
 
-An `unresolved` or `empty` result is rendered as a miss in the API and in the UI, with no filled-in guess. Undocumented Qloo parameters stay out of taste client code, fixtures, and prompts. Numbers that appear only as examples in PRODUCT.md stay out of live screens and drafts. Degraded autopilot is visible both as the job state and in `GET /health`. When a run reaches `ready`, its evidence snapshot is frozen and later cache updates do not rewrite it.
+An `unresolved` or `empty` result is rendered as a miss in the API and in the UI, with no filled-in guess. Undocumented Qloo parameters stay out of taste client code, fixtures, and prompts — every parameter used resolves to a [QLOO_APIS.md](QLOO_APIS.md) §6/§7 catalogue row, with any §9 conflict behind it closed and dated. Numbers that appear only as examples in PRODUCT.md stay out of live screens and drafts. Degraded autopilot is visible both as the job state and in `GET /health`. When a run reaches `ready`, its evidence snapshot is frozen and later cache updates do not rewrite it.
 
 - [ ] Label every miss as a miss
-- [ ] Keep undocumented Qloo parameters out of every repo
+- [ ] Keep undocumented Qloo parameters out of every repo — every parameter used maps to a [QLOO_APIS.md](QLOO_APIS.md) §6/§7 row
 - [ ] Keep illustrative numbers from the product brief out of live screens
 - [ ] Make degraded mode visible in the UI and in `/health`
 - [ ] Freeze evidence snapshots when the run completes
@@ -575,11 +580,12 @@ An `unresolved` or `empty` result is rendered as a miss in the API and in the UI
 
 ### 53. Containers and Cloud Run
 
-Write Dockerfiles for the Go gateway, taste, and AI, and publish the Flutter web build on the public demo host. Infra holds the Cloud Run service manifests and the env wiring that points each service at the others. Secrets live in a secret manager; a preview revision can boot in fixture mode with no Qloo key. CORS allows only the client origin, and the Qloo key is injected into taste, never into the browser.
+Write Dockerfiles for the Go gateway, taste, and AI, and publish the Flutter web build on the public demo host. Infra holds the Cloud Run service manifests and the env wiring that points each service at the others, and provisions a managed Postgres for the demo — the Compose container does not follow to Cloud Run, while Redis stays optional behind epic 17's in-process fallback. Secrets live in a secret manager; a preview revision can boot in fixture mode with no Qloo key. CORS allows only the client origin, and the Qloo key is injected into taste, never into the browser.
 
 - [x] Dockerfiles for gateway, taste, and AI — all three build and run in Compose (distroless gateway, uv multi-stage Python images)
 - [ ] Publish the Flutter web build on the public demo host
 - [ ] Add Cloud Run manifests and env wiring in infra
+- [ ] Provision a managed Postgres for the demo (Redis optional behind the epic 17 fallback)
 - [ ] Store secrets in a secret manager, and allow preview to run on fixtures
 - [ ] Restrict CORS to the client origin and keep the Qloo key server-side
 
@@ -611,6 +617,8 @@ The public README covers the five-repo layout, the Compose run path, the honesty
 - [ ] Devpost text mapped to the four judging criteria, including the eval result
 - [ ] Screenshots of the sample, the do-not-lease card, the evidence drawer, and the baseline toggle
 - [x] Check team size, originality, and key terms against the rules page — done 16 Oct 2026; findings in [PRODUCT.md](PRODUCT.md) §1 (no team cap, Qloo integration must be new, originality clause, judging Nov 2–16)
+- [ ] Make the submitted repositories public with an open-source licence visible in each About section, and put the live demo URL in the README and the Devpost text
+- [ ] Keep the demo free and reachable through Nov 16, 2026 (judging end), with every submission material in English
 - [ ] Submit at least 24 hours before 30 Oct 2026, 11:45pm EDT
 
 ### 57. Judging week
@@ -622,3 +630,4 @@ Re-run entity resolution against the live hackathon key for both sample blocks a
 - [ ] Click the three-minute script on a clean browser profile
 - [ ] Check the second sample and one free-entry address
 - [ ] Keep a rollback to the previous Cloud Run revision
+- [ ] Leave the demo live and no-login through Nov 16, 2026 — the judging window runs Nov 2–16
