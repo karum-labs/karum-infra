@@ -1,62 +1,71 @@
-Yes, you can split them into two separate microservices and two distinct repositories: `service-taste` (handling Qloo) and `service-ai` (handling Vertex AI and search grounding). Dividing them this way is standard if two people are working on the backend simultaneously—one focusing on Qloo data wrangling, and the other on LLM prompt engineering and web grounding.
+# Technical architecture
 
-## The 5-Repository Layout
+The system is five repositories, split so two people can build the backend in parallel — one on Qloo data wrangling and taste scoring, one on LLM prompting and drafts, with a shared protobuf contract between them. This is the shape [PLAN.md](PLAN.md) executes and [DECISIONS.md](DECISIONS.md) §2 records.
+
+## The 5-repository layout
 
 ```text
-├── infra/            # Shared Protobufs, Docker Compose, and Cloud Run manifests
-├── client/           # Flutter web UI (judge target; same screens on desktop — no mobile app)
-├── server/           # Go + Gin API Gateway (routes traffic, orchestrates jobs)
-├── service-taste/    # Microservice 1: Qloo API integration, caching, & taste scoring
-└── service-ai/       # Microservice 2: Vertex AI, Google Search Grounding, & pitch drafting
+├── karum-infra/          # This repo: shared Protobufs, Docker Compose, Cloud Run manifests
+├── karum-client/         # Flutter web UI (judge target; same screens on desktop — no mobile app)
+├── karum-server/         # Go + Gin API gateway (routes traffic, orchestrates jobs)
+├── karum-service-taste/  # Microservice 1: Qloo API integration, caching, & taste scoring
+└── karum-service-ai/     # Microservice 2: Vertex AI, Google Search Grounding, & draft generation
 ```
 
-## What Each Microservice Does
+## What each microservice does
 
 ### 1. service-taste (The Taste & Correlation Service)
 
-- **Primary tech:** Python (FastAPI/gRPC) or Go.
-- **Role:** Acts as the data abstraction layer for Qloo. It isolates Qloo's API quirks, authentication, and rate limits from the rest of your app.
+- **Primary tech:** Python (uv-managed) + gRPC; stubs generated from `karum-infra/proto/` with buf.
+- **Role:** The data abstraction layer for Qloo. It isolates Qloo's API quirks, `X-Api-Key` auth, rate limits, and silently-ignored parameters from the rest of the app.
+- **Endpoint:** `https://hackathon.api.qloo.com` only — every endpoint and parameter is catalogued in [QLOO_APIS.md](QLOO_APIS.md).
 
 **What it does:**
 
-- **Entity resolution:** Resolves raw user strings (e.g., "Madre Mezcal") into Qloo Entity IDs.
-- **Cross-domain querying:** Calls Qloo's Recommendation endpoint to fetch places matching the brand in the target city.
-- **Data normalization and scoring:** Extracts affinity scores, strips extraneous metadata, and flattens cultural tags (e.g., `["craft_cocktails", "indie_rock"]`).
-- **Caching layer:** Stores Qloo query responses in memory or Redis so repeated test runs do not burn through hackathon API credits.
-- **gRPC RPC:** `GetRankedVenues(BrandRequest)` returns `VenueListResponse`.
+- **Entity resolution:** Resolves raw input (an address, a neighbour name, a shortlisted brand) into Qloo entity IDs via `GET /search`, flagging low-confidence hits so the gateway pauses for confirmation instead of guessing.
+- **Constraint resolution:** Maps product chips ("no F&B", "fitness", "eyewear") to tag URNs via `GET /v2/tags`.
+- **Block profile:** Fans out the documented `/v2/insights` calls for a block — taste tags, brand affinities (with the spike-settled location filter and `feature.explainability=true`), category saturation, and demographics.
+- **Scoring:** Computes catchment fit, co-tenancy complement, and cannibalisation from documented Qloo fields only, returning the ranked shortlist, the do-not-lease list, and the evidence bundle.
+- **Caching:** Private server-side cache (Redis) so replay runs do not burn hackathon quota. Recorded fixtures are redacted — raw Qloo JSON never lands in a repo (QLOO_APIS.md §1).
+- **gRPC RPC:** `ResolveEntities`, `ResolveTags`, `GetBlockProfile`, `ScoreCandidates`, plus optional `GetHeatmap` and `CompareSets` behind a capability flag (PLAN epics 5, 12–16).
 
 ### 2. service-ai (The Agent & Synthesis Service)
 
-- **Primary tech:** Python (FastAPI/gRPC) using `google-genai` and Pydantic.
-- **Role:** Performs live web verification and generates sales deliverables.
+- **Primary tech:** Python (uv-managed) + gRPC using `google-genai` and Pydantic.
+- **Role:** Grounded reasoning and the judge-facing texts. Every response carries `model_id`, `prompt_version`, and cited evidence ids so the gateway persists provenance without parsing prose.
 
 **What it does:**
 
-- **Live menu verification:** Calls Gemini 2.5 Flash with Google Search Grounding to check whether target venues already stock the product or direct competitors.
-- **Pitch and battlecard generation:** Ingests the venue's menu context alongside Qloo's cultural tags to draft customized sales scripts.
-- **Buyer persona mapping:** Infers the beverage director / GM profile for that style of venue.
-- **gRPC RPC:** `VerifyAndDraftPitch(PitchRequest)` returns `PitchResponse`.
+- **Shortlist probe:** `ProbeShortlist` checks the ranked set for contradictions (e.g. high catchment fit in a saturated category) using entity ids, tags, and scores — never raw user text — with a bounded budget for follow-up taste calls.
+- **Counterfactual baseline:** `LlmOnlyBaseline` answers the same inputs with no Qloo payload and is labeled ungrounded, powering the LLM-only toggle.
+- **Drafts:** `DraftMemo`, `DraftOutreach`, and `DraftListing` — the one-page memo, the outreach email, and the listing blurb, each number citing an evidence id.
+- **Grounded retail check:** `CheckRetailPresence` uses Google Search grounding to test whether a shortlisted brand has physical stores, attaching the grounding source to the evidence.
+- **gRPC RPC:** `ProbeShortlist`, `LlmOnlyBaseline`, `DraftMemo`, `DraftOutreach`, `DraftListing`, `CheckRetailPresence` (PLAN epic 6).
 
 ## End-to-End Execution Flow
 
 ```text
-[ Flutter Client ]
-        │  POST /api/v1/campaigns/generate
+[ karum-client — Flutter web ]
+        │  POST /api/v1/analyses  (address, neighbour text, constraints)
         ▼
-[ Go Gateway (server) ]
+[ Go Gateway (karum-server) ]
+        │  geocodes the vacancy first → one lat/lng reused by the map pin,
+        │  the saturation radius, and the Qloo location filter
         │
         ├── 1. gRPC call ──► [ service-taste ] ──► Qloo API
-        │                     (Returns ranked Austin bars + cultural tags)
+        │                     (resolve → block profile → score; explainability + evidence)
         │
         ├── 2. HTTP call ──► Google Places API
-        │                     (Enriches bars with addresses, hours, websites)
+        │                     (optional pin enrichment: address, hours, website)
         │
         ├── 3. gRPC call ──► [ service-ai ] ──► Vertex AI + Search
-        │                     (Checks live menus & writes sales pitches)
+        │                     (probe, LLM-only baseline, memo / outreach / listing)
         │
         ├── 4. HTTP call ──► Google Routes API
-        │                     (Computes optimal multi-stop driving path)
+        │                     (optional broker site-visit route)
         │
-        ▼  Returns complete campaign run-sheet
-[ Flutter Client ]
+        ▼  Returns job state, SSE trace, and the ranked shortlist
+[ karum-client — Flutter web ]
 ```
+
+Each process boots in `live`, `fixture`, or `degraded` mode (`*_MODE` in [.env.example](.env.example)). Fixture mode replays the redacted recordings and makes no outbound calls, so the whole stack runs green with no keys present.

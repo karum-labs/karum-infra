@@ -197,3 +197,4 @@ Full entity records (description, image, properties) by ID, plus lookups by many
 6. **Unit sanity** — `/search` miles vs Insights metres, and both WKT orders (longitude-first) vs bare pairs (latitude-first).
 7. **429 behaviour and quota headroom** — rate-limit headers, reset timing, monthly ceiling.
 8. **Data density** — `filter.popularity` and `filter.price_level` populated for retail brands in the demo cities.
+9. **Per-candidate affinity probe** — `filter.results.entities=<candidate>` returns just those entities with their `query.affinity`, as the scoring table in §3.9 assumes.

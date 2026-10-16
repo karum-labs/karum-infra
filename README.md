@@ -24,7 +24,7 @@ Karum reads the cultural taste of a surrounding block via **Qloo**, scores candi
         ├── gRPC ──► [ service-ai ] ──► Vertex AI + Search
         └── HTTP ──► Google Routes API
         ▼
-  Complete campaign run-sheet back to the client
+  Ranked shortlist, evidence, and drafts back to the client
 ```
 
 ## What lives here

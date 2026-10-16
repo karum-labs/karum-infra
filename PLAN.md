@@ -153,9 +153,9 @@ Build the taste-service HTTP client with one typed method per endpoint the spike
 
 ### 12. Entity resolution
 
-`ResolveEntities` calls Qloo search for places using the neighbour name plus the geocoded city, and returns the top five candidates with a confidence. The same RPC searches brands when the caller passes a user shortlist. Low-confidence and ambiguous hits are flagged so the gateway can pause for confirmation instead of guessing an entity id. A total miss is an explicit `unresolved` error, not an empty success. Cache both hits and negative lookups under a short TTL.
+`ResolveEntities` calls `GET /search` for places using the neighbour name plus the vacancy point — `filter.location=<lat>,<lon>` with `filter.radius` in **miles**, disambiguated by `filter.address` (recipe: [QLOO_APIS.md](QLOO_APIS.md) §3.1) — and returns the top five candidates with a confidence. The same RPC searches brands when the caller passes a user shortlist. Low-confidence and ambiguous hits are flagged so the gateway can pause for confirmation instead of guessing an entity id. A total miss is an explicit `unresolved` error, not an empty success. Cache both hits and negative lookups under a short TTL.
 
-- [ ] Search places with neighbour name plus city and return the top five
+- [ ] Search places with neighbour name plus vacancy point (`filter.location` + `filter.radius` in miles) and return the top five
 - [ ] Search brands for a user shortlist
 - [ ] Mark low-confidence and ambiguous hits for confirmation
 - [ ] Return an explicit miss when nothing resolves
@@ -193,9 +193,9 @@ Build the taste-service HTTP client with one typed method per endpoint the spike
 
 ### 16. Optional graph extras
 
-`GetHeatmap` runs only when the capability flag is on and a place-genre tag such as `urn:tag:genre:place:restaurant` is present. `CompareSets` runs the neighbour set against a candidate only when that endpoint was verified in the spike. If either call is missing, the response degrades to the pins plus the radius the saturation check already used. Demographic mismatch warnings attach beside the rubric. With the flag off, neither RPC is invoked and the client hides both widgets.
+`GetHeatmap` runs only when the capability flag is on and a signal tag is present. Qloo accepts any entity or tag as the heatmap signal ([QLOO_APIS.md](QLOO_APIS.md) §3.7) — Karum deliberately anchors on a place-genre tag such as `urn:tag:genre:place:restaurant` as a design choice for interpretability, not because Qloo requires it. `CompareSets` runs the neighbour set against a candidate only when that endpoint was verified in the spike. If either call is missing, the response degrades to the pins plus the radius the saturation check already used. Demographic mismatch warnings attach beside the rubric. With the flag off, neither RPC is invoked and the client hides both widgets.
 
-- [ ] Call heatmap only when the capability flag and a place-genre tag exist
+- [ ] Call heatmap only when the capability flag is on and a signal tag is present (Karum's choice: a place-genre tag)
 - [ ] Call compare for the neighbour set versus a candidate when that endpoint is verified
 - [ ] Degrade to pins plus a radius when either call is missing
 - [ ] Attach demographic mismatch warnings beside the rubric
@@ -605,12 +605,12 @@ Generate a trace id on `POST /api/v1/analyses` and propagate it from Flutter thr
 
 ### 56. Docs and Devpost
 
-The public README covers the five-repo layout, the Compose run path, the honesty rules, and the MIT licence line. Devpost text maps the build onto the four judging criteria and includes the leave-one-out table. Screenshots show the sample shortlist, a do-not-lease card, the evidence drawer, and the baseline toggle. Check team size, originality, and API-key terms against the rules page before submit. Submit at least 24 hours before 30 Oct 2026, 11:45pm EDT.
+The public README covers the five-repo layout, the Compose run path, the honesty rules, and the MIT licence line. Devpost text maps the build onto the four judging criteria and includes the leave-one-out table. Screenshots show the sample shortlist, a do-not-lease card, the evidence drawer, and the baseline toggle. Team size, originality, and key terms were checked against the rules on 16 Oct 2026 — no team cap, the Qloo integration must be new, judges keep free access until Nov 16 — recorded in [PRODUCT.md](PRODUCT.md) §1. Submit at least 24 hours before 30 Oct 2026, 11:45pm EDT.
 
 - [x] README with architecture, local run, honesty rules, and licence — lives in the infra README; adapt it for the public submission when the demo ships
 - [ ] Devpost text mapped to the four judging criteria, including the eval result
 - [ ] Screenshots of the sample, the do-not-lease card, the evidence drawer, and the baseline toggle
-- [ ] Check team size, originality, and key terms against the rules page
+- [x] Check team size, originality, and key terms against the rules page — done 16 Oct 2026; findings in [PRODUCT.md](PRODUCT.md) §1 (no team cap, Qloo integration must be new, originality clause, judging Nov 2–16)
 - [ ] Submit at least 24 hours before 30 Oct 2026, 11:45pm EDT
 
 ### 57. Judging week

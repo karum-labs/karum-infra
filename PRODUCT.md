@@ -58,18 +58,18 @@ With a Live Nation executive on the panel, music booking will be the most crowde
 
 | Item | Finding | Status |
 |---|---|---|
-| Submission window | Starts Sept 30, 2026, 9:30 EDT; deadline **Oct 30, 2026 @ 11:45pm EDT** | Verified (Devpost) |
+| Submission window | Starts Sept 30, 2026, 9:00am EDT; deadline **Oct 30, 2026 @ 11:45pm EDT** | Verified (rules, 16 Oct 2026) |
 | Prizes | $25,000 cash: 1st $15,000, 2nd $6,000, 3rd $4,000 | Verified |
 | Eligibility | Above age of majority; all countries except standard exceptions | Verified |
 | Build requirement | Integrate the Qloo API and either work as an agentic tool, use an agent framework, or wire Qloo into an existing agent | Verified |
 | Submission | Live hosted demo, public repo (GitHub/GitLab/Bitbucket) with all source and run instructions, text description, open-source licence visible in repo About; no video required | Verified |
-| Participants | 303 when fetched | Verified |
+| Participants | 303 when first fetched; **1,545 on 16 Oct 2026** | Verified (Devpost) |
 | API access | Hackathon key via the Qloo developer guide form; entrants report it works only against `https://hackathon.api.qloo.com` with an `X-Api-Key` header and takes "a few business days" | Entrant-reported |
-| Judging period / announcement | Not confirmed. One entrant's code keeps free access "until 2026-11-17 so hackathon judges get unrestricted access, as the rules require" | Unverified; check the rules page |
-| Team size | Not confirmed for 2026; the 2025 rules allowed "Teams of up to four (4)" | Unverified |
-| New vs. existing project | Not confirmed. "Wires Qloo into an agent you already have" implies an existing agent is allowed if the Qloo integration is new. Some entrants state their repos were "created after the submission period opened" | Unverified; check the rules page |
+| Judging period / announcement | **Judging Nov 2, 2026 12:00pm → Nov 16, 2026 11:45pm EDT; winners on or around Nov 23.** Judges must get free access to the project until judging ends — which matches the entrant keeping access "until 2026-11-17" | Verified (rules, 16 Oct 2026) |
+| Team size | **No team-size cap appears anywhere in the 2026 rules** — only that a team appoints one Representative. (The 2025 rules capped teams at four.) | Verified (rules, 16 Oct 2026) |
+| New vs. existing project | **The Qloo integration must be new** — a pre-existing project must have gained its Qloo integration after Sept 30, 2026, and the submission must explain how it was significantly updated during the window | Verified (rules, 16 Oct 2026) |
 
-**Action:** read `qloo.devpost.com/rules` yourself before writing code. I could not retrieve it. Confirm the team cap, the originality clause, whether judges must have free access through the judging period, and any API-key usage terms.
+**Rules read in full — 16 Oct 2026** (`qloo.devpost.com/rules` retrieved; the earlier "could not retrieve it" blocker is closed). Remaining constraints from the text: submissions must be the entrant's original work with no prior financial or preferential support from Qloo; judges must have free access to the hosted demo through Nov 16, 2026; the repo must be public with an open-source licence file detectable in the About section; all submission materials must be in English; and no API-key usage terms appear beyond obtaining the key via the developer-guide form. Everything previously open in this table is now verified above.
 
 ### 2. How Qloo works, and what each capability unlocks
 
@@ -88,16 +88,16 @@ With a Live Nation executive on the panel, music booking will be the most crowde
 
 | Capability | How it is called | Product capability it unlocks |
 |---|---|---|
-| Entity resolution | `GET /search` (types include artist, book, brand, destination, movie, person, place, podcast, TV show, video game); `GET /entities?entity_ids=` | Turn messy user input ("that taco place on Red River") into a canonical, auditable ID. This is the basis for explainability |
+| Entity resolution | `GET /search` (its `types` enum differs from Insights `filter.type` — Karum uses `urn:entity:place` and `urn:entity:brand`; see [QLOO_APIS.md](QLOO_APIS.md) §1); `GET /entities?entity_ids=` | Turn messy user input ("that taco place on Red River") into a canonical, auditable ID. This is the basis for explainability |
 | Tag resolution | `GET /v2/tags?filter.query=` | Turn vague concepts ("natural wine", "minimalist") into graph-native signals |
-| Audiences | `GET /v2/audiences` | Start from a named segment instead of seed entities |
+| Audiences | `GET /v2/audiences` — ⚠️ OpenAPI `deprecated: true`; take segments from Insights output instead (see [QLOO_APIS.md](QLOO_APIS.md) §4) | Start from a named segment instead of seed entities |
 | Core inference | `GET /v2/insights` with `filter.type=urn:entity:…` and `signal.interests.entities` / `signal.interests.tags` | Cross-domain ranking: "people who like X → which brands, places, artists" |
 | Tag-based filtering | `filter.tags=urn:tag:genre:…` | Restrict outputs to a category (e.g., only restaurants or only retail) while ranking by taste |
-| Location | `filter.location.query` (city or place); Qloo shows radius-style filtering ("copenhagen · 3 km") | Ask "what fits *here*." This is the core of any site-selection product |
+| Location | **Verified 16 Oct 2026:** `filter.location=<lat>,<lon>` + `filter.location.radius=<metres>` on Insights (`filter.radius=<miles>` on `/search`); `filter.location.query` takes locality names only | Ask "what fits *here*." This is the core of any site-selection product — exact recipes in [QLOO_APIS.md](QLOO_APIS.md) §3.1 and §3.5 |
 | Demographic output | `filter.type=urn:demographics` | Infer the age/gender skew of an entity's audience, so the demographic is the result of taste rather than the input |
 | Taste description | `filter.type=urn:tag` | "What defines this set or location": readable descriptors for explanations |
 | Heatmap / locality | **Verified 16 Oct 2026:** `filter.type=urn:heatmap` inside `/v2/insights`, needs a location plus any entity/tag signal (`urn:tag:genre:place:restaurant` is a good choice, not a requirement) | Visual map of where a taste concentrates. This is the strongest demo asset — see [QLOO_APIS.md](QLOO_APIS.md) §3.7 |
-| Comparison | Entrants reference `/v2/analysis/compare` | Overlap and difference between two entity sets (e.g., current tenants vs. candidate) |
+| Comparison | **Verified 16 Oct 2026:** `GET /v2/analysis/compare` with `a.` / `b.signal.interests.entities` | Overlap and difference between two entity sets (e.g., current tenants vs. candidate) |
 | Popularity / trends / exclusions / diversification | Qloo says results "can be weighted by factors such as regionalization and real-time popularity"; TechCrunch quotes adjustable "novel vs expected" weighting | Separate "safe" from "emerging" picks and exclude what is already present. **Verified 16 Oct 2026:** `filter.popularity.min/max`, `bias.trends`, `filter.exclude.tags` (+ `operator.filter.exclude.tags`), and `diversify.by=subtype` (tags only) are documented — see [QLOO_APIS.md](QLOO_APIS.md) |
 
 Entrant repos report real coverage gaps. Undercard notes "Qloo coverage is limited in this hackathon environment: some artists cannot be found … or ranked." Plan for misses from the start, and label every miss as a miss rather than guessing.
@@ -536,7 +536,7 @@ A weekend rebuild with Qloo plus an LLM would give the first screen, not the cal
 - **Another 2026 entrant may build retail site or tenant tools.** CulturePilot ("better market decisions") and others are adjacent, and I could only see public GitHub, not Devpost drafts.
 - **Real estate is unglamorous next to music and entertainment** for judges like Cedric the Entertainer. The demo must feel vivid (map, surprising pick, strong "do not lease" line).
 - **Willingness to pay is untested.** Small landlords are notoriously cheap, and the pricing above is a hypothesis.
-- **I could not read the 2026 rules page or full Qloo docs.** An originality clause or API-key limit could change the plan.
+- ~~**I could not read the 2026 rules page or full Qloo docs.**~~ **Closed 16 Oct 2026:** the rules were read in full (no team cap; the Qloo integration must be new; judging Nov 2–16) and the API surface is mapped in [QLOO_APIS.md](QLOO_APIS.md). What remains unverified is spike behaviour — parameter acceptance, radius granularity, quota — plus key-delivery timing.
 
 **Kill criteria (abandon by Oct 8–10 if any is true):**
 1. For at least 3 of 5 test blocks, Qloo's brand or place outputs under location do not change meaningfully when the neighbours change. That would mean Qloo is not adding block-specific signal.
