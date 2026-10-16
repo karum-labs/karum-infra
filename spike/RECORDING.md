@@ -49,7 +49,7 @@ redact before promoting anything into the fixture pack. The key never leaves
 ## Traps carried into client code (16 Oct)
 
 1. **Location format splits by surface.** `/search` takes the bare `lat,lon` pair only — WKT and Qloo UUIDs are rejected ("must be in the form lat,lon"). Insights takes WKT `POINT(<lon> <lat>)` only — the bare pair returns "WKT format is invalid" (DI-21).
-2. **An Insights WKT point without `filter.location.radius` returns 0 results** — always send a radius. And `radius=0` behaves like the ~15 km default, not strict containment.
+2. **An entity-typed Insights call with a WKT point and no `filter.location.radius` returns 0 results** — always send a radius on place-side calls (the heatmap probe returned cells without one). And `radius=0` behaves like the ~15 km default, not strict containment.
 3. **Unsupported parameters are silently ignored** — always pair a variant with a baseline; on repeat runs the API replays byte-identically, so identical output is meaningful evidence.
 4. **`warnings` is the honesty channel.** `{"type":"not_found","signal.interests.entities":[…ids]}` names signal entities with no insights data — 3 of 4 resolved Colaba store ids failed it. Keep Leopold-class entities, or show the miss.
 5. **Deprecations:** `filter.entities` works but returns `warnings: deprecated` — use `filter.results.entities`. `urn:entity:heatmap` is a hard 400 — use `urn:heatmap`.
@@ -58,7 +58,7 @@ redact before promoting anything into the fixture pack. The key never leaves
 8. **`bias.quality` validates strictly** — the accepted set is the server's own enum: a positive number or one of `very_low, low, mid, medium, high, very_high` (both doc sets are subsets; `mid` was in neither). Places without a quality score drop out of the result set.
 9. **`signal.interests.entities.include` is a boolean, not an id list** — ids → 400 "must be a boolean" (DI-23). Scalar `weight` accepts number and string forms but made no observable difference on the single-signal test call — pair any weighting with a diff test.
 10. **`resolve_to` accepts only `urn:reference:brand` and `both`** — other literals (including the deep-dive `place`/`brand`) → 400 "All of the provided signal.interests.entities were invalid" (DI-16). `both` can resolve to a *place* row — watch the `not_found` warning.
-11. **Compare does not reuse the `/search` envelope** — `results = {tags, a, b, matchEntities}`; parse `matchEntities`, not a results list (DI-22).
+11. **Compare does not reuse the `/search` envelope** — `results = {tags, a, b, matchEntities}`; parse the `tags` overlap and `matchEntities`, not a results list (DI-22). `matchEntities` was empty in every probe and cross-type overlap was 0 — the chart degrades when the overlap is empty.
 12. **Trending windows shorter than ~6 months return an empty list** (no error); weekly rows, `population_rank` arrives as a string. Out of the MVP.
 13. **Heatmap dimensions change the cell count** (230 → 265 / 232 in probes) and add `*_total_count` columns beyond the documented count families.
 

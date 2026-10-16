@@ -4,7 +4,7 @@
 >
 > **Status.** A planning aid, not a contract; [QLOO_APIS.md](QLOO_APIS.md) remains the authority for parameters and doc conflicts.
 >
-> **Reality check.** The Qloo spike ([PLAN.md](PLAN.md) epic 9) has not run yet — the hackathon key is in hand (16 Oct 2026; monthly quota 10,000 requests). Every call below still passes through the 22-item spike checklist in [QLOO_APIS.md](QLOO_APIS.md) §5 before any client code depends on it. All calls use the single hackathon host `https://hackathon.api.qloo.com` with an `X-Api-Key` header.
+> **Reality check.** The Qloo spike ([PLAN.md](PLAN.md) epic 9) is **complete** — 16 Oct 2026, 123 calls, 9,877 of the 10,000 monthly quota remaining, and every call below settled against [QLOO_APIS.md](QLOO_APIS.md) §5 and the evidence in [spike/RECORDING.md](spike/RECORDING.md). All calls use the single hackathon host `https://hackathon.api.qloo.com` with an `X-Api-Key` header.
 
 ---
 
@@ -44,8 +44,8 @@
 This is the short version of [QLOO_APIS.md](QLOO_APIS.md) §1 and §4 — it applies to everything in this document.
 
 1. **One host only**: `https://hackathon.api.qloo.com`. Keys 401 against the production and staging hosts (DI-1).
-2. **GET with query-string parameters only.** The hackathon surface is believed GET-only. Parameters that need a POST body (`*.entities.query`, merged-locality arrays, weight arrays) stay out of the code until spike 10 proves POST works (DI-3).
-3. **Never use** `/recs` or `/recommendations` (explicitly forbidden), the deprecated `/v2/audiences` routes (DI-20), `urn:entity:audience`, or `urn:entity:destination` / `urn:entity:locality` as an Insights `filter.type`.
+2. **GET with query-string parameters by default; POST works where documented.** Spike 10 settled 16 Oct that `POST /v2/insights` honours JSON bodies (DI-3 closed) — the `*.entities.query` parameters are usable via POST and stay off GET. Merged-locality arrays and weight arrays remain unverified or rejected (400) and are not used.
+3. **Never use** `/recs` or `/recommendations` (explicitly forbidden), the deprecated `/v2/audiences` routes (DI-20), or `urn:entity:audience`. `urn:entity:destination` works but is enum-absent and unused (spike 2); `urn:entity:locality` 400s as a `filter.type` unless signalled by locality entities.
 4. **Unsupported parameters are silently ignored** — you get a 200 with unchanged results, not an error. So every parameter must be tested against a no-parameter baseline. A 200 is not proof.
 5. **Documented parameters only.** Every parameter in code must map to a row in [QLOO_APIS.md](QLOO_APIS.md) §6 or §7.
 6. **Fixtures are redacted, never raw.** Qloo's terms forbid storing raw response data in a public repository, and the Devpost submission requires public repos.
@@ -61,25 +61,25 @@ Summary first, details after.
 |---|---|---|---|---|
 | 1 | Neighbour + shortlist resolution ("that ramen place on Bedford") | `GET /search` | PLAN 12, 36 | Core |
 | 2 | Constraint chips → tag IDs ("no F&B", "eyewear") | `GET /v2/tags`, `GET /v2/tags/types` | PLAN 13 | Core |
-| 3 | Block taste descriptors ("what defines this block") | Insights `filter.type=urn:tag` | PLAN 14 | Core — 403 risk (DI-2) |
-| 4 | Candidate brand generation (the core ranking input) | Insights `filter.type=urn:entity:brand` + location + explainability | PLAN 14 | Core — location conflict (spike 1) |
-| 5 | Saturation / cannibalisation check ("a café is already here") | Insights `filter.type=urn:entity:place` + tags + location radius | PLAN 14, 15 | Core — granularity via spike 5 |
-| 6 | Audience-skew sanity check | Insights `filter.type=urn:demographics` | PLAN 14 | Should-build — 403 risk (DI-2) |
-| 7 | Scoring inputs (popularity, price band, trends bias, exclusions, probes, weights) | Parameter set on the Insights calls | PLAN 15 | Core — several name conflicts (DI-4/5/6/13) |
-| 8 | Evidence drawer ("which neighbour audiences carried this") | `feature.explainability=true` | PLAN 14, 41 | Core — shape via spike 4 |
+| 3 | Block taste descriptors ("what defines this block") | Insights `filter.type=urn:tag` | PLAN 14 | Core — works; no 403 (DI-2 closed, spike 2) |
+| 4 | Candidate brand generation (the core ranking input) | Insights `filter.type=urn:entity:brand` + location + explainability | PLAN 14 | Core — location settled: `signal.location` is the localiser (spike 1, DI-11 closed) |
+| 5 | Saturation / cannibalisation check ("a café is already here") | Insights `filter.type=urn:entity:place` + tags + location radius | PLAN 14, 15 | Core — radius settled as genuine metres (spike 5) |
+| 6 | Audience-skew sanity check | Insights `filter.type=urn:demographics` | PLAN 14 | Should-build — works; no 403 (DI-2 closed, spike 2) |
+| 7 | Scoring inputs (popularity, price band, trends bias, exclusions, probes, weights) | Parameter set on the Insights calls | PLAN 15 | Core — names settled (DI-4/5/6/13 closed) |
+| 8 | Evidence drawer ("which neighbour audiences carried this") | `feature.explainability=true` | PLAN 14, 41 | Core — shape settled (spike 4) |
 | 9 | Map heatmap overlay | Insights `filter.type=urn:heatmap` | PLAN 16, 39 | Optional, capability-flagged |
 | 10 | Neighbours-vs-candidate overlap chart | `GET /v2/analysis/compare` | PLAN 16 | Optional, capability-flagged |
-| 11 | Card hydration (images, descriptions) | `GET /entities` (id or external-ID namespaces) | PLAN 40 | Planned — round-trip via spike 16 |
+| 11 | Card hydration (images, descriptions) | `GET /entities` (id or external-ID namespaces) | PLAN 40 | Planned — round-trip settled (spike 16) |
 | 12 | Operational plumbing (key probe, quota, cache, prewarm, fixtures, health) | `GET /` + response headers + everything cached | PLAN 9, 11, 17, 31 | Core |
 
 ### 2.1 Neighbour and shortlist resolution — `GET /search`
 
 - **What it does:** turns messy human input ("the natural-wine bar on Bedford") into one canonical Qloo entity. Everything downstream keys off that entity ID.
 - **How users see it:** type-ahead suggestions while adding neighbours, and a confirmation screen when two matches are similarly plausible — the user picks, Karum never guesses silently.
-- **The call:** `GET /search?query=<name>&types=urn:entity:place&filter.location=<lat>,<lon>&filter.radius=<miles>&filter.address=<partial>&sort_by=distance&take=5`. For a user shortlist: `types=urn:entity:brand`. Documented extras on this endpoint: `filter.tags` (+ `operator.filter.tags`), `filter.popularity`, `filter.rating`, `filter.exists` (e.g. `external.resy`, pattern `^external\.\w+$`).
+- **The call:** `GET /search?query=<name>&types=urn:entity:place&filter.location=<lat>,<lon>&filter.radius=<miles>&filter.address=<partial>&take=5` — keep the default match sort for name lookups (`sort_by=distance` degenerates into "nearest venues" — trap 7). For a user shortlist: `types=urn:entity:brand`. Documented extras on this endpoint: `filter.tags` (+ `operator.filter.tags`), `filter.popularity`, `filter.rating`, `filter.exists` (e.g. `external.resy`, pattern `^external\.\w+$`).
 - **Where it lives:** [PLAN.md](PLAN.md) epics 12 (service-taste) and 36 (client type-ahead); [PRODUCT.md](PRODUCT.md) workflow step 3.
 - **Why it matters:** auditability. A recommendation is only as good as the IDs it is built from; the confirmation pause is what makes the evidence chain honest.
-- **Watch-outs:** `/search` radius is **miles** (`filter.radius`, default 10) while Insights radius is **metres** (`filter.location.radius`) — same-sounding parameter, different unit. A miss must be an explicit `unresolved` error, not an empty success. `take` is exclusive max 200 here.
+- **Watch-outs:** `/search` radius is **miles** (`filter.radius`, default 10) while Insights radius is **metres** (`filter.location.radius`) — same-sounding parameter, different unit. `filter.location` takes the bare `lat,lon` pair only: WKT and Qloo UUIDs are rejected (DI-21). A miss must be an explicit `unresolved` error, not an empty success. `take` is exclusive max 200 here.
 
 ### 2.2 Constraint chips → tag IDs — `GET /v2/tags` and `GET /v2/tags/types`
 
@@ -95,23 +95,23 @@ Summary first, details after.
 - **The call:** `GET /v2/insights?filter.type=urn:tag&signal.interests.entities=<neighbour IDs>&filter.tag.types=<optional namespace>`.
 - **Where it lives:** [PLAN.md](PLAN.md) epic 14 (first call of `GetBlockProfile`); [PRODUCT.md](PRODUCT.md) call sequence #2.
 - **Why it matters:** it gives the agent and the user shared vocabulary, and doubles as the fallback explanation when richer signals are unavailable.
-- **Watch-outs:** `urn:tag` is documented on the use-case pages but **missing from the Insights `filter.type` enum** — this is the biggest 403 risk in the plan (DI-2, spike 2). The fallback is already designed: derive descriptors from the resolved entities' own payloads and label them as inference; never fail the whole run for this panel.
+- **Watch-outs:** `urn:tag` is missing from the Insights `filter.type` enum, but the 403 risk is settled: it works — 20 block tags for Colaba (spike 2, DI-2 closed). The derived-descriptor path stays as a degrade guard: derive descriptors from the resolved entities' own payloads and label them as inference; never fail the whole run for this panel.
 
 ### 2.4 Candidate brand generation — Insights with `filter.type=urn:entity:brand`
 
 - **What it does:** the heart of the product. Given the neighbours (and a location), returns the brands those neighbours' audiences show affinity for — the pool from which the shortlist is scored. This is what an LLM cannot fake: cross-domain, location-aware, behaviour-based affinity.
-- **The call:** `GET /v2/insights?filter.type=urn:entity:brand&signal.interests.entities=<neighbour IDs>&<location>&feature.explainability=true&bias.trends=medium&filter.popularity.min=<optional>&filter.exclude.entities=<neighbour IDs>&take=50`.
+- **The call:** `GET /v2/insights?filter.type=urn:entity:brand&signal.interests.entities=<neighbour IDs>&signal.location=POINT(<lon> <lat>)&feature.explainability=true&bias.trends=medium&filter.popularity.min=<optional>&filter.exclude.entities=<neighbour IDs>&take=50`.
 - **Where it lives:** [PLAN.md](PLAN.md) epic 14 (the spike-critical call); [PRODUCT.md](PRODUCT.md) call sequence #3.
 - **Why it matters:** it produces the non-obvious picks — the eyewear or stationery brand that beats the obvious "another café" — which is the product's core insight and the demo's magic moment.
-- **Watch-outs:** the biggest documentation conflict in the whole project. Qloo's entity-type guide lists **no location parameter at all** for brands, while the location use case explicitly advertises one ([QLOO_APIS.md](QLOO_APIS.md) §3.4, spike 1). The probe order is settled: `filter.location=POINT(<lon> <lat>)` → `signal.location` → `signal.location.query` → `filter.location.query` → `filter.location.metro`. WKT coordinates are **longitude-first**; a bare `lat,lon` pair is latitude-first. If none of them narrows results, the fallback is the neighbour signal plus a recorded locality, so the location story degrades visibly instead of silently.
+- **Watch-outs:** the biggest documentation conflict in the whole project — settled 16 Oct (spike 1, DI-11 closed): `signal.location=POINT(<lon> <lat>)` is the **only** working localiser (7 new entities plus a re-rank in the Colaba test); `filter.location`, `filter.location.query` and `filter.location.metro` are silently ignored, and `signal.location.query=<locality>` only shifts rankings subtly. WKT is **longitude-first**; a bare `lat,lon` pair is latitude-first. The neighbour signal plus `signal.location` is the base; a recorded locality via `signal.location.query` is the degrade path, so the location story degrades visibly instead of silently.
 
 ### 2.5 Saturation / cannibalisation check — Insights with `filter.type=urn:entity:place`
 
 - **What it does:** "is a coffee shop already within walking distance?" — the check that stops Karum recommending what the block already has. It feeds both the cannibalisation penalty in scoring and the "do not lease: third coffee concept" card.
-- **The call:** `GET /v2/insights?filter.type=urn:entity:place&filter.tags=<category tag>&filter.location=<lat>,<lon>&filter.location.radius=<metres>&sort_by=distance&take=50`. Documented refinements for later: `filter.price_level`, `filter.price_range.from/.to`, `filter.hotel_class`, ratings (`filter.rating`, TripAdvisor, business_rating), `filter.external.exists=resy,michelin,tablet` plus the Resy triple (count/rating/party_size), `filter.hours`, `filter.references_brand`, and `filter.exclude.tags` (+ operator) for the inverse "what to avoid" queries.
+- **The call:** `GET /v2/insights?filter.type=urn:entity:place&filter.tags=<category tag>&filter.location=POINT(<lon> <lat>)&filter.location.radius=<metres>&sort_by=distance&take=50` — Insights takes WKT only (longitude-first); always send an explicit radius (a WKT point without one returns 0 results). Documented refinements for later: `filter.price_level`, `filter.price_range.from/.to`, `filter.hotel_class`, ratings (`filter.rating`, TripAdvisor, business_rating), `filter.external.exists=resy,michelin,tablet` plus the Resy triple (count/rating/party_size), `filter.hours`, `filter.references_brand`, and `filter.exclude.tags` (+ operator) for the inverse "what to avoid" queries.
 - **Where it lives:** [PLAN.md](PLAN.md) epics 14 and 15; [PRODUCT.md](PRODUCT.md) call sequence #4.
 - **Why it matters:** it is the product's negative space ("do not lease") and the tie-breaker between two otherwise plausible candidates.
-- **Watch-outs:** radius here is **metres** (default 15000; omitted radius pads the boundary by the lesser of 10% of the locality diameter or ~2,414 m; `0` = strictly inside). Spike 5 settles whether e.g. 400 m genuinely filters at 400 m — this is the granularity question behind kill-rule 1 (if only city-level works, the "block" story weakens).
+- **Watch-outs:** radius here is **metres** and spike-settled (16 Oct): 400 m genuinely filters (max observed 394 m), `0` behaves like the ~15 km default rather than strict containment, and a WKT point without a radius returns **zero** rows — always send one (spike 5; DI-21). The docs' padding/`0`-strictness claims are false, so kill-rule 1's granularity question is answered: the block story holds at 400 m.
 
 ### 2.6 Audience-skew sanity check — Insights with `filter.type=urn:demographics`
 
@@ -141,7 +141,7 @@ Summary first, details after.
 - **The call:** the same brand/place calls from 2.4–2.5 with `feature.explainability=true`.
 - **Where it lives:** [PLAN.md](PLAN.md) epics 14 and 41; [PRODUCT.md](PRODUCT.md) call sequence #3 and the "How we know" panel.
 - **Why it matters:** it is the honesty backbone of the demo and the hardest thing for a judge to dismiss: the recommendation decomposes into named inputs.
-- **Watch-outs:** it is in the OpenAPI spec but absent from the per-entity parameter tables — shape and acceptance go through spike 4. There is a documented warning path (`query.explainability.warning`) when it cannot be computed; results stay normal, and Karum falls back to derived attribution, labelled as inference.
+- **Watch-outs:** settled 16 Oct (spike 4): accepted on brand and place calls — per result `query.explainability.signal.interests.entities[].{entity_id, score}` plus top-level `effect_on_top3/5/10/all_recs` aggregates; observed scores were all 1.0, so the ≥0.1 inclusion rule is untested. Dead signal entities surface in a top-level `warnings` array (`not_found`), not a `query.explainability.warning` field — 3 of 4 Colaba ids failed it, so treat `warnings` as the honesty check and keep the derived-attribution fallback, labelled as inference.
 
 ### 2.9 Map heatmap overlay — Insights with `filter.type=urn:heatmap`
 
@@ -149,7 +149,7 @@ Summary first, details after.
 - **The call:** `GET /v2/insights?filter.type=urn:heatmap&filter.location.query=<locality>&signal.interests.tags=urn:tag:genre:place:restaurant&output.heatmap.boundary=<selector>`. Important correction from the docs: **any** entity or tag works as the signal — the restaurant-genre tag is Karum's deliberate choice for interpretability, not a requirement ([QLOO_APIS.md](QLOO_APIS.md) §3.7).
 - **Where it lives:** [PLAN.md](PLAN.md) epics 16 and 39; [PRODUCT.md](PRODUCT.md) call sequence #6. Optional, behind the capability flag.
 - **Why it matters:** it makes the "location is where Qloo is hardest to fake" argument visible in one glance.
-- **Watch-outs:** the `output.heatmap.boundary` literals are unclear (DI-12) and older material spells the type `urn:entity:heatmap` (DI-18) — spike 3 settles both before the flag turns on. Off by default: the map still works with pins + the competitor radius ring.
+- **Watch-outs:** settled 16 Oct (spikes 3 + 22, DI-12/DI-18 closed): `urn:heatmap` is the only accepted spelling (`urn:entity:heatmap` → 400); `urn:entity:locality` returns locality polygons instead of cells; `heatmap.dimensions` adds `*_affinity(_rank)` columns and `filter.dimensions.*` adds `*_count_affinity(_rank)` plus undocumented `*_total_count` (cells 230 → 265/232) with no explicit boundary needed. Off by default: the map still works with pins + the competitor radius ring.
 
 ### 2.10 Neighbours-vs-candidate overlap chart — `GET /v2/analysis/compare`
 
@@ -164,12 +164,12 @@ Summary first, details after.
 - **What it does:** the Insights payload is deliberately plain — hydration fills the card gaps (image, description, properties) for already-known IDs, by `entity_ids` or through one of 22 external-ID namespaces (`external.resy.ids`, `external.michelin.ids`, `external.instagram.ids`, …). It also lets cards render Qloo-known data when no Google Places key is configured.
 - **Where it lives:** [PLAN.md](PLAN.md) epic 40; [QLOO_APIS.md](QLOO_APIS.md) §3.12.
 - **Why it matters:** demo polish and trust — a judge sees recognisable, verifiable cards instead of bare names.
-- **Watch-outs:** misses return a 404-style body, not an empty success — handle the miss explicitly. The external-ID round-trip for the demo cities goes through spike 16.
+- **Watch-outs:** settled 16 Oct (spike 16): `/entities?entity_ids=` round-trips a full record (Leopold: 173 tags, full properties) and `external.resy.ids` returned the same entity `/search` found — card enrichment without a Places key is viable. Misses return a 404-style body, not an empty success — handle the miss explicitly.
 
 ### 2.12 Operational plumbing (invisible but load-bearing)
 
 - **Key-liveness probe** — the hackathon key is in hand (16 Oct 2026) and its monthly quota is recorded as 10,000 requests; `GET /` against the hackathon host confirms it stays live ([PLAN.md](PLAN.md) epic 9, first checklist item).
-- **Quota and 429 handling** — rate-limit headers and reset timing are recorded (spike 7); estimated internal use (spike, city choice, prewarm, and the 20-block eval) is 1,000–2,000 calls, leaving wide headroom for judge traffic once the 24h cache is in place — keep a simple ledger and check it before the eval run and the judging window.
+- **Quota and 429 handling** — rate-limit headers and the rolling ~30-day reset window are recorded (spike 7; 429 deliberately unprobed — zero 429s across 123 calls). Estimated remaining internal use (city choice, prewarm, and the 20-block eval) fits comfortably inside the 9,877 left — keep the ledger and check it before the eval run and the judging window.
 - **Caching** — private server-side caching is allowed with no time limit. Karum caches by canonical parameter hash for 24h with a single-flight lock, plus an in-process fallback if Redis is down (epic 17).
 - **Prewarm** — the two sample blocks are loaded on deploy and refreshed inside the cache TTL so a judge's first click is fast (epic 47).
 - **Fixtures** — the spike's redacted responses become the first fixture files; replay tests assert the typed client structures with no live network (epics 7, 11, 50).
@@ -182,9 +182,9 @@ These are decisions, not oversights — each is recorded in [QLOO_APIS.md](QLOO_
 
 - `/recs` and `/recommendations` — explicitly forbidden for the hackathon.
 - `/v2/audiences` and `/v2/audiences/types` — OpenAPI `deprecated: true`; demographic output comes from Insights instead (DI-20).
-- POST-only parameters (`filter.exclude.entities.query`, `signal.interests.entities.query`, merged-locality arrays, weight arrays) — off the table unless spike 10 proves POST works.
+- POST bodies for `*.entities.query` work (spike 10, DI-3 closed) but stay off GET; merged-locality arrays and weight arrays are unverified/rejected (400) — not used.
 - `urn:entity:audience` (deprecated) and search-only legacy types (`actor`, `album`, `author`, `director`) outside `/search`.
-- `urn:entity:destination` and `urn:entity:locality` as Insights `filter.type` — enum-absent / only partially supported.
+- `urn:entity:locality` as an Insights `filter.type` — 400s unless signalled by locality entities. (`urn:entity:destination` works but is enum-absent and unused — spike 2, DI-2 closed.)
 - `GET /v2/trending` — deliberately out of the MVP (it returns below, as suggestion A1).
 - `signal.location.radius` where density discovery matters — Qloo advises against overriding it.
 - Any parameter without a §6/§7 catalogue row.
@@ -211,7 +211,7 @@ Three groups: **A** = cheap additions to the pipeline that already exists (same 
 - **The call:** the existing brand insights call with `filter.results.entities=<judge's brand ID>` (resolve the name via `/search` first).
 - **Where it plugs in:** the shortlist board (epic 40) and evidence drawer (epic 41); reuses the probe machinery already in scoring (epic 15, spike 9).
 - **Why it's worth it:** it makes the agent feel genuinely interactive and answers the single most common judge reflex — "did you check the obvious one?" — with Qloo evidence instead of assertion.
-- **Gates:** none beyond spike 9; resolve-then-probe needs a confident `/search` hit, and a miss must be labelled a miss.
+- **Gates:** none beyond spike 9 (settled 16 Oct — `filter.results.entities` works; `filter.results.tags` is a no-op). Resolve-then-probe needs a confident `/search` hit, and a miss must be labelled a miss.
 
 #### A3. Safe ↔ bold mode — `bias.trends` + popularity bands
 
@@ -243,7 +243,7 @@ Three groups: **A** = cheap additions to the pipeline that already exists (same 
 - **The call:** the existing place-side saturation call, plus reading `price_level` from the returned properties.
 - **Where it plugs in:** block profile (epic 14), scoring (epic 15), memo (epic 23), clarifying defaults (epic 28).
 - **Why it's worth it:** grounds "premium tier" in data instead of the user's self-assessment, with zero extra calls.
-- **Gates:** spike 8 already checks that `price_level` is populated for the demo cities — extend it to confirm the field reads back on results.
+- **Gates:** spike 8 settled density (`price_level`/`price_range`/`business_rating`/`hours`/`images` present); demo-city rows get spot-checked at build time — extend that to confirm `price_level` reads back on results.
 
 #### A7. Geohash block definition — `filter.location.geohash`
 
@@ -259,7 +259,7 @@ Three groups: **A** = cheap additions to the pipeline that already exists (same 
 - **The call:** no new call — the epic-14 demographics response, reformatted.
 - **Where it plugs in:** memo/outreach drafting (epic 23) and the evidence drawer (epic 41).
 - **Why it's worth it:** a second, human-readable layer of evidence for free; it also quietly demonstrates Qloo's "demographics as output of taste, not input" philosophy.
-- **Gates:** none beyond the existing DI-2 403 risk — if demographics 403s, the section is omitted.
+- **Gates:** none — demographics works (spike 2, DI-2 closed); if a call ever fails, the section is omitted.
 
 #### A9. External-ID card links — `/entities` namespaces
 
@@ -285,7 +285,7 @@ These are not hackathon-week features. They are the roadmap [PRODUCT.md](PRODUCT
 - **What it does:** compares two high streets or districts — each proxied by its venue set — and shows how their audiences overlap or differ, plus their tag profiles. A sellable artifact for business improvement districts and councils (PRODUCT.md's named secondary buyer).
 - **The call:** `CompareSets` with `a.`/`b.` signals = each district's resolved venues; pair with `urn:tag` descriptor calls for the written summary.
 - **Why it's worth it:** the same engine, a second paying audience, and a report nobody else in the field is producing.
-- **Gates:** merged-locality arrays are POST-only (DI-3) — districts must be represented by their venues, not by locality arrays, until spike 10 says otherwise.
+- **Gates:** merged-locality arrays remain unverified (spike 10 settled POST bodies, not arrays — DI-3 closed) — districts must be represented by their venues, not by locality arrays.
 
 #### B3. Portfolio cannibalisation guard
 
@@ -316,7 +316,7 @@ These are not hackathon-week features. They are the roadmap [PRODUCT.md](PRODUCT
 
 ### Group C — Spike-gated ideas (verify before planning)
 
-These use documented parameters, but only in the "deep-dive" spec or with open conflicts. Put each into the epic-9 session as an extra probe; only then decide whether the pay-off justifies the build.
+These use documented parameters, but only in the "deep-dive" spec or with open conflicts. The epic-9 session (16 Oct) settled the affordable ones — the answers are inline below; anything still untested needs a small follow-up probe before adoption.
 
 - **C1. `model=predictive` on compare** — a forward-looking overlap chart next to the descriptive one (spike 19 settled: both models accepted with identical shape; the chart must parse `matchEntities` — DI-22).
 - **C2. `bias.content_based` (0–1) + backfill dials** — a "novel vs expected" dial and suppression of low-confidence filler; both are deep-dive-only — spike 18 settled the backfill dials as silently ignored on this surface.
@@ -344,30 +344,30 @@ Unchanged from the current discipline; restated so new ideas do not drift:
 
 | # | Idea | Qloo call | Effort | Judge-visible | Gate |
 |---|---|---|---|---|---|
-| A1 | Momentum badge + "why now" line | `/v2/trending` | S | Yes, high | Spike 20; after must-builds |
-| A2 | Probe any brand on demand | `filter.results.entities` | S | Yes, high | Spike 9 |
+| A1 | Momentum badge + "why now" line | `/v2/trending` | S | Yes, high | Spike 20 settled — after must-builds |
+| A2 | Probe any brand on demand | `filter.results.entities` | S | Yes, high | Spike 9 settled |
 | A3 | Safe ↔ bold toggle | `bias.trends` + popularity bands | S | Yes, high | Documented; demo wording |
-| A4 | Constraints as positive signal | `signal.interests.tags` (+weight) | S | Indirect | Spike 14 (weights) |
-| A5 | Quality-credibility badges | `filter.external.exists`, Resy/rating fields | S–M | Yes, medium | DI-4 (spike 11); field read-back |
-| A6 | Price centre-of-gravity for rent guidance | `filter.price_level` read-back | S | Indirect (memo) | Spike 8 extension |
-| A7 | Geohash block definition (fallback) | `filter.location.geohash` | S | Protects demo | After spike 5 |
-| A8 | Demographic memo section | reuse `urn:demographics` | S | Yes, medium | DI-2 (spike 2) |
-| A9 | External-ID card links | `/entities` namespaces | S | Yes, medium | Spike 16 |
+| A4 | Constraints as positive signal | `signal.interests.tags` (+weight) | S | Indirect | Spike 14 closed — weights inert on the test call; diff-test any use |
+| A5 | Quality-credibility badges | `filter.external.exists`, Resy/rating fields | S–M | Yes, medium | DI-4 closed (spike 11); field read-back |
+| A6 | Price centre-of-gravity for rent guidance | `filter.price_level` read-back | S | Indirect (memo) | Spike 8 settled — extend to field read-back |
+| A7 | Geohash block definition (fallback) | `filter.location.geohash` | S | Protects demo | Spike 5 settled — fallback unneeded |
+| A8 | Demographic memo section | reuse `urn:demographics` | S | Yes, medium | DI-2 closed (spike 2) |
+| A9 | External-ID card links | `/entities` namespaces | S | Yes, medium | Spike 16 settled |
 | B1 | Brand-side workspace (deepened) | heatmap w/ brand signal; `filter.references_brand` | M | Post-hackathon | Epic 48; framing rule |
-| B2 | District / BID compare reports | `CompareSets` on venue sets | M | Post-hackathon | DI-3 (no locality arrays) |
+| B2 | District / BID compare reports | `CompareSets` on venue sets | M | Post-hackathon | DI-3 closed — no locality arrays; use venue sets |
 | B3 | Portfolio cannibalisation guard | place + tags per saved vacancy | M | Post-hackathon | Epic 29/43; caching |
 | B4 | Watch mode + momentum alerts | diff + `/v2/trending` | M | Post-hackathon | Epics 30/43 |
 | B5 | Pop-up / food-hall mode | parameter profiles only | S–M | Post-hackathon | None new |
 | B6 | MCP depth (`taste_of_block`, `probe_brand`) | gateway calls via MCP | M | Post-hackathon | Epic 49; quota policy |
-| C1 | Predictive compare | `model=predictive` | ? | Maybe | Spike 19 |
-| C2 | Novel-vs-expected dial + filler caps | `bias.content_based`, backfill dials | ? | Maybe | Spike 18 |
-| C3 | Merged localities / weight arrays | POST surface | ? | No | Spike 10 (DI-3) |
-| C4 | Trending for tags/localities | `/v2/trending` | ? | Maybe | Spike 20 extension |
-| C5 | City/metro diversification | `diversify.by` | ? | No | Spike 15 (DI-10) |
-| C6 | Renderability guard | `filter.exists=properties.image` | ? | Indirect | Deep-dive verify |
-| C7 | Demographics as input weights | `signal.demographics.*.weight` | ? | Maybe | DI-7/DI-20 |
+| C1 | Predictive compare | `model=predictive` | ? | Maybe | Spike 19 settled — same shape as descriptive |
+| C2 | Novel-vs-expected dial + filler caps | `bias.content_based`, backfill dials | ? | Maybe | Spike 18 settled — backfill dials are no-ops |
+| C3 | Merged localities / weight arrays | POST surface | ? | No | DI-3 closed — POST works; arrays unverified/rejected |
+| C4 | Trending for tags/localities | `/v2/trending` | ? | Maybe | Spike 20 settled for brands; tags/localities untested |
+| C5 | City/metro diversification | `diversify.by` | ? | No | DI-10 closed — subtype is tag-scope only; city/metro untested |
+| C6 | Renderability guard | `filter.exists=properties.image` | ? | Indirect | Untested deep-dive param — cheap probe first |
+| C7 | Demographics as input weights | `signal.demographics.*.weight` | ? | Maybe | DI-7 closed; DI-20 — audiences route deprecated, deep-dive weights untested |
 
-Effort: S = a day or less on top of an existing epic; M = a small feature slice; "?" = unknown until the spike call is made. "Judge-visible" means it shows up in the three-minute demo script.
+Effort: S = a day or less on top of an existing epic; M = a small feature slice; "?" = effort sized only after a follow-up probe. "Judge-visible" means it shows up in the three-minute demo script.
 
 ## 5. Practical adoption order (if you only do a few)
 
@@ -376,7 +376,7 @@ Effort: S = a day or less on top of an existing epic; M = a small feature slice;
 3. **A1 — Momentum badge.** Best story per call; add only after the must-build list is green (it sits on the cut line today).
 4. **A8 + A6 — memo sections.** Nearly free: they reuse data already fetched and make the memo feel researched rather than generated.
 5. **Everything in Group B** is the post-hackathon roadmap — PRODUCT.md's v1/v2 in concrete form. Do not pull it forward before the judge path ships.
-6. **Group C items** each cost one probe call in the epic-9 session; decide after the answer, not before.
+6. **Group C items** — the epic-9 session answered the affordable ones (inline above); anything still open costs one small follow-up probe before adoption.
 
 ---
 

@@ -79,7 +79,7 @@ In `infra/proto`, define the messages every service shares: vacancy, constraint,
 
 ### 5. Taste RPCs
 
-Define the `service-taste` gRPC service the gateway calls. `ResolveEntities` returns ranked place or brand candidates plus a confidence. `ResolveTags` maps a constraint phrase to tag URNs. `GetBlockProfile` returns taste tags, brand candidates, saturation, and demographics for confirmed neighbour ids. `ScoreCandidates` returns the shortlist, the do-not-lease list, and the evidence bundle. `GetHeatmap` and `CompareSets` are optional RPCs behind a capability flag so the client can hide them when the spike marks an endpoint unavailable.
+Define the `service-taste` gRPC service the gateway calls. `ResolveEntities` returns ranked place or brand candidates plus a confidence. `ResolveTags` maps a constraint phrase to tag URNs. `GetBlockProfile` returns taste tags, brand candidates, saturation, and demographics for confirmed neighbour ids. `ScoreCandidates` returns the shortlist, the do-not-lease list, and the evidence bundle. `GetHeatmap` and `CompareSets` are optional RPCs behind a capability flag so the client can hide them when an endpoint is unavailable or its output is too thin to render — both settled as available (spikes 3/19); compare's `matchEntities` came back empty on the probed pairs (DI-22).
 
 - [ ] `ResolveEntities` for places and brands, with ranked candidates and a confidence
 - [ ] `ResolveTags` for constraint phrases
@@ -138,12 +138,12 @@ Hit `https://hackathon.api.qloo.com` with the `X-Api-Key` header and work the sp
 
 ### 10. City choice
 
-Script three cities by five blocks and measure entity resolution rate, how brand rank shifts when the neighbour set changes, and whether resolved tags are ones the product can explain. Score each block against the kill rules for signal, resolution, and retail plausibility, then lock two demo cities and two sample blocks — **Mumbai (Colaba) is pre-adopted as the second demo city** (16 Oct coverage-probe decision; every spike verdict sits on this block), so this pass decides the Western lead city (NYC / London / Austin) and the two sample blocks. If location is only city-level, record the neighbour-entity fallback the profile query will use instead of a radius. If the gate fails, point the same gRPC services at Shelfwise before any feature work continues.
+Script three cities by five blocks and measure entity resolution rate, how brand rank shifts when the neighbour set changes, and whether resolved tags are ones the product can explain. Score each block against the kill rules for signal, resolution, and retail plausibility, then lock two demo cities and two sample blocks — **Mumbai (Colaba) is pre-adopted as the second demo city** (16 Oct coverage-probe decision; every spike verdict sits on this block), so this pass decides the Western lead city (NYC / London / Austin) and the two sample blocks. Location is settled at block granularity — `signal.location` localises brand calls at the block point (spike 1, DI-11) — so the city-level fallback is recorded as not needed. If the gate fails, point the same gRPC services at Shelfwise before any feature work continues.
 
 - [ ] Run three cities by five blocks for resolution rate, brand shift when neighbours change, and tag usefulness
 - [ ] Score each block against the kill rules for signal, resolution, and retail plausibility
 - [ ] Pick two demo cities and two sample blocks that pass — half-decided: Mumbai (Colaba) locked 16 Oct as the second demo city; this pass picks the Western lead city and the sample blocks
-- [ ] Record the neighbour-entity fallback if location is only city-level
+- [x] Record the neighbour-entity fallback if location is only city-level — not needed: `signal.location` (WKT) localises brand results at the block point (spike 1, DI-11); the profile query keeps the neighbour signal plus `signal.location`
 - [ ] If the gate fails, switch the same services to Shelfwise before feature work continues
 
 ## 3. service-taste
@@ -160,7 +160,7 @@ Build the taste-service HTTP client with one typed method per endpoint the spike
 
 ### 12. Entity resolution
 
-`ResolveEntities` calls `GET /search` for places using the neighbour name plus the vacancy point — `filter.location=<lat>,<lon>` with `filter.radius` in **miles**, disambiguated by `filter.address` (recipe: [QLOO_APIS.md](QLOO_APIS.md) §3.1) — and returns the top five candidates with a derived confidence — rank, distance, and name match, marked as a model inference in the proto because `/search` publishes no score ([QLOO_APIS.md](QLOO_APIS.md) §3.1). The same RPC searches brands when the caller passes a user shortlist. Low-confidence and ambiguous hits are flagged so the gateway can pause for confirmation instead of guessing an entity id. A total miss is an explicit `unresolved` error, not an empty success. Cache both hits and negative lookups under a short TTL.
+`ResolveEntities` calls `GET /search` for places using the neighbour name plus the vacancy point — `filter.location=<lat>,<lon>` with `filter.radius` in **miles**, disambiguated by `filter.address` (recipe: [QLOO_APIS.md](QLOO_APIS.md) §3.1; keep the default match sort — `sort_by=distance` turns a name query into "nearest venues", trap 7) — and returns the top five candidates with a derived confidence — rank, distance, and name match, marked as a model inference in the proto because `/search` publishes no score ([QLOO_APIS.md](QLOO_APIS.md) §3.1). The same RPC searches brands when the caller passes a user shortlist. Low-confidence and ambiguous hits are flagged so the gateway can pause for confirmation instead of guessing an entity id. A total miss is an explicit `unresolved` error, not an empty success. Cache both hits and negative lookups under a short TTL.
 
 - [ ] Search places with neighbour name plus vacancy point (`filter.location` + `filter.radius` in miles) and return the top five
 - [ ] Search brands for a user shortlist
@@ -200,10 +200,10 @@ Build the taste-service HTTP client with one typed method per endpoint the spike
 
 ### 16. Optional graph extras
 
-`GetHeatmap` runs only when the capability flag is on and a signal tag is present; the flag can turn on now that the spike settled the heatmap facts (DI-18 closed; DI-12 closed 16 Oct — boundary literals, dimensions, and count columns all settled). Qloo accepts any entity or tag as the heatmap signal ([QLOO_APIS.md](QLOO_APIS.md) §3.7) — Karum deliberately anchors on a place-genre tag such as `urn:tag:genre:place:restaurant` as a design choice for interpretability, not because Qloo requires it. `CompareSets` runs the neighbour set against a candidate only when the spike settled its parameters (spike 19 settled 16 Oct; parse `matchEntities` — DI-22). If either call is missing, the response degrades to the pins plus the radius the saturation check already used. Demographic mismatch warnings attach beside the rubric. With the flag off, neither RPC is invoked and the client hides both widgets. `/v2/trending` (momentum badge and outreach line, [QLOO_APIS.md](QLOO_APIS.md) §3.11) is deliberately out of the MVP — revisit only after the must-build list is green.
+`GetHeatmap` runs only when the capability flag is on and a signal tag is present; the flag can turn on now that the spike settled the heatmap facts (DI-18 closed; DI-12 closed 16 Oct — boundary literals, dimensions, and count columns all settled). Qloo accepts any entity or tag as the heatmap signal ([QLOO_APIS.md](QLOO_APIS.md) §3.7) — Karum deliberately anchors on a place-genre tag such as `urn:tag:genre:place:restaurant` as a design choice for interpretability, not because Qloo requires it. `CompareSets` is settled as well (spike 19, 16 Oct): the response is `{tags, a, b, matchEntities}` — chart the `tags` overlap, degrade cleanly when it comes back empty, and treat `matchEntities` as a bonus (it was empty on every probe; DI-22). If either call is missing, the response degrades to the pins plus the radius the saturation check already used. Demographic mismatch warnings attach beside the rubric. With the flag off, neither RPC is invoked and the client hides both widgets. `/v2/trending` (momentum badge and outreach line, [QLOO_APIS.md](QLOO_APIS.md) §3.11) is deliberately out of the MVP — revisit only after the must-build list is green.
 
 - [ ] Call heatmap only when the capability flag is on and a signal tag is present (Karum's choice: a place-genre tag)
-- [ ] Call compare for the neighbour set versus a candidate when that endpoint is verified
+- [ ] Call compare for the neighbour set versus a candidate — endpoint settled 16 Oct (spike 19); parse the `tags` overlap plus `matchEntities` and degrade when both are empty (DI-22)
 - [ ] Degrade to pins plus a radius when either call is missing
 - [ ] Attach demographic mismatch warnings beside the rubric
 - [ ] Hide both features from the client when the flag is off
@@ -457,7 +457,7 @@ Render the five `RankedCandidate`s as cards with three labeled sub-score bars (c
 
 ### 41. Evidence and counterfactual
 
-The evidence drawer lists each `EvidenceCall`: the Qloo endpoint, the parameters, and the result count, plus which neighbour audiences carried the affinity — read straight from `query.explainability` when the spike confirms `feature.explainability=true` (see [QLOO_APIS.md](QLOO_APIS.md) §3.8), falling back to derived attribution only if it is unavailable. Style Qloo-fact fields and model-inference fields differently, using the split marked in the proto comments. The LLM-only toggle requests `LlmOnlyBaseline` for the same inputs and labels it ungrounded. Copy-evidence writes the drawer as plain text.
+The evidence drawer lists each `EvidenceCall`: the Qloo endpoint, the parameters, and the result count, plus which neighbour audiences carried the affinity — read straight from `query.explainability` — accepted on brand and place calls, confirmed 16 Oct (spike 4; see [QLOO_APIS.md](QLOO_APIS.md) §3.8) — falling back to derived attribution when the payload is thin or a signalled id shows up in `warnings` (3 of 4 Colaba ids were `not_found`). Style Qloo-fact fields and model-inference fields differently, using the split marked in the proto comments. The LLM-only toggle requests `LlmOnlyBaseline` for the same inputs and labels it ungrounded. Copy-evidence writes the drawer as plain text.
 
 - [ ] Drawer listing each Qloo call, its parameters, and its result count
 - [ ] Show which neighbour audiences carried the affinity

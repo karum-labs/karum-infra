@@ -2,7 +2,7 @@
 
 Every Qloo endpoint Karum may call, with the exact parameters, mapped to the epics in [PLAN.md](PLAN.md). Sources: the [Qloo Knowledge Center](https://docs.qloo.com) pages (documentation dated 2025-10-27 → 2026-07-20) and the official [Qloo Agentic Hackathon Developer Guide](https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide) (page updated 2026-10-07). **Snapshot: 16 Oct 2026.**
 
-Anything marked **verify** — or listed in the §5 spike checklist — goes through [PLAN.md](PLAN.md) epic 9 before it reaches client code. Every doc-vs-doc conflict carries an ID in §9; when the spike settles one, record the answer here, tick the checklist item, and close the §9 row with a date.
+The §5 spike checklist ran to completion on 16 Oct 2026 (123 calls; evidence in [spike/RECORDING.md](spike/RECORDING.md)) — every parameter Karum uses is settled or explicitly marked do-not-use before it reaches client code. Every doc-vs-doc conflict carries an ID in §9; a closed row carries the observed answer and the date.
 
 | § | Section | What it covers |
 | --- | --- | --- |
@@ -23,17 +23,17 @@ Anything marked **verify** — or listed in the §5 spike checklist — goes thr
 | Base URL | `https://hackathon.api.qloo.com` **only** — keys get 401 against `api.qloo.com` or `staging.api.qloo.com` |
 | Docs-host trap | Every OpenAPI page in the docs lists `https://api.qloo.com` as "Production Qloo API server", and some examples use `staging.api.qloo.com`. Copy-pasted cURL must have its host swapped to the hackathon host. See DI-1. |
 | Auth | `X-Api-Key` header (never a query param, never `Authorization: Bearer`) |
-| Method | `GET` with query-string params — the hackathon surface is GET-only. The docs describe POST-only parameters (`filter.exclude.entities.query`, `signal.interests.entities.query`) and POST bodies that accept arrays (merged localities, weight arrays); on a GET-only surface those are unavailable until the spike proves otherwise (DI-3, spike item 10). |
+| Method | `GET` with query-string params by default. **Settled 16 Oct (spike 10, DI-3 closed):** `POST /v2/insights` works with JSON bodies, so `filter.exclude.entities.query` and `signal.interests.entities.query` are usable via POST and stay off GET. Weight-array shapes were rejected (400) and merged-locality arrays remain unverified — use GET unless a parameter is documented POST-only. |
 | Availability | **All documented endpoints are available** during the hackathon |
 | Forbidden | **`/recs` and `/recommendations`** — legacy endpoints, explicitly unsupported |
 | Silent failures | Unsupported parameters are **ignored, not rejected**: you get 200 with an empty result. Verify every parameter against §7 (per-entity guide) before assuming a data gap |
-| Insights `filter.type` | `urn:entity:{artist, book, brand, locality, movie, person, place, podcast, tv_show, videogame}` + `urn:heatmap` + `urn:entity:audience` (deprecated). Notes: the enum spells `videogame` with no underscore; `urn:entity:destination` has a full §7 table but is **absent** from the enum; `urn:tag` and `urn:demographics` are documented on the use-case pages but **absent** from the enum — all three are 403 risks (DI-2). `urn:entity:locality` is partially supported: only `signal.interests.entities` when the provided entities are localities. A 403 means the type is unsupported |
+| Insights `filter.type` | `urn:entity:{artist, book, brand, locality, movie, person, place, podcast, tv_show, videogame}` + `urn:heatmap` + `urn:entity:audience` (deprecated). Notes: the enum spells `videogame` with no underscore; `urn:entity:destination`, `urn:tag` and `urn:demographics` are **absent** from the enum but all three return data — no 403s anywhere (DI-2 closed 16 Oct). `urn:entity:locality` is partially supported: only `signal.interests.entities` when the provided entities are localities (400s otherwise) |
 | `/search` types | Not the same set as Insights `filter.type` — the enum adds search-only legacy types (`actor`, `album`, `author`, `director`, `locality`) and (oddly) `urn:heatmap` and `urn:entity:audience`. Karum searches `urn:entity:place` and `urn:entity:brand` only (DI-17) |
 | Error map | 401 wrong base URL or header · 403 unsupported entity type · 400 missing or invalid signal ("at least one valid signal or filter is required") · 429 rate limit |
 | Pagination | `take` default 20, **max 50** on every endpoint except `/search` (exclusive max 200). `page` 1–100, default 1. `offset` arbitrary. Docs recommend `page` over `offset` |
 | Caching | Private server-side caching is allowed with **no time limit**, but **never store raw Qloo responses in a public repository** — the fixture pack must be redacted because Devpost requires public repos |
 | Response fields | The full response is always returned; fields cannot be filtered. Verbose payloads (`akas`, `short_descriptions`) must be trimmed client-side |
-| Quotas | **10,000 requests/month** per key (key received 16 Oct 2026). Observed 16 Oct by probe: `X-Second-RateLimit-Limit: 5` (req/s), `X-Month-RateLimit-Limit: 10000`, `X-Month-RateLimit-Reset` counts down ≈ 2,592,000 s — a rolling ~30-day window, not a calendar-month reset; 429 behaviour still unprobed (spike 7). Limits are raisable via Discord `#api-help`; keys are deactivated after the judging period |
+| Quotas | **10,000 requests/month** per key (key received 16 Oct 2026). Observed 16 Oct by probe: `X-Second-RateLimit-Limit: 5` (req/s), `X-Month-RateLimit-Limit: 10000`, `X-Month-RateLimit-Reset` counts down ≈ 2,592,000 s — a rolling ~30-day window, not a calendar-month reset; 429 deliberately unprobed (spike 7 — partial by design: zero 429s across 123 calls, 9,877 remaining). Limits are raisable via Discord `#api-help`; keys are deactivated after the judging period |
 
 ## 2. Endpoint inventory
 
@@ -57,7 +57,7 @@ Grouped the way the docs group them (Insights · Lookup APIs · Analysis & Trend
 
 ## 3. Call recipes
 
-These are the calls Karum makes, each with the full documented parameter surface. Where the docs disagree with themselves, the §9 ID is cited and the spike settles it.
+These are the calls Karum makes, each with the full documented parameter surface. Where the docs disagree with themselves, the §9 ID is cited and the spike's answer is recorded inline (all rows closed 16 Oct 2026).
 
 ### 3.1 Resolve neighbours — `GET /search` (epic 12)
 
@@ -69,7 +69,7 @@ These are the calls Karum makes, each with the full documented parameter surface
         &filter.address=<city or street>  # partial match, comma-separated terms
         &take=5                           # exclusive max 200
         &page=1                           # 1–100
-        &sort_by=distance                 # match | distance | popularity — default match
+        # sort_by: leave unset (default match) for name lookups — distance means "nearest venues" (trap 7)
 ```
 
 Shortlist brands: `types=urn:entity:brand`. Other supported parameters: `filter.tags` (+ `operator.filter.tags=union|intersection`, default `union`), `filter.popularity` (min, 0–1), `filter.rating` (min, 0–5), `filter.exists` (e.g. `external.resy`, `external.michelin` — pattern `^external\.\w+$`; `filter.exists=external.resy` returned NYC Resy venues on the first try, 16 Oct).
@@ -125,7 +125,7 @@ The Taste Analysis page requires `filter.type=urn:tag` **plus at least one** of:
              &take=50
 ```
 
-**Location conflict inside Qloo's own docs — the spike settles it:**
+**Location conflict inside Qloo's own docs — settled 16 Oct (spike 1):**
 
 - The [Entity Type Parameter Guide](https://docs.qloo.com/reference/available-parameters-by-entity-type) Brand table lists **no location parameter at all** (`filter.location`, `.radius`, `.query` are absent).
 - The [Location-Based Insights](https://docs.qloo.com/reference/insights-with-location-use-case) use case explicitly advertises `urn:entity:brand` with location, and ships a recipe for "popular brands inside Paris center based on WKT shape".
@@ -333,12 +333,12 @@ Everything the snapshot documents, in one place. **Guide** = [Entity Type Parame
 | `filter.dimensions.hotel_class` | array of ints 1–5; requires `hotel_class` in `heatmap.dimensions`; adds `hotel_class_count_affinity_rank` and `hotel_class_count_affinity` | — | heatmap | — |
 | `filter.hours` | one weekday: `monday` … `sunday` | — | place | open-on-day checks |
 | `filter.latest_known_year.min` / `.max` | integer | — | tv_show | — |
-| `filter.location` | lat/lon pair (**latitude first**), WKT (**longitude first**), or a locality UUID | — | destination, place; the use case adds brand (DI-2, §3.4) | the "fits here" gate |
+| `filter.location` | bare `lat,lon` pair (**latitude first** — `/search` only); WKT (**longitude first** — Insights only); the UUID option is rejected on both surfaces (spike 6, DI-21) | — | destination, place; brands localise via `signal.location` (DI-11 closed) | the "fits here" gate |
 | `filter.exclude.location` | WKT `POINT` / `POLYGON` / `MULTIPOLYGON` or locality UUID; `filter.exclude.location.radius` > 0 fuzzes the boundary | — | destination, place | — |
 | `filter.location.query` | fuzzy locality name (GET: one string; POST: array merges shapes); single match returned as `query.locality.signal`; 400 when nothing matches | — | destination, place | locality-by-name with padding rules |
 | `filter.exclude.location.query` | fuzzy exclusion by locality name(s); single match returned as `query.locality.exclude.signal`; 400 when nothing matches | — | destination, place | — |
-| `filter.location.radius` | integer metres; max 800000; when omitted, pads by min(10% of diameter, ~2414 m); `0` = strictly inside | 15000 | destination, place | saturation radius — settles kill-rule 1 (spike 5) |
-| `filter.exclude.location.radius` | integer metres; `0` strict, positive expands the exclusion | — | [deep-dive] | — |
+| `filter.location.radius` | integer metres; max 800000; **observed 16 Oct (spike 5):** omitted on a WKT point → 0 results; `0` ≈ 15 km default, not strict containment — the docs' padding/strictness claim is false | 15000 | destination, place | saturation radius — always send it (epic 14) |
+| `filter.exclude.location.radius` | integer metres; `0` strict, positive expands the exclusion | — | [deep-dive] | silently ignored (spike 5) |
 | `filter.location.geohash` | geohash prefix match (pygeohash, precision 12) | — | destination, place | — |
 | `filter.exclude.location.geohash` | geohash prefix exclusion | — | destination, place | — |
 | `filter.location.metro` | exact metro-area name | — | [deep-dive] | ignored on brand calls (DI-11 closed, spike 15) |
@@ -375,7 +375,7 @@ Everything the snapshot documents, in one place. **Guide** = [Entity Type Parame
 | `backfill.cross_domain.take` | integer 1–20 | 20 | [deep-dive] | cap appended filler |
 | `backfill.content_based.take` | integer 1–10 | 10 | [deep-dive] | cap content-similarity filler |
 | `signal.interests.entities` | comma-separated entity IDs (GET); `{entity, weight}` array (POST) | — | all (Required for destination) | the primary Karum signal |
-| `signal.interests.entities.include` | comma-separated entity IDs | — | [deep-dive] | force entities into affinity scoring |
+| `signal.interests.entities.include` | **boolean** — the docs' id-list form → 400 (DI-23 closed 16 Oct) | — | [deep-dive] | force entities into affinity scoring |
 | `signal.interests.entities.query` | **POST-only**; `{name, address, resolve_to}` objects or strings; response path `query.entities.signal`; warnings `not_found` / `could_not_resolve_brand` | — | all | unavailable on GET (DI-3); `resolve_to` variants DI-16 |
 | `signal.interests.entities.weight` | number ≥ 0 or weight string | — | all | signal strength |
 | `signal.interests.tags` | comma-separated tag IDs (GET); `{tag, weight}` array (POST), weights > 0 and relative | — | all | constraint chips as taste input |
@@ -401,14 +401,14 @@ Everything the snapshot documents, in one place. **Guide** = [Entity Type Parame
 | `offset` | integer ≥ 0 | — | all | arbitrary skip |
 | `sort_by` | `affinity`, `distance`, `rating`, `quality`; `distance` requires `filter.location`; `quality` is place-only and drops places without a score | `affinity` | place per guide; all per the deep-dive enum | rank control |
 | `feature.explainability` | boolean | `false` | [deep-dive] | the evidence drawer's source (§3.8) |
-| `output.heatmap.boundary` | heatmap boundary selector; literals unclear — docs mention a geohash default, "city or a neighborhood", and show `urn:entity:locality`; dimensions require `urn:geohash` (DI-12) | geohashes | heatmap | — |
+| `output.heatmap.boundary` | heatmap boundary selector; **settled 16 Oct (DI-12 closed):** `urn:geohash` is a no-op; `urn:entity:locality` returns locality polygons instead of cells; `heatmap.dimensions` needs no explicit boundary | geohashes | heatmap | — |
 | `heatmap.dimensions` | `quality`, `popularity`, `hotel_class`, `price_level`; adds `<dim>_affinity_rank` (0–1) and `<dim>_affinity` (percent rank); influences overall ranking | — | heatmap | richer overlay |
 | `diversify.by` | `properties.geocode.city`, `properties.geocode.metro`, `subtype` (`subtype` applies to `urn:tag` only per the guide; city/metro general per the deep dive — DI-10) | — | guide: tag; deep dive: general | spread results across cities |
 | `diversify.take` | integer ≥ 1 | — | same scope as `diversify.by` | max per group before paging |
 
 ## 7. Entity-type support matrix
 
-Condensed from the [Entity Type Parameter Guide](https://docs.qloo.com/reference/available-parameters-by-entity-type). Names are exact. Where the guide's names differ from the deep-dive spec (Resy, `price_range`), the §9 ID is cited and the spike settles which resolves.
+Condensed from the [Entity Type Parameter Guide](https://docs.qloo.com/reference/available-parameters-by-entity-type). Names are exact. Where the guide's names differ from the deep-dive spec (Resy, `price_range`), the §9 ID is cited; the closed row records which spelling resolves (all rows closed 16 Oct 2026).
 
 ### 7.1 Baseline — artist, book, brand, movie, person, podcast, tv_show, videogame
 
@@ -449,7 +449,7 @@ Condensed from the [Entity Type Parameter Guide](https://docs.qloo.com/reference
 - **Filters:** `filter.type` (required), `filter.location`, `filter.location.query`, `filter.location.radius`, `heatmap.dimensions`, `filter.dimensions.hotel_class`, `filter.dimensions.price_level`, `output.heatmap.boundary`
 - **Signals:** `signal.demographics.age`, `signal.demographics.audiences`, `signal.demographics.gender`, `signal.interests.entities`, `signal.interests.tags`
 - **Output:** `take`
-- The guide marks signals optional, but the Heatmap use-case page requires a location plus at least one signal in practice. `heatmap.dimensions` applies only when `output.heatmap.boundary=urn:geohash` per the guide (DI-12).
+- The guide marks signals optional, but the Heatmap use-case page requires a location plus at least one signal in practice. `heatmap.dimensions` applies with the default boundary — the guide's `urn:geohash` requirement is moot (spike 22, DI-12 closed).
 
 ### 7.6 Tag
 
