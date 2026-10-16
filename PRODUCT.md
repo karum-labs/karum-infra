@@ -76,7 +76,7 @@ With a Live Nation executive on the panel, music booking will be the most crowde
 **What the Taste Graph is.** Qloo describes "250M+ entities across music, film, dining, fashion, and more" in the hackathon brief. Its corporate materials cite larger catalogue figures (575M+ entities); treat those as marketing-level numbers. Third-party coverage describes recommendations derived from "co-occurrences between lifestyle entities and anonymized behavioral signals," with no personal identity data. Qloo's own capabilities page describes three properties:
 - One combined read of a set of interests: "each addition re-reads the whole, rather than stacking on the last answer."
 - Crossing category boundaries: "Qloo carries an affinity from music to hotels, or from fashion to dining."
-- Locality reads at block, neighbourhood, city and country scale. These include a heatmap, which Qloo says requires a place-genre signal such as `urn:tag:genre:place:restaurant`.
+- Locality reads at block, neighbourhood, city and country scale. These include a heatmap; Qloo's marketing frames it around a place-genre signal such as `urn:tag:genre:place:restaurant`, while the API itself accepts any entity or tag signal (see the table below and [QLOO_APIS.md](QLOO_APIS.md) §3.7).
 
 **How it differs from the alternatives:**
 - **Semantic similarity and embeddings:** an embedding says Brian Eno is *like* other ambient artists because the text describing them is alike. Qloo says people who like Brian Eno and Jil Sander *also go to* specific Copenhagen restaurants. That is a behavioural co-occurrence across unrelated categories, which no text corpus encodes.
@@ -84,21 +84,22 @@ With a Live Nation executive on the panel, music booking will be the most crowde
 - **Traditional recommenders:** these work inside one catalogue and need user history. Qloo starts from a single signal and returns results across domains.
 - **Demographic targeting:** this infers taste from age and gender. Qloo infers it from taste itself, and can output demographics as a *result* of taste.
 
-**API surface relevant to the hackathon** (from entrant repos and Qloo docs snippets; confirm against `docs.qloo.com` with your key):
+**API surface relevant to the hackathon** (verified against the Qloo docs snapshot of 16 Oct 2026; exact recipes, the per-entity parameter matrix and every known doc-vs-doc conflict are in [QLOO_APIS.md](QLOO_APIS.md) §§1–9):
 
 | Capability | How it is called | Product capability it unlocks |
 |---|---|---|
-| Entity resolution | `GET /search` (its `types` enum differs from Insights `filter.type` — Karum uses `urn:entity:place` and `urn:entity:brand`; see [QLOO_APIS.md](QLOO_APIS.md) §1); `GET /entities?entity_ids=` | Turn messy user input ("that taco place on Red River") into a canonical, auditable ID. This is the basis for explainability |
-| Tag resolution | `GET /v2/tags?filter.query=` | Turn vague concepts ("natural wine", "minimalist") into graph-native signals |
-| Audiences | `GET /v2/audiences` — ⚠️ OpenAPI `deprecated: true`; take segments from Insights output instead (see [QLOO_APIS.md](QLOO_APIS.md) §4) | Start from a named segment instead of seed entities |
-| Core inference | `GET /v2/insights` with `filter.type=urn:entity:…` and `signal.interests.entities` / `signal.interests.tags` | Cross-domain ranking: "people who like X → which brands, places, artists" |
+| Entity resolution | `GET /search` (its `types` enum differs from Insights `filter.type` — Karum uses `urn:entity:place` and `urn:entity:brand`; see [QLOO_APIS.md](QLOO_APIS.md) §1); `GET /entities?entity_ids=` or one of 22 external-ID namespaces (`external.resy.ids`, `external.michelin.ids`, …) | Turn messy user input ("that taco place on Red River") into a canonical, auditable ID. This is the basis for explainability; hydration recipe in [QLOO_APIS.md](QLOO_APIS.md) §3.12 |
+| Tag resolution | `GET /v2/tags?filter.query=`; `feature.typo_tolerance` and beta `feature.semantic_search` carry free-text constraints | Turn vague concepts ("natural wine", "minimalist") into graph-native signals — recipe in [QLOO_APIS.md](QLOO_APIS.md) §3.2 |
+| Audiences | `GET /v2/audiences` — ⚠️ OpenAPI `deprecated: true`; take segments from Insights output instead (see [QLOO_APIS.md](QLOO_APIS.md) §4). Audience IDs for `signal.demographics.audiences` nominally still come from there (DI-20) | Start from a named segment instead of seed entities |
+| Core inference | `GET /v2/insights` with `filter.type=urn:entity:…` and `signal.interests.entities` / `signal.interests.tags`; `filter.results.entities` probes specific candidates | Cross-domain ranking: "people who like X → which brands, places, artists" — recipes in [QLOO_APIS.md](QLOO_APIS.md) §3.3–§3.6 |
+| Explainability | `feature.explainability=true` on any Insights call | Per-result contribution scores (≥0.1 always included) plus a top-N aggregate — the evidence drawer's primary source, [QLOO_APIS.md](QLOO_APIS.md) §3.8 |
 | Tag-based filtering | `filter.tags=urn:tag:genre:…` | Restrict outputs to a category (e.g., only restaurants or only retail) while ranking by taste |
-| Location | **Verified 16 Oct 2026:** `filter.location=<lat>,<lon>` + `filter.location.radius=<metres>` on Insights (`filter.radius=<miles>` on `/search`); `filter.location.query` takes locality names only | Ask "what fits *here*." This is the core of any site-selection product — exact recipes in [QLOO_APIS.md](QLOO_APIS.md) §3.1 and §3.5 |
-| Demographic output | `filter.type=urn:demographics` | Infer the age/gender skew of an entity's audience, so the demographic is the result of taste rather than the input |
-| Taste description | `filter.type=urn:tag` | "What defines this set or location": readable descriptors for explanations |
-| Heatmap / locality | **Verified 16 Oct 2026:** `filter.type=urn:heatmap` inside `/v2/insights`, needs a location plus any entity/tag signal (`urn:tag:genre:place:restaurant` is a good choice, not a requirement) | Visual map of where a taste concentrates. This is the strongest demo asset — see [QLOO_APIS.md](QLOO_APIS.md) §3.7 |
-| Comparison | **Verified 16 Oct 2026:** `GET /v2/analysis/compare` with `a.` / `b.signal.interests.entities` | Overlap and difference between two entity sets (e.g., current tenants vs. candidate) |
-| Popularity / trends / exclusions / diversification | Qloo says results "can be weighted by factors such as regionalization and real-time popularity"; TechCrunch quotes adjustable "novel vs expected" weighting | Separate "safe" from "emerging" picks and exclude what is already present. **Verified 16 Oct 2026:** `filter.popularity.min/max`, `bias.trends`, `filter.exclude.tags` (+ `operator.filter.exclude.tags`), and `diversify.by=subtype` (tags only) are documented — see [QLOO_APIS.md](QLOO_APIS.md) |
+| Location | **Verified 16 Oct 2026:** `filter.location=<lat>,<lon>` (or WKT — longitude first — or a locality UUID) + `filter.location.radius=<metres>` on Insights (`filter.radius=<miles>` on `/search`); `filter.location.query` takes locality names | Ask "what fits *here*." This is the core of any site-selection product — exact recipes in [QLOO_APIS.md](QLOO_APIS.md) §3.1 and §3.5 |
+| Demographic output | `filter.type=urn:demographics` — documented on the use-case page but **absent from the `filter.type` enum** (403 risk; DI-2, spike 2) | Infer the age/gender skew of an entity's audience, so the demographic is the result of taste rather than the input |
+| Taste description | `filter.type=urn:tag` (requires at least one signal; `filter.tag.types` scopes the namespace) | "What defines this set or location": readable descriptors for explanations — recipe in [QLOO_APIS.md](QLOO_APIS.md) §3.3 |
+| Heatmap / locality | **Verified 16 Oct 2026:** `filter.type=urn:heatmap` inside `/v2/insights`, needs a location plus any entity/tag signal (`urn:tag:genre:place:restaurant` is a good choice, not a requirement); `output.heatmap.boundary` literals are an open doc conflict (DI-12, spike 3) | Visual map of where a taste concentrates. This is the strongest demo asset — see [QLOO_APIS.md](QLOO_APIS.md) §3.7 |
+| Comparison | **Verified 16 Oct 2026:** `GET /v2/analysis/compare` with required `a.` / `b.signal.interests.entities`; `filter.subtype` and `model=descriptive|predictive` shape it | Overlap and difference between two entity sets (e.g., current tenants vs. candidate) — recipe in [QLOO_APIS.md](QLOO_APIS.md) §3.10 |
+| Popularity / trends / exclusions / diversification | Qloo says results "can be weighted by factors such as regionalization and real-time popularity"; TechCrunch quotes adjustable "novel vs expected" weighting | Separate "safe" from "emerging" picks and exclude what is already present. **Verified 16 Oct 2026:** `filter.popularity.min/max`, `bias.trends`, `bias.content_based` (0–1), `filter.exclude.tags` (+ `operator.filter.exclude.tags`), and `diversify.by=subtype` (tags only; city/metro is a doc conflict, DI-10) are documented — catalogue in [QLOO_APIS.md](QLOO_APIS.md) §6.2 |
 
 Entrant repos report real coverage gaps. Undercard notes "Qloo coverage is limited in this hackathon environment: some artists cannot be found … or ranked." Plan for misses from the start, and label every miss as a miss rather than guessing.
 
@@ -356,19 +357,20 @@ Remove Qloo and the product collapses to the generic LLM answer in counterfactua
    - **Cannibalisation penalty:** same category already present within the radius.
 7. **Agent reasoning:** the LLM reasons only over the returned entities and tags. It checks for contradictions (high fit but a category already saturated), and runs follow-up probes when a candidate is borderline. Running probes on its own initiative is what makes it an agent rather than a form.
 8. **Decision:** a ranked shortlist of 5 candidates, 3 "do not lease" warnings, and one recommended pick.
-9. **Explanation:** a "How we know" panel for each candidate. It lists every Qloo call, its parameters and result count, which neighbour audiences carried the affinity, and the descriptive tags. Inferences are clearly separated from Qloo outputs.
+9. **Explanation:** a "How we know" panel for each candidate. It lists every Qloo call, its parameters and result count, which neighbour audiences carried the affinity (from the `feature.explainability` payload, [QLOO_APIS.md](QLOO_APIS.md) §3.8), and the descriptive tags. Inferences are clearly separated from Qloo outputs.
 10. **Action:** generates (a) a one-page leasing memo PDF for the owner, (b) a tailored outreach email per brand citing the audience evidence, and (c) a listing blurb rewritten for the top candidate category. It can also save the analysis and re-run monthly ("watch this vacancy").
 
-### Qloo API architecture (verified against docs.qloo.com — see [QLOO_APIS.md](QLOO_APIS.md) for the full reference; spike items still open are marked)
+### Qloo API architecture (verified against docs.qloo.com — see [QLOO_APIS.md](QLOO_APIS.md) for the full reference; open spike items and DI IDs are marked)
 1. `GET /search?query=<neighbour>&types=urn:entity:place&filter.location=<lat>,<lon>&filter.radius=<miles>&take=5`, once per neighbour, giving neighbour IDs biased to the vacancy point. **Note: `/search` radius is in miles (`filter.radius`), Insights radius is in metres (`filter.location.radius`).**
-2. `GET /v2/insights?filter.type=urn:tag&signal.interests.entities=<neighbour IDs>`, the "block taste" descriptors.
-3. `GET /v2/insights?filter.type=urn:entity:brand&signal.interests.entities=<neighbour IDs>&<location>&feature.explainability=true`, the brands the neighbours' audiences show affinity for. This is the candidate generator, and the explainability payload feeds the evidence drawer directly. **Spike: Qloo's entity-type guide omits location params for `brand` while the location use case advertises them — settle whether `filter.location=POINT(<lon> <lat>)`, `signal.location`, or a locality query actually narrows results (fallback: `filter.location.query=<locality>`).**
-4. `GET /v2/insights?filter.type=urn:entity:place&filter.tags=<candidate category tag>&filter.location=<lat>,<lon>&filter.location.radius=<metres>`, which checks whether that category already exists nearby (cannibalisation).
-5. `GET /v2/insights?filter.type=urn:demographics&signal.interests.entities=<top candidates>`, the audience-skew sanity check against the catchment. **Spike: `urn:demographics` is documented on the use-case page but missing from the hackathon guide's supported-`filter.type` list (403 risk).**
-6. Optional: the heatmap via `filter.type=urn:heatmap` with a signal — any entity or tag works; `urn:tag:genre:place:restaurant` is the sensible choice for Karum but not a hard requirement — to render where affinity concentrates around the unit.
-7. Optional: `GET /v2/analysis/compare?a.signal.interests.entities=<neighbour IDs>&b.signal.interests.entities=<candidate>` for the "your neighbours vs. this candidate" overlap chart.
+2. `GET /v2/insights?filter.type=urn:tag&signal.interests.entities=<neighbour IDs>`, the "block taste" descriptors. Taste Analysis requires at least one signal alongside `filter.type` ([QLOO_APIS.md](QLOO_APIS.md) §3.3).
+3. `GET /v2/insights?filter.type=urn:entity:brand&signal.interests.entities=<neighbour IDs>&<location>&feature.explainability=true`, the brands the neighbours' audiences show affinity for. This is the candidate generator, and the explainability payload feeds the evidence drawer directly. **Spike 1 (brand + location):** Qloo's entity-type guide lists no location params for `brand` while the location use case advertises them — probe `filter.location=POINT(<lon> <lat>)` → `signal.location=POINT(...)` → `signal.location.query` → `filter.location.query` → `filter.location.metro` (WKT is longitude-first, a bare pair latitude-first); fallback is the neighbour-entity signal plus a recorded locality ([QLOO_APIS.md](QLOO_APIS.md) §3.4).
+4. `GET /v2/insights?filter.type=urn:entity:place&filter.tags=<candidate category tag>&filter.location=<lat>,<lon>&filter.location.radius=<metres>`, which checks whether that category already exists nearby (cannibalisation). An omitted radius pads the boundary by min(10% of the locality diameter, ~2.4 km); `0` = strictly inside ([QLOO_APIS.md](QLOO_APIS.md) §3.5, spike 5).
+5. `GET /v2/insights?filter.type=urn:demographics&signal.interests.entities=<top candidates>`, the audience-skew sanity check against the catchment. **Spike 2 / DI-2: `urn:demographics` is documented on the use-case page but missing from the `filter.type` enum (403 risk); age buckets also split coarse/fine (DI-7).**
+6. Optional: the heatmap via `filter.type=urn:heatmap` with a signal — any entity or tag works; `urn:tag:genre:place:restaurant` is the sensible choice for Karum but not a hard requirement — to render where affinity concentrates around the unit. Boundary literals and dimension gates are an open doc conflict (DI-12, spike 3).
+7. Optional: `GET /v2/analysis/compare?a.signal.interests.entities=<neighbour IDs>&b.signal.interests.entities=<candidate>` for the "your neighbours vs. this candidate" overlap chart — both signals are required; `filter.subtype` / `model` shape the analysis ([QLOO_APIS.md](QLOO_APIS.md) §3.10, spike 19).
+8. `GET /entities?entity_ids=…` (or external-ID namespaces such as `external.resy.ids`) to hydrate shortlist and neighbour cards with Qloo-known data ([QLOO_APIS.md](QLOO_APIS.md) §3.12).
 
-**Standing rules:** never `/recs` or `/recommendations` (legacy, forbidden); unsupported parameters are silently ignored, so every call must be asserted non-empty in tests; fixture JSON must be redacted — Qloo forbids raw responses in public repos and Devpost requires public repos.
+**Standing rules** — the full enforcement list is [QLOO_APIS.md](QLOO_APIS.md) §4. The only base URL is `https://hackathon.api.qloo.com` (copy-pasted cURL from the docs points at prod/staging hosts and 401s — DI-1). Never `/recs` or `/recommendations` (legacy, forbidden). The surface is GET-only, so POST-body parameters (merged localities, weight arrays, `*.entities.query`) stay out of client code until spike 10 proves otherwise (DI-3). Unsupported parameters are silently ignored — a 200 is not proof — so tests assert non-empty results **and** parameter effectiveness against a no-parameter baseline. Fixture JSON must be redacted — Qloo forbids raw responses in public repos and Devpost requires public repos.
 
 ### Full example session
 - **User:** "Unit at 1xx Bedford Ave, Brooklyn. Neighbours: a natural-wine bar, a vinyl shop, a ramen counter. 900 sq ft, no kitchen. Who should I sign?"
@@ -431,7 +433,7 @@ Also offer a second sample block in another city, plus a free-entry mode, so jud
 - Category saturation check
 - Three-part score and ranking
 - "Do not lease" list
-- Evidence drawer and call trace
+- Evidence drawer (fed by `feature.explainability`) and call trace
 - Map with pins
 - LLM-only comparison panel
 - Memo PDF and outreach email
@@ -464,7 +466,7 @@ Also offer a second sample block in another city, plus a free-entry mode, so jud
 
 | Phase | Days | Deliverable |
 |---|---|---|
-| 1. Qloo/API experimentation | Oct 4–8 | Request the key immediately; use fixtures while waiting. Coverage notebook: for 3 cities × 5 blocks, test place resolution, brand insights with location, tag outputs, heatmap availability. **Kill/go gate on Oct 8** |
+| 1. Qloo/API experimentation | Oct 4–8 | Request the key immediately; use fixtures while waiting. Coverage notebook: for 3 cities × 5 blocks, test place resolution, brand insights with location, tag outputs, heatmap availability ([QLOO_APIS.md](QLOO_APIS.md) §5 is the script). **Kill/go gate on Oct 8** |
 | 2. Core prototype | Oct 8–12 | Scoring pipeline as a CLI: address and neighbours in, ranked JSON with evidence out |
 | 3. Agent workflow | Oct 12–16 | LLM tool loop, probes, deterministic fallback, trace object |
 | 4. Frontend/UX | Oct 14–21 | Start screen, trace timeline, map, shortlist board, do-not-lease column, evidence drawer |
@@ -503,8 +505,9 @@ A weekend rebuild with Qloo plus an LLM would give the first screen, not the cal
 
 **Technical risks and mitigations**
 - **Place and brand coverage gaps:** gate on Phase 1 tests; choose demo cities by coverage; label misses explicitly.
-- **Location-filter granularity (city vs. radius):** test radius behaviour early. If only city-level works, use neighbour-entity signals as the "block" proxy.
-- **Heatmap not available on the hackathon key:** make it optional, and use pins plus the competitor radius instead.
+- **Location-filter granularity (block vs. city):** `filter.location.radius` is documented in metres (default 15000, max 800000, `0` = strict) — spike 5 confirms that e.g. a 400 m radius genuinely filters at 400 m. If only city-level works, use neighbour-entity signals as the "block" proxy.
+- **Heatmap not available on the hackathon key:** make it optional — boundary literals are also an open doc conflict (DI-12); pins plus the competitor radius carry the map without it.
+- **Doc conflicts and unit traps:** parameters have multiple spellings across Qloo's docs (Resy triple DI-4, `price_range` DI-5, exclude-tags operator DI-13) and a wrong spelling is ignored, not rejected — spike 11 runs before a name enters client code. `/search` radius is miles vs metres on Insights, and WKT is longitude-first while a bare `filter.location` pair is latitude-first.
 - **Agent reliability:** use a deterministic fallback pipeline; constrain the LLM to returned entities; add schema validation.
 - **Latency (5–8 Qloo calls):** run calls in parallel, cache, pre-warm samples, and stream the trace so waiting feels like progress.
 - **Brand results skew to big chains, or brands without retail presence:** use the documented popularity bands (`filter.popularity.min/max`) and a "has physical retail" heuristic, or let the user paste a candidate list.
@@ -513,7 +516,7 @@ A weekend rebuild with Qloo plus an LLM would give the first screen, not the cal
 
 # WHY THIS COULD WIN (directly mapped to the judging criteria)
 
-- **Technological Implementation:** it uses five or more distinct Qloo capabilities in one reasoning chain (place resolution, tag output, cross-domain brand affinity under location, category presence checks, demographics, and optionally heatmap and compare), plus agent probes, a fallback, an evidence trace and a leave-one-out evaluation. That is clearly a "working, non-trivial implementation."
+- **Technological Implementation:** it uses five or more distinct Qloo capabilities in one reasoning chain (place resolution, tag output, cross-domain brand affinity under location, per-result explainability, category presence checks, demographics, and optionally heatmap and compare), plus agent probes, a fallback, an evidence trace and a leave-one-out evaluation. That is clearly a "working, non-trivial implementation."
 - **Design:** it is a complete flow from address to memo to outreach, has a map-centred UI, needs zero setup for judges, and keeps the outputs a broker would actually send.
 - **Potential Impact:** it names a buyer (landlords and brokers), states the economic stakes (multi-year leases and vacancy carrying costs), shows how incumbents fail (footfall without taste), and provides an evaluation that quantifies the gain over LLM-only.
 - **Quality of the Idea:** it is non-obvious. It inverts GeoTaste (a fixed space choosing among many brands, instead of one business choosing a place), applies Alloy's compatibility logic to co-tenancy, and adopts Zesty's negative space ("do not lease").
@@ -536,10 +539,10 @@ A weekend rebuild with Qloo plus an LLM would give the first screen, not the cal
 - **Another 2026 entrant may build retail site or tenant tools.** CulturePilot ("better market decisions") and others are adjacent, and I could only see public GitHub, not Devpost drafts.
 - **Real estate is unglamorous next to music and entertainment** for judges like Cedric the Entertainer. The demo must feel vivid (map, surprising pick, strong "do not lease" line).
 - **Willingness to pay is untested.** Small landlords are notoriously cheap, and the pricing above is a hypothesis.
-- ~~**I could not read the 2026 rules page or full Qloo docs.**~~ **Closed 16 Oct 2026:** the rules were read in full (no team cap; the Qloo integration must be new; judging Nov 2–16) and the API surface is mapped in [QLOO_APIS.md](QLOO_APIS.md). What remains unverified is spike behaviour — parameter acceptance, radius granularity, quota — plus key-delivery timing.
+- ~~**I could not read the 2026 rules page or full Qloo docs.**~~ **Closed 16 Oct 2026:** the rules were read in full (no team cap; the Qloo integration must be new; judging Nov 2–16) and the API surface is mapped in [QLOO_APIS.md](QLOO_APIS.md). What remains unverified is spike behaviour — parameter acceptance, radius granularity, quota — plus key-delivery timing; the open items are the [QLOO_APIS.md](QLOO_APIS.md) §5 checklist and every known doc conflict is registered in its §9.
 
 **Kill criteria (abandon by Oct 8–10 if any is true):**
-1. For at least 3 of 5 test blocks, Qloo's brand or place outputs under location do not change meaningfully when the neighbours change. That would mean Qloo is not adding block-specific signal.
+1. For at least 3 of 5 test blocks, Qloo's brand or place outputs under location do not change meaningfully when the neighbours change. That would mean Qloo is not adding block-specific signal (spike 1 tests exactly this).
 2. Fewer than 70% of real neighbourhood venues resolve via `/search` in the demo cities.
 3. Top candidate brands are mostly non-retail or implausible for small units, even after filtering.
 4. The leave-one-out test does not beat LLM-only on at least 12 of 20 blocks.
