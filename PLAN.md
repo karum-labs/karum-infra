@@ -138,11 +138,11 @@ Hit `https://hackathon.api.qloo.com` with the `X-Api-Key` header and work the sp
 
 ### 10. City choice
 
-Script three cities by five blocks and measure entity resolution rate, how brand rank shifts when the neighbour set changes, and whether resolved tags are ones the product can explain. Score each block against the kill rules for signal, resolution, and retail plausibility, then lock two demo cities and two sample blocks. If location is only city-level, record the neighbour-entity fallback the profile query will use instead of a radius. If the gate fails, point the same gRPC services at Shelfwise before any feature work continues.
+Script three cities by five blocks and measure entity resolution rate, how brand rank shifts when the neighbour set changes, and whether resolved tags are ones the product can explain. Score each block against the kill rules for signal, resolution, and retail plausibility, then lock two demo cities and two sample blocks — **Mumbai (Colaba) is pre-adopted as the second demo city** (16 Oct coverage-probe decision; every spike verdict sits on this block), so this pass decides the Western lead city (NYC / London / Austin) and the two sample blocks. If location is only city-level, record the neighbour-entity fallback the profile query will use instead of a radius. If the gate fails, point the same gRPC services at Shelfwise before any feature work continues.
 
 - [ ] Run three cities by five blocks for resolution rate, brand shift when neighbours change, and tag usefulness
 - [ ] Score each block against the kill rules for signal, resolution, and retail plausibility
-- [ ] Pick two demo cities and two sample blocks that pass
+- [ ] Pick two demo cities and two sample blocks that pass — half-decided: Mumbai (Colaba) locked 16 Oct as the second demo city; this pass picks the Western lead city and the sample blocks
 - [ ] Record the neighbour-entity fallback if location is only city-level
 - [ ] If the gate fails, switch the same services to Shelfwise before feature work continues
 

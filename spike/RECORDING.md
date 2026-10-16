@@ -62,4 +62,5 @@ Side question, outside the 22 items: are Indian locations available? Seven calls
 - **Brands: mixed.** "Café Coffee Day" resolves (`B6DA90E2-E073-4CE1-83CC-678F089C92EC`); "Amul" returns 0 — brand coverage is thinner than place coverage; record misses honestly.
 - **Core flow: works.** A brand-affinity call signalled by the Colaba block (Leopold Cafe plus three block stores) returned 20 brands, India-native fashion labels on top (The Label Life, AND, Shyamal & Bhumika, House of Masaba, Ritu Kumar, Tarun Tahiliani…), `popularity` populated (0.933 on the top record).
 - **Trap observed:** with `sort_by=distance` the name query behaves as "nearest venues" rather than a name match — use the default match sort to resolve a named entity.
-- Evidence: raw payloads in `spike/out/` (local-only; redact before any fixture use). Not promoted to PRODUCT.md or PLAN epic 10 — demo-city choice stays a product decision.
+- Evidence: raw payloads in `spike/out/` (local-only; redact before any fixture use).
+- **Decision (16 Oct, product):** Mumbai's Colaba block is adopted as the **second demo city** beside one Western lead city (NYC / London / Austin to be locked in PLAN epic 10). Carried into [PRODUCT.md](../PRODUCT.md) §India wedge and PLAN epic 10.

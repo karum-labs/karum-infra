@@ -162,7 +162,7 @@ Existing tools lean on footfall and demographics ("foot traffic sensors, Wi-Fi a
 
 For contrast, music-side tools charge for far lower-stakes help: Booking-Agent.io sells venue and talent-buyer data at "$49.99/month."
 
-**India wedge (assessed and rejected as the primary angle):** malls with vacancy and a crowded D2C-brand expansion market make tenant mix a real Indian problem. However, I could not verify Qloo's place and brand coverage in Indian Tier-2 cities, and I could not retrieve current vacancy data. Use one Indian demo city (e.g., Bengaluru's Indiranagar) only if Phase 1 coverage tests pass. Lead the demo with a city where coverage is proven (NYC, London or Austin).
+**India wedge (assessed and rejected as the primary angle):** malls with vacancy and a crowded D2C-brand expansion market make tenant mix a real Indian problem. However, I could not verify Qloo's place and brand coverage in Indian Tier-2 cities, and I could not retrieve current vacancy data. **Update 16 Oct 2026:** the coverage probe passed in Tier-1 — real venues and India-native brand labels resolve in Mumbai (Colaba / Kala Ghoda) and Bengaluru (Indiranagar; [spike/RECORDING.md](spike/RECORDING.md) §Coverage probe). **Decision: Mumbai's Colaba block is the second demo city**, beside one Western lead city where coverage is proven (NYC, London or Austin — locked by the epic 10 measurement pass). Vacancy data stays a manual curation task.
 
 ### 7. Raw idea pool (48 ideas, compressed)
 
