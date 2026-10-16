@@ -31,3 +31,10 @@ coverage.out
 *.swp
 *.swo
 .DS_Store
+
+# Spike runner — raw Qloo responses and resolved entity ids stay local.
+spike/out/
+spike/state.json
+
+# Python bytecode
+__pycache__/

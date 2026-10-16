@@ -7,7 +7,7 @@
 COMPOSE ?= docker compose
 BUF ?= buf
 
-.PHONY: help up down logs test prewarm eval lint-proto breaking generate
+.PHONY: help up down logs test prewarm eval lint-proto breaking generate spike
 
 ## help: list available targets.
 help:
@@ -54,3 +54,7 @@ breaking:
 ## generate: emit Go and Python stubs from the shared protos.
 generate:
 	cd proto && $(BUF) generate
+
+## spike ARGS="key": run the Qloo spike runner (see spike/README.md).
+spike:
+	python spike/run_spike.py $(ARGS)

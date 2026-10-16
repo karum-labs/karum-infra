@@ -32,6 +32,7 @@ Karum reads the cultural taste of a surrounding block via **Qloo**, scores candi
 - **`proto/`** — the shared protobuf definitions and buf configuration. `karum.health.v1` is the placeholder contract the two microservices implement; the domain protos (vacancy, tags, scoring, taste RPCs, AI RPCs) land in a later pass.
 - **`QLOO_APIS.md`** — every Qloo endpoint Karum may call with exact parameters, mapped to PLAN epics, plus the spike checklist for the open questions.
 - **`QLOO_USE_CASES.md`** — the plain-language map of where Karum uses Qloo today (each call, its epic, its watch-outs) plus suggested additional use cases, grouped by build cost and spike gates.
+- **`spike/`** — the epic-9 probe runner (`run_spike.py`, stdlib-only) and recording sheet that work the QLOO_APIS.md §5 checklist against the hackathon host; raw responses stay local in `spike/out/`.
 - **`docker-compose.yml`** — the full local stack (gateway, taste, AI, Redis, Postgres) with healthchecks and a deterministic startup order.
 - **`.env.example`** — every environment variable and which process reads it.
 - **`versions.env`** — the single source of truth for Go, Python, Flutter, and buf versions.
