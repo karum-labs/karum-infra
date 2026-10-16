@@ -44,15 +44,15 @@ Grouped the way the docs group them (Insights · Lookup APIs · Analysis & Trend
 | 1 | `GET /search` | Neighbour and shortlist brand resolution | 12 | **Core** — full params §3.1 |
 | 2 | `GET /entities` | Hydrate entity cards from IDs | 40, 41 | Recommended — `entity_ids` plus 22 external-ID namespaces (§3.12) |
 | 3 | `GET /v2/tags` | Constraint chips → tag URNs | 13 | **Core** — §3.2 |
-| 4 | `GET /v2/tags/types` | Tag-type allow-list | 13 | **Core** — §3.2b; response schema not shown in the snapshot |
+| 4 | `GET /v2/tags/types` | Tag-type allow-list | 13 | **Core** — §3.2b; schema + `urn:entity:*` parents settled 16 Oct (spike 13) |
 | 5 | `GET /v2/audiences`, `GET /v2/audiences/types` | Named audience segments | — | ⚠️ OpenAPI `deprecated: true` — do not build on (§4); audience IDs for `signal.demographics.audiences` still come from here (DI-20) |
-| 6 | `GET /v2/insights` (`urn:tag`) | Block taste tags | 14 | **Core** — enum-absent, 403 risk (DI-2); §3.3 |
-| 7 | `GET /v2/insights` (`urn:entity:brand`) | Brand-affinity candidates | 14 | **Core** — location param **verify** (§3.4) |
+| 6 | `GET /v2/insights` (`urn:tag`) | Block taste tags | 14 | **Core** — enum-absent but works (DI-2 closed); §3.3 |
+| 7 | `GET /v2/insights` (`urn:entity:brand`) | Brand-affinity candidates | 14 | **Core** — `signal.location` (WKT) is the localiser, `filter.location*` ignored (DI-11 closed); §3.4 |
 | 8 | `GET /v2/insights` (`urn:entity:place`) | Saturation / cannibalisation check | 14 | **Core** — location fully supported (§3.5) |
-| 9 | `GET /v2/insights` (`urn:demographics`) | Audience-skew sanity check | 14 | 403 risk — enum-absent (DI-2); §3.6 |
-| 10 | `GET /v2/insights` (`urn:heatmap`) | Map heatmap overlay | 16 | Optional, capability flag — enum-confirmed; boundary literals **verify** (§3.7) |
-| 11 | `GET /v2/analysis/compare` | Neighbours vs. candidate overlap chart | 16 | Optional, capability flag — §3.10 |
-| 12 | `GET /v2/trending` | "Emerging brand" momentum evidence | nice-to-have | Optional add — §3.11 |
+| 9 | `GET /v2/insights` (`urn:demographics`) | Audience-skew sanity check | 14 | Enum-absent but works (DI-2 closed); fine age buckets (DI-7 closed); §3.6 |
+| 10 | `GET /v2/insights` (`urn:heatmap`) | Map heatmap overlay | 16 | Optional, capability flag — enum-confirmed (DI-18); boundary, dimensions and count columns settled (DI-12 closed); §3.7 |
+| 11 | `GET /v2/analysis/compare` | Neighbours vs. candidate overlap chart | 16 | Optional, capability flag — settled 16 Oct; parse `matchEntities` (DI-22); §3.10 |
+| 12 | `GET /v2/trending` | "Emerging brand" momentum evidence | nice-to-have | Optional add — out of MVP; needs ≥ ~6-month windows (§3.11) |
 | 13 | `GET /` (API info) | Key-validity probe for `GET /health` | 31 | Optional — not covered by this snapshot |
 
 ## 3. Call recipes

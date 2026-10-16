@@ -235,7 +235,7 @@ Three groups: **A** = cheap additions to the pipeline that already exists (same 
 - **The call:** `filter.external.exists=resy,michelin,tablet` (and the Resy triple / ratings filters from [QLOO_APIS.md](QLOO_APIS.md) §3.5) on the place-side calls; surface what comes back on cards and in the memo.
 - **Where it plugs in:** saturation/enrichment calls (epic 14) and cards (epic 40).
 - **Why it's worth it:** for a landlord audience it is the "these are real venues, not hallucinated names" proof — important in a domain with six-figure decisions.
-- **Gates:** Resy parameters have three documented spellings (DI-4, spike 11); verify the fields actually return on results before showing them (extend the spike-8 density check).
+- **Gates:** Resy spelling settled — `filter.external.resy.*` is the working one; Colaba carries no Resy data (0 rows), but `/entities` resy externals do return rating/cuisine fields (spikes 11 + 16, DI-4 closed).
 
 #### A6. Price centre-of-gravity read — `filter.price_level`
 
@@ -251,7 +251,7 @@ Three groups: **A** = cheap additions to the pipeline that already exists (same 
 - **The call:** `filter.location.geohash=<prefix>` on place-side Insights (documented, pygeohash precision 12).
 - **Where it plugs in:** the saturation call (epic 14) as the fallback recorded in epic 10's city-choice decisions.
 - **Why it's worth it:** it protects the "block-level, not city-level" story — the exact thing the product's differentiation depends on — with a documented parameter instead of a hand-wave.
-- **Gates:** only adopt after spike 5's radius result; verify prefix behaviour in the same session.
+- **Gates:** spike 5 settled radius granularity (genuine metres — 400 m filters at max 394 m), so the geohash fallback is not needed; prefix behaviour was never probed — verify it first if this idea is ever adopted.
 
 #### A8. Demographic memo section — reuse the existing `urn:demographics` output
 
