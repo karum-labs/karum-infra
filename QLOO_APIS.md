@@ -64,7 +64,7 @@ These are the calls Karum makes, each with the full documented parameter surface
 ```
 /search?query=<neighbour name>
         &types=urn:entity:place
-        &filter.location=<lat>,<lon>      # lat/lon pair, WKT, or a Qloo UUID
+        &filter.location=<lat>,<lon>      # bare lat,lon pair ONLY — WKT and Qloo UUIDs are rejected (spike 6, DI-21)
         &filter.radius=<miles>            # default 10, max 100 — MILES, see the unit trap
         &filter.address=<city or street>  # partial match, comma-separated terms
         &take=5                           # exclusive max 200
@@ -72,7 +72,7 @@ These are the calls Karum makes, each with the full documented parameter surface
         &sort_by=distance                 # match | distance | popularity — default match
 ```
 
-Shortlist brands: `types=urn:entity:brand`. Other supported parameters: `filter.tags` (+ `operator.filter.tags=union|intersection`, default `union`), `filter.popularity` (min, 0–1), `filter.rating` (min, 0–5), `filter.exists` (e.g. `external.resy`, `external.michelin` — pattern `^external\.\w+$`).
+Shortlist brands: `types=urn:entity:brand`. Other supported parameters: `filter.tags` (+ `operator.filter.tags=union|intersection`, default `union`), `filter.popularity` (min, 0–1), `filter.rating` (min, 0–5), `filter.exists` (e.g. `external.resy`, `external.michelin` — pattern `^external\.\w+$`; `filter.exists=external.resy` returned NYC Resy venues on the first try, 16 Oct).
 
 > **Unit trap:** `/search` radius is `filter.radius` in **miles** (default 10). Insights radius is `filter.location.radius` in **metres** (default 15000). Different names, different units.
 
@@ -110,7 +110,7 @@ Documented exactly like that, but the snapshot's schema enum for `filter.parents
              &take=50
 ```
 
-The Taste Analysis page requires `filter.type=urn:tag` **plus at least one** of: `signal.interests.entities`, `signal.interests.tags`, `signal.demographics.audiences`, `signal.location` / `signal.location.query`, `filter.tag.types`, `filter.parents.types`. Response is `results.tags` (§8.2). `urn:tag` is absent from the Insights enum — 403 risk (DI-2, spike 2).
+The Taste Analysis page requires `filter.type=urn:tag` **plus at least one** of: `signal.interests.entities`, `signal.interests.tags`, `signal.demographics.audiences`, `signal.location` / `signal.location.query`, `filter.tag.types`, `filter.parents.types`. Response is `results.tags` (§8.2). `urn:tag` is absent from the Insights enum, but the 403 risk is settled: **it works** (spike 2, 16 Oct — 20 tags for the Colaba block); `urn:demographics` and `urn:entity:destination` work too. `urn:entity:locality` 400s unless signalled by locality entities.
 
 ### 3.4 Brand-affinity candidates — `/v2/insights` (epic 14b) — spike-critical
 
@@ -129,31 +129,31 @@ The Taste Analysis page requires `filter.type=urn:tag` **plus at least one** of:
 
 - The [Entity Type Parameter Guide](https://docs.qloo.com/reference/available-parameters-by-entity-type) Brand table lists **no location parameter at all** (`filter.location`, `.radius`, `.query` are absent).
 - The [Location-Based Insights](https://docs.qloo.com/reference/insights-with-location-use-case) use case explicitly advertises `urn:entity:brand` with location, and ships a recipe for "popular brands inside Paris center based on WKT shape".
-- Candidates to test, in order: `filter.location=POINT(<lon> <lat>)`, `signal.location=POINT(<lon> <lat>)`, `signal.location.query=<locality>`, `filter.location.query=<locality>`, and `filter.location.metro=<metro name>` (deep-dive-only parameter, DI-11).
-- WKT is **longitude-first**; a bare `filter.location` pair is **latitude-first**. Easy bug.
-- `signal.location.radius` exists (metres, max 800000), but the docs advise against it: it "overrides dynamic density discovery".
-- If none of them narrows brand results, the fallback is the neighbour-entity signal with `filter.location.query=<locality>` recorded in epic 10.
+- **Settled 16 Oct (spike 1):** `signal.location=POINT(<lon> <lat>)` is the only one that changes results — 7 new entities plus a re-rank in the Colaba test (Sabyasachi, Gaurav Gupta, Manish Malhotra); `signal.location.query=<locality>` shifts rankings subtly (1 new entity). `filter.location`, `filter.location.query` and `filter.location.metro` were byte-identical to baseline — silently ignored. Identical repeat responses also proved the API replays deterministically, which makes paired probes trustworthy.
+- WKT is **longitude-first**; the `/search` bare pair is **latitude-first**. Easy bug.
+- `signal.location.radius` exists (metres, max 800000), but the docs advise against it: it "overrides dynamic density discovery". Untested — not needed.
+- The neighbour-entity signal alone is the working base; `signal.location` adds localisation when the block's point is known.
 
 ### 3.5 Saturation check — `/v2/insights` (epic 14c)
 
 ```
 /v2/insights?filter.type=urn:entity:place
              &filter.tags=<category tag URN>
-             &filter.location=<lat>,<lon>          # or POINT(<lon> <lat>) or locality UUID
-             &filter.location.radius=<metres>      # default 15000, max 800000, 0 = no padding
+             &filter.location=POINT(<lon> <lat>)   # Insights takes WKT only — a bare pair 400s (spike 6)
+             &filter.location.radius=<metres>      # genuine metres (400 m kept max 394 m); omit on a point → 0 results; 0 ≈ 15 km default (spike 5)
              &sort_by=distance                     # requires filter.location
              &take=50
 ```
 
-Place fully supports location params per the entity guide. When `filter.location.radius` is omitted the API pads the boundary by the lesser of 10% of the locality diameter or ~2,414 m; `0` restricts strictly to the boundary.
+Place fully supports location params per the entity guide. **Correction (spike 5, 16 Oct):** for a WKT *point*, an omitted `filter.location.radius` returns **zero results** — always send a radius. `0` falls back to the ~15 km default (max observed distance 13.8 km), not strict containment; positive radii are metres-exact. `filter.exclude.location.radius` is silently ignored.
 
 Optional place refinements, all documented in the snapshot — exact names and ranges in §6.1:
 
-- Price / rent proxies: `filter.price_level.min` / `.max` (1–4), `filter.price_range.from` / `.to` (the `.min/.max` variant is DI-5).
+- Price / rent proxies: `filter.price_level.min` / `.max` (1–4), `filter.price_range.from` / `.to` — **spike-confirmed**; the `.min` / `.max` variant is silently ignored (DI-5 closed 16 Oct).
 - Quality proxies: `filter.hotel_class.min` / `.max` (1–5), `filter.rating.min` / `.max`, `filter.properties.business_rating.min` / `.max`, `filter.external.tripadvisor.rating.min` / `.max` (+ `.count.min/.max`), `filter.external.exists=michelin,resy`.
-- Resy demand: `filter.external.resy.rating.min` / `.max`, `.count.min` / `.max`, `.party_size.min` / `.max` (name variants DI-4).
+- Resy demand: `filter.external.resy.rating.min` / `.max` — **spike-confirmed**; the `filter.properties.resy.*` and `filter.resy.rating_count.*` spellings are silently ignored (DI-4 closed 16 Oct; `.party_size` untested).
 - Fit filters: `filter.hours=<weekday>`, `filter.address=<partial>`, `filter.references_brand=<brand IDs>`, `filter.popularity.min` / `.max`.
-- For the do-not-lease side, invert with `filter.exclude.tags` plus `operator.filter.exclude.tags=union|intersection` (name variant DI-13).
+- For the do-not-lease side, invert with `filter.exclude.tags` plus `operator.exclude.tags=union|intersection` — **spike-confirmed** (include + exclude of the same tag → 0 rows; both operator spellings produced identical results, DI-13 closed 16 Oct).
 
 ### 3.6 Demographics — `/v2/insights` (epic 14d)
 
@@ -163,32 +163,32 @@ Optional place refinements, all documented in the snapshot — exact names and r
              &signal.interests.tags=<tag URN>        # optional; may be combined
 ```
 
-Requires `filter.type=urn:demographics` plus at least one of `signal.interests.entities` / `signal.interests.tags`; both may be sent together. Returns `results.demographics`: per `entity_id`, an `age` bucket map and a `gender` map of deltas (positive = stronger-than-average alignment). Sample shapes in §8.3. **Verify:** `urn:demographics` is documented on the [Demographic Insights](https://docs.qloo.com/reference/demographics-use-case) page but **missing from the Insights `filter.type` enum** — 403 risk (DI-2, spike 2). Age buckets have a coarse/fine split (DI-7, spike 17).
+Requires `filter.type=urn:demographics` plus at least one of `signal.interests.entities` / `signal.interests.tags`; both may be sent together. Returns `results.demographics`: per `entity_id`, an `age` bucket map and a `gender` map of deltas (positive = stronger-than-average alignment). Sample shapes in §8.3. **Settled 16 Oct (spike 2/17):** no 403 — `urn:demographics` works; observed age buckets are fine-only (`24_and_younger` … `55_and_older`, deltas within ±0.5) and mixed entities+tags returns one profile row per input (DI-7 closed; DI-2 closed).
 
 ### 3.7 Heatmap — `/v2/insights` (epic 16, capability flag)
 
 ```
 /v2/insights?filter.type=urn:heatmap
-             &filter.location.query=<locality>   or filter.location=<lat>,<lon> | POINT(...) | UUID
+             &filter.location.query=<locality>   or filter.location=POINT(<lon> <lat>)   # WKT only — a bare pair 400s (spike 6)
              &signal.interests.tags=<URN>        or signal.interests.entities=<id>
-             &output.heatmap.boundary=<...>      # defaults to geohashes; literals unclear (DI-12)
+             &output.heatmap.boundary=<...>      # geohash cells by default; urn:geohash is a no-op; urn:entity:locality → locality entities with polygons (spike 3)
              &heatmap.dimensions=quality,popularity[,hotel_class][,price_level]
              &filter.dimensions.hotel_class=4,5  # only with hotel_class dimension
              &filter.dimensions.price_level=1,2  # only with price_level dimension
              &take=50
 ```
 
-Returns geohash cells with `affinity`, `affinity_rank` (0–1) and `popularity` (§8.4). Two corrections to the old brief, still true: **any** entity or tag works as the signal (the "requires a place-genre signal" line is marketing-page copy — `urn:tag:genre:place:restaurant` remains a sensible choice for Karum), and it is part of `/v2/insights`, not a separate route. `heatmap.dimensions` adds `<dim>_affinity_rank` and `<dim>_affinity` per cell and influences the overall ranking; `filter.dimensions.*` additionally adds `<dim>_count_affinity_rank` and `<dim>_count_affinity`. The enum says `urn:heatmap`; older material used `urn:entity:heatmap` (DI-18). Boundary literals and dimension gating: DI-12, spike 3.
+Returns geohash cells with `affinity`, `affinity_rank` (0–1) and `popularity` (§8.4). Two corrections to the old brief, still true: **any** entity or tag works as the signal (the "requires a place-genre signal" line is marketing-page copy — `urn:tag:genre:place:restaurant` remains a sensible choice for Karum), and it is part of `/v2/insights`, not a separate route. `heatmap.dimensions` adds `<dim>_affinity_rank` and `<dim>_affinity` per cell and influences the overall ranking; `filter.dimensions.*` additionally adds `<dim>_count_affinity_rank` and `<dim>_count_affinity`. The enum says `urn:heatmap`; the older `urn:entity:heatmap` is a hard 400 — "not supported for filter.type" (DI-18 closed, spike 3). Boundary settled by spike 3: `urn:geohash` is a byte-identical no-op, `urn:entity:locality` switches the result container to `entities` — locality rows carrying polygon geometry (8 rows at the point; 41 with `filter.location.query=Mumbai`). Dimension gating and count columns stay with spike 22 (DI-12 partial).
 
 ### 3.8 Explainability — the evidence-drawer source
 
 `feature.explainability=true` on any Insights call adds `query.explainability`:
 
-- **Per result:** which input entities (e.g. `signal.interests.entities`) contributed to the recommendation, normalized 0–1. Entities scoring ≥ 0.1 are always included; lower-impact entities may be omitted to reduce response size.
-- **Aggregate:** the top-level `query.explainability` shows the average influence of each input entity across top-N subsets (top 3, 5, 10, all).
-- **Warning path:** if explainability cannot be computed, `query.explainability.warning` is returned but results are still normal.
+- **Per result** (observed 16 Oct, spike 4): `query.explainability.signal.interests.entities[]` with `{entity_id, score}` — which input entities contributed, normalized 0–1. Entities scoring ≥ 0.1 are always included; lower-impact entities may be omitted. The ≥ 0.1 rule itself was not exercised (all observed scores were 1.0).
+- **Aggregate** (observed): `query.explainability.effect_on_top3/5/10/all_recs[]` with `{entity_id, avg_score}` — average influence of each input entity across top-N subsets.
+- **Warning path** (observed 16 Oct): dead signal entities surface in a top-level `warnings` array — `{"type":"not_found","signal.interests.entities":[…ids]}` — while results stay normal. 3 of 4 resolved Colaba store ids failed it; treat `warnings` as the honesty check for neighbour ids.
 
-This gives epic 41's "which neighbour audiences carried the affinity" straight from Qloo instead of inferring it. It is in the Insights OpenAPI spec but absent from the per-entity tables — spike item 4.
+This gives epic 41's "which neighbour audiences carried the affinity" straight from Qloo instead of inferring it. It is in the Insights OpenAPI spec but absent from the per-entity tables — spike 4 settled 16 Oct: accepted on both brand and place calls.
 
 ### 3.9 Scoring inputs (epic 15) — documented params only
 
@@ -200,14 +200,14 @@ This gives epic 41's "which neighbour audiences carried the affinity" straight f
 | Trends bias | `bias.trends` (`off`…`very_high`, default `medium`) | All types |
 | Content-based bias | `bias.content_based` (0–1, default 0.5) | Deep-dive-only; balances metadata vs behavioural signal |
 | Backfill dials | `backfill.cross_domain.take` (≤20), `backfill.content_based.take` (≤10) | Deep-dive-only; cap appended filler |
-| Direct affinity probe | `filter.results.entities=<candidate>` | Returns just those entities with their affinity — a clean per-candidate co-tenancy probe (spike 9) |
-| Tag affinity probe | `filter.results.tags=<tag IDs>` | Same idea for tags |
+| Direct affinity probe | `filter.results.entities=<candidate>` | Returns just those entities with their affinity (`query.affinity`, observed 0.832) — spike 9 settled 16 Oct; the legacy `filter.entities` spelling works but adds `warnings: deprecated` |
+| Tag affinity probe | `filter.results.tags=<tag IDs>` | **No-op** — byte-identical to baseline on the tested place call (spike 9, 16 Oct); do not rely on it |
 | Exclude neighbours | `filter.exclude.entities=<ids>` | Stops the vacancy's own neighbours ranking as candidates |
 | Signal weights | `signal.interests.entities.weight`, `signal.interests.tags.weight`, `signal.location.weight`, `signal.demographics.*.weight` | Number ≥0 or weight string `very_low`…`very_high`; spike 14 |
 | Force-include entities | `signal.interests.entities.include=<ids>` | Deep-dive-only; guarantees an entity contributes to affinity |
 | Sort control | `sort_by` = `affinity` / `distance` / `rating` / `quality` | `distance` requires `filter.location`; `quality` is place-only |
 
-Also relevant: the entity guide documents `diversify.by=subtype` + `diversify.take` for `filter.type=urn:tag` only, while the deep dive documents `properties.geocode.city` / `.metro` diversification generally — do not assume city/metro for brands or places without the spike (DI-10).
+Also relevant: the entity guide documents `diversify.by=subtype` + `diversify.take` for `filter.type=urn:tag` only, while the deep dive documents `properties.geocode.city` / `.metro` diversification generally. Observed 16 Oct: `diversify.by=subtype` was a no-op on a brand call and `filter.location.metro` is ignored — the guide's tag-only note holds (DI-10 partial, DI-11 closed).
 
 ### 3.10 Compare sets — `GET /v2/analysis/compare` (epic 16, capability flag)
 
@@ -264,6 +264,8 @@ Full entity records (description, image, properties) by ID, plus lookups by 22 e
 ## 5. Spike checklist (refines PLAN epic 9)
 
 Work every item against `https://hackathon.api.qloo.com` with the `X-Api-Key` header. Record for each: the exact request, the redacted response, and the observed behaviour. When an item settles, mark it here and close the matching §9 row; the answer then flows into [PLAN.md](PLAN.md) epics 11–16. Expect unsupported parameters to be **silently ignored** — a non-empty result is not proof a parameter was honoured; compare against a no-parameter call.
+
+**Status — 16 Oct 2026 (second item run, 64 calls):** settled — 1, 2, 4, 5, 6, 8, 9, 10, 11, 16, 17, 21. Partial — 3 (boundary settled; count columns with 22), 7 (429 deliberately unprobed), 15 (both variants no-ops on the tested surface). Deferred to build time — 12, 13, 14, 18, 19, 22; 20 (trending) is out of the MVP. Full observations, counts, and evidence filenames live in [spike/RECORDING.md](spike/RECORDING.md); the quota ledger there reads 71 calls spent · 9,929 remaining.
 
 **Original scope:**
 
@@ -571,7 +573,7 @@ Positive = stronger-than-average alignment, negative = lower. One block per requ
 }
 ```
 
-With `heatmap.dimensions`, each cell adds `<dim>_affinity_rank` (0–1) and `<dim>_affinity` (percent rank); with `filter.dimensions.*`, it also adds `<dim>_count_affinity(_rank)` (spike 22).
+With `heatmap.dimensions`, each cell adds `<dim>_affinity_rank` (0–1) and `<dim>_affinity` (percent rank); with `filter.dimensions.*`, it also adds `<dim>_count_affinity(_rank)` (spike 22). With `output.heatmap.boundary=urn:entity:locality` the container is `results.entities` instead of `results.heatmap`: locality rows (name, entity_id, location) carrying polygon geometry — observed 16 Oct, spike 3.
 
 ### 8.5 Search and entities-by-ID — `GET /search`, `GET /entities`
 
@@ -629,23 +631,24 @@ Every conflict found in the 16 Oct 2026 snapshot, each mapped to the §5 spike i
 | ID | The conflict | Settled by |
 | --- | --- | --- |
 | DI-1 | OpenAPI specs list `https://api.qloo.com` ("Production Qloo API server") and some examples use `staging.api.qloo.com`; the hackathon guide says hackathon keys 401 there | Rule: use `hackathon.api.qloo.com` everywhere; smoke-check the prod host once and record the 401 |
-| DI-2 | Insights `filter.type` enum omits `urn:tag`, `urn:demographics`, and `urn:entity:destination`, yet the use-case pages document the first two and the parameter reference tables the third; `locality` is partial; the enum spells `videogame` without an underscore | Spike 2 |
-| DI-3 | Some parameters are "POST only" (`filter.exclude.entities.query`, `signal.interests.entities.query`) and others accept arrays only via POST (merged localities, weight arrays); the hackathon surface is believed GET-only | Spike 10 |
-| DI-4 | Resy names in three spellings: deep dive `filter.external.resy.{count, rating, party_size}.min/max`; place guide `filter.properties.resy.rating.min/max`, `filter.resy.rating_count.min/max`, `filter.resy.rating.party.min/max` | Spike 11 |
-| DI-5 | `filter.price_range.from` / `.to` (deep dive + place guide) vs `filter.price_range.min` / `.max` (parameter reference) | Spike 11 |
+| DI-2 | Insights `filter.type` enum omits `urn:tag`, `urn:demographics`, and `urn:entity:destination`, yet the use-case pages document the first two and the parameter reference tables the third; `locality` is partial; the enum spells `videogame` without an underscore | **Closed 16 Oct** — no 403s: `urn:tag`, `urn:demographics` and `urn:entity:destination` all returned data; `urn:entity:videogame` spelling confirmed; `urn:entity:locality` 400s unless signalled by locality entities (spike 2) |
+| DI-3 | Some parameters are "POST only" (`filter.exclude.entities.query`, `signal.interests.entities.query`) and others accept arrays only via POST (merged localities, weight arrays); the hackathon surface is believed GET-only | **Closed 16 Oct** — POST exists: `POST /v2/insights` 200 with a JSON body; `signal.interests.entities.query` resolved server-side ("Qloo HQ" → "Sonder HQ", score 21.88) and the same body applied `filter.exclude.entities.query`; CORS advertises POST (spike 10) |
+| DI-4 | Resy names in three spellings: deep dive `filter.external.resy.{count, rating, party_size}.min/max`; place guide `filter.properties.resy.rating.min/max`, `filter.resy.rating_count.min/max`, `filter.resy.rating.party.min/max` | **Closed 16 Oct** — deep-dive spelling wins: `filter.external.resy.rating.min` honoured (0 rows in Colaba — no Resy data); `filter.properties.resy.rating.min` and `filter.resy.rating_count.min` silently ignored (spike 11) |
+| DI-5 | `filter.price_range.from` / `.to` (deep dive + place guide) vs `filter.price_range.min` / `.max` (parameter reference) | **Closed 16 Oct** — `.from` / `.to` honoured (result set changed); `.min` / `.max` silently ignored (spike 11) |
 | DI-6 | `bias.quality` weight strings: `very_low`…`very_high` (deep dive) vs `low` / `medium` / `high` (parameter reference) | Spike 12 |
-| DI-7 | Age buckets: the deep-dive enum carries both coarse (`35_and_younger`, `36_to_55`, `55_and_older`) and fine buckets; the parameter reference lists fine only; doc samples use fine | Spike 17 |
+| DI-7 | Age buckets: the deep-dive enum carries both coarse (`35_and_younger`, `36_to_55`, `55_and_older`) and fine buckets; the parameter reference lists fine only; doc samples use fine | **Closed 16 Oct** — responses carry fine buckets only (`24_and_younger` … `55_and_older`), deltas within ±0.5 (spike 17) |
 | DI-8 | `filter.parents.types` schema enum lists `urn:audience:*` values while the description says parental entity types (`urn:entity:place`); Taste Analysis uses `urn:entity:movie`, `urn:entity:tv_show` | Spike 13 |
 | DI-9 | `filter.tag.types` description on the tags route talks about audience types; actual usage is tag namespaces (`urn:tag:keyword:media`) | Spike 13 |
-| DI-10 | `diversify.by` city/metro described generally (deep dive + parameter reference) vs tag-only with `subtype` (entity guide) | Spike 15 |
-| DI-11 | `filter.location.metro` appears only in the deep-dive parameter list, not in any per-entity table | Spike 15 |
-| DI-12 | `output.heatmap.boundary`: deep dive says default geohashes, "city or a neighborhood", and shows `urn:entity:locality`; the entity guide requires `urn:geohash` for dimensions; count-column behaviour only in the deep dive | Spikes 3 and 22 |
-| DI-13 | Exclude-tags operator: `operator.filter.exclude.tags` (deep dive) vs `operator.exclude.tags` (parameter reference + entity guide) | Spike 11 |
-| DI-14 | Parameter reference lists legacy `filter.entities` (mapped from `filter.entity_ids`); the deep dive uses `filter.results.entities` | Spike 11 |
-| DI-15 | `filter.types` and `filter.distance.max` appear only in the location use-case prose — absent from every schema | Spike 21 |
+| DI-10 | `diversify.by` city/metro described generally (deep dive + parameter reference) vs tag-only with `subtype` (entity guide) | **Partial 16 Oct** — `diversify.by=subtype` silently ignored on the brand call tested; the guide's tag-only note holds; tag-scoped use not probed (spike 15) |
+| DI-11 | `filter.location.metro` appears only in the deep-dive parameter list, not in any per-entity table | **Closed 16 Oct** — byte-identical to baseline on a brand call: ignored (spike 1) |
+| DI-12 | `output.heatmap.boundary`: deep dive says default geohashes, "city or a neighborhood", and shows `urn:entity:locality`; the entity guide requires `urn:geohash` for dimensions; count-column behaviour only in the deep dive | **Partial 16 Oct** — `urn:geohash` is a byte-identical no-op; `urn:entity:locality` accepted and switches the container to `entities`: locality rows with polygon geometry (8 rows; 41 with `filter.location.query=Mumbai`). Count columns remain with spike 22 (spike 3) |
+| DI-13 | Exclude-tags operator: `operator.filter.exclude.tags` (deep dive) vs `operator.exclude.tags` (parameter reference + entity guide) | **Closed 16 Oct** — `filter.exclude.tags` honoured (include + exclude of the same tag → 0 rows); both operator spellings produced identical results — no observable difference; prefer `operator.exclude.tags` (spike 11) |
+| DI-14 | Parameter reference lists legacy `filter.entities` (mapped from `filter.entity_ids`); the deep dive uses `filter.results.entities` | **Closed 16 Oct** — both work; `filter.entities` returns the entity plus `warnings: deprecated`; `filter.results.entities` is the current, clean spelling (spike 11) |
+| DI-15 | `filter.types` and `filter.distance.max` appear only in the location use-case prose — absent from every schema | **Closed 16 Oct** — both silently ignored on `/search` (`filter.types=urn:entity:brand` left results as places; `filter.distance.max` identical to its control) (spike 21) |
 | DI-16 | `resolve_to` literals: `place` / `brand` / `both` (deep-dive schema) vs `self` / `urn:reference:brand` / `both` (parameter-reference prose) | Spike 14 |
-| DI-17 | `/search` `types` enum includes `urn:heatmap` and `urn:entity:audience`, and legacy names (`actor`, `album`, `author`, `director`, `locality`) exist for search only | Awareness — Karum searches `place` / `brand` only; note in spike 21 |
-| DI-18 | Heatmap `filter.type` spelling: `urn:heatmap` (current enum) vs `urn:entity:heatmap` (older material and entrant repos) | Spike 3 |
-| DI-19 | `filter.rating`: deep dive describes "Point of Interest", parameter reference scopes it to Movie / TV Show | Spike 2 |
-| DI-20 | `/v2/audiences` and `/v2/audiences/types` are deprecated, yet `signal.demographics.audiences` says IDs come from that route | Spike 17 |
+| DI-17 | `/search` `types` enum includes `urn:heatmap` and `urn:entity:audience`, and legacy names (`actor`, `album`, `author`, `director`, `locality`) exist for search only | **Closed 16 Oct (awareness)** — Karum searches `place` / `brand` only; the legacy enums have no impact (spike 21) |
+| DI-18 | Heatmap `filter.type` spelling: `urn:heatmap` (current enum) vs `urn:entity:heatmap` (older material and entrant repos) | **Closed 16 Oct** — `urn:heatmap` is the only accepted spelling; `urn:entity:heatmap` → 400 "not supported for filter.type" (spike 3) |
+| DI-19 | `filter.rating`: deep dive describes "Point of Interest", parameter reference scopes it to Movie / TV Show | **Closed 16 Oct** — `filter.rating.min=4.5` accepted and effective on place results (50 → 28 rows): not movie/TV-only (spike 2) |
+| DI-20 | `/v2/audiences` and `/v2/audiences/types` are deprecated, yet `signal.demographics.audiences` says IDs come from that route | **Closed 16 Oct (out of scope)** — audiences routes deprecated; Karum does not use `signal.demographics.audiences`; demographics work via entity/tag signals and per-input profile rows (spike 17) |
+| DI-21 | Location format: the docs describe `filter.location` as "a lat/lon pair, WKT, or a Qloo UUID" on both surfaces, but each surface accepts only one form | **Closed 16 Oct** — split by surface: `/search` takes the bare `lat,lon` pair only (WKT and UUID rejected: "must be in the form lat,lon"); Insights takes WKT `POINT(<lon> <lat>)` only (bare pair → "WKT format is invalid") (spike 6) |
 

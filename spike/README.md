@@ -43,9 +43,10 @@ curl.exe -s "https://hackathon.api.qloo.com/" -H "X-Api-Key: $env:QLOO_API_KEY"
    (writes `state.json`; every later command reads it). `/search` takes miles and a
    latitude-first bare pair.
 3. The gate items: `brand-location`, `filter-type`, `explainability`, `radius`,
-   `variants`, `entities`, `post`. These settle spike items 1, 2, 4–8, 10, 11.
-4. Next tier: `heatmap` (item 3), then item 16 via `entities --resy-id`, then the
-   feature-gated items 12–22 through `raw` as features come up.
+   `variants`, `entities`, `post`. These settle spike items 1, 2, 4–8, 10, 11 —
+   **all run 16 Oct, verdicts in [RECORDING.md](RECORDING.md)**.
+4. Next tier: `heatmap` (item 3, done 16 Oct), then item 16 via `entities --resy-id`
+   (done), then the feature-gated items 12–22 through `raw` as features come up.
 
 Record every answer in [RECORDING.md](RECORDING.md), then tick the item in
 QLOO_APIS.md §5, close the matching §9 row with the observed answer and a date, and
@@ -61,7 +62,7 @@ let the result flow into the PLAN epic that depends on it.
 | `filter-type` | 2 | `urn:tag`, `urn:demographics`, `urn:entity:destination`, `urn:entity:locality`, `urn:entity:videogame` |
 | `explainability` | 4 | `feature.explainability=true` on brand and place calls; reports shape |
 | `radius [--lat .. --lon ..] [--tag urn]` | 5, 6 | Default vs 400 m vs 0 vs 20 km; computes max distance when coordinates are present |
-| `variants --entity <uuid> [--tag urn] [--lat .. --lon ..]` | 9, 11 | Resy triple, `price_range` from/to vs min/max, exclude operators, legacy `filter.entities` |
+| `variants --entity <uuid> [--tag urn] [--lat .. --lon ..] [--radius N] [--skip-brand]` | 9, 11 | Resy triple, `price_range` from/to vs min/max, exclude operators, legacy `filter.entities`; place probes need `--radius` (a WKT point without one returns 0 rows) |
 | `entities [--ids a,b] [--resy-id <id>]` | 16 | `/entities` by id and `external.resy.ids` round trip |
 | `post` | 10 | One GET→POST attempt with a JSON body |
 | `heatmap [--lat .. --lon ..] [--tag urn]` | 3, 22 | `urn:heatmap` default boundary vs `urn:geohash` |
@@ -78,8 +79,14 @@ up) into `spike/out/`.
 - Insights `filter.location.radius` is **metres**; `/search` `filter.radius` is
   **miles**. WKT is longitude-first (`POINT(lon lat)`); the `/search` bare pair is
   latitude-first.
+- **Format split (DI-21):** `/search` takes the bare `lat,lon` pair only — WKT and
+  Qloo UUIDs are rejected. Insights takes WKT `POINT(lon lat)` only — a bare pair
+  400s. A WKT point **without** `filter.location.radius` returns 0 results, and
+  `radius=0` is the ~15 km default, not strict containment.
+- All observed traps and verdicts, with counts, are in [RECORDING.md](RECORDING.md) —
+  read it before adding probes.
 - The script never bursts calls to watch a 429. If a rate-limit response shows up,
   record the headers and the reset timing by hand (item 7) — whether the quota resets
   before judging (Nov 2–16) matters.
-- Quota: 10,000 requests/month. A full pass of every command above is roughly 40
-  calls; even the whole spike stays well inside the budget.
+- Quota: 10,000 requests/month. The full spike used 71 calls (9,929 remaining,
+  16 Oct) — keep it that way: baseline-paired probes only.

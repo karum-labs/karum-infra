@@ -144,6 +144,19 @@ def result_count(payload):
     return None
 
 
+def error_messages(payload: dict) -> list[str]:
+    messages = []
+    if payload.get("message"):
+        messages.append(str(payload["message"]))
+    error = payload.get("error")
+    if isinstance(error, dict) and error.get("message"):
+        messages.append(str(error["message"]))
+    for err in payload.get("errors") or []:
+        if isinstance(err, dict) and err.get("message"):
+            messages.append(str(err["message"]))
+    return messages
+
+
 def collect_points(node, depth: int = 0):
     """Yield (lat, lon) pairs found anywhere in a response, a few levels deep."""
     if depth > 4:
@@ -217,8 +230,13 @@ def call(label: str, path: str, method: str = "GET", body: dict | None = None, h
     labels = [row_label(row) for row in result_rows(payload)[:3]]
     if labels:
         print(f"    top: {', '.join(labels)}")
-    if isinstance(payload, dict) and payload.get("message"):
-        print(f"    message: {payload['message']}")
+    if isinstance(payload, dict):
+        for message in error_messages(payload):
+            print(f"    message: {message}")
+        warnings = payload.get("warnings")
+        if warnings:
+            types = [w.get("type") for w in warnings] if isinstance(warnings, list) else [str(warnings)]
+            print(f"    warnings: {types}")
     limit_headers = {k: v for k, v in headers.items() if any(s in k.lower() for s in ("rate", "limit", "quota"))}
     if limit_headers:
         print(f"    limit headers: {json.dumps(limit_headers)}")
@@ -228,13 +246,29 @@ def call(label: str, path: str, method: str = "GET", body: dict | None = None, h
 def report_explanations(payload) -> None:
     if not isinstance(payload, dict):
         return
-    explanations = payload.get("explanations")
-    if isinstance(explanations, list) and explanations:
-        first = explanations[0]
-        keys = sorted(first.keys()) if isinstance(first, dict) else []
-        print(f"    explanations: {len(explanations)} rows, first-row keys: {keys}")
-    else:
-        print("    explanations: absent — check the count against baseline (silent-ignore risk)")
+    top = None
+    query = payload.get("query")
+    if isinstance(query, dict) and isinstance(query.get("explainability"), dict):
+        top = query["explainability"]
+    per_result = None
+    for row in result_rows(payload):
+        if isinstance(row, dict):
+            row_query = row.get("query")
+            if isinstance(row_query, dict) and row_query.get("explainability"):
+                per_result = row_query["explainability"]
+                break
+    if not top and not per_result:
+        print("    explainability: absent — feature may have been silently ignored")
+        return
+    if top:
+        entities = top.get("signal.interests.entities")
+        if isinstance(entities, dict):
+            print(f"    aggregate explainability blocks: {sorted(entities.keys())}")
+    if per_result:
+        inputs = per_result.get("signal.interests.entities")
+        if isinstance(inputs, list) and inputs:
+            print(f"    per-result: {len(inputs)} input contribution(s), e.g. score={inputs[0].get('score')}")
+    print("    shape: query.explainability.signal.interests.entities[].entity_id/score")
 
 
 # --------------------------------------------------------------------------
@@ -334,12 +368,14 @@ def cmd_explainability(args) -> None:
 
 def cmd_radius(args) -> None:
     if args.lat is None or args.lon is None:
-        fail("radius needs --lat and --lon (bare pair, latitude-first)")
+        fail("radius needs --lat and --lon")
     base = {
         "filter.type": "urn:entity:place",
-        "filter.location": f"{args.lat},{args.lon}",
+        "filter.location": f"POINT({args.lon} {args.lat})",  # insights wants WKT, longitude-first
         "take": 50,
     }
+    if args.ids:
+        base["signal.interests.entities"] = ",".join(place_ids(load_state(), args.ids))
     if args.tag:
         base["filter.tags"] = args.tag
     cases = (
@@ -366,7 +402,10 @@ def cmd_variants(args) -> None:
         fail("pass --lat and --lon together")
     base = {"filter.type": "urn:entity:place", "take": 10}
     if args.lat is not None:
-        base["filter.location"] = f"{args.lat},{args.lon}"
+        base["filter.location"] = f"POINT({args.lon} {args.lat})"
+        base["filter.location.radius"] = args.radius  # a WKT point without radius returns 0 results (observed)
+    signal = ",".join(place_ids(load_state(), args.ids))
+    base["signal.interests.entities"] = signal
     call("variants-baseline", "/v2/insights?" + qs(base))
 
     def place_probe(label: str, extra: dict) -> None:
@@ -382,10 +421,13 @@ def cmd_variants(args) -> None:
         place_probe("exclude-tags-plain-operator", {"filter.exclude.tags": args.tag, "operator.exclude.tags": "union"})
     else:
         print("variants: --tag not given, skipping the operator.exclude pair")
-    brand_base = {"filter.type": "urn:entity:brand", "take": 10}
-    call("variants-entities-baseline", "/v2/insights?" + qs(brand_base))
-    call("variants-filter-entities", "/v2/insights?" + qs({**brand_base, "filter.entities": args.entity}))
-    call("variants-filter-results-entities", "/v2/insights?" + qs({**brand_base, "filter.results.entities": args.entity}))
+    brand_base = {"filter.type": "urn:entity:brand", "take": 10, "signal.interests.entities": signal}
+    if args.skip_brand:
+        print("variants: --skip-brand given — brand side skipped (already settled)")
+    else:
+        call("variants-entities-baseline", "/v2/insights?" + qs(brand_base))
+        call("variants-filter-entities", "/v2/insights?" + qs({**brand_base, "filter.entities": args.entity}))
+        call("variants-filter-results-entities", "/v2/insights?" + qs({**brand_base, "filter.results.entities": args.entity}))
     print("count unchanged from baseline = parameter ignored. Closes DI-4, DI-5, DI-13, DI-14 (spike 11); spike 9 rides along.")
 
 
@@ -418,7 +460,7 @@ def cmd_heatmap(args) -> None:
         fail("heatmap needs --lat and --lon")
     base = {
         "filter.type": "urn:heatmap",
-        "filter.location": f"{args.lat},{args.lon}",
+        "filter.location": f"POINT({args.lon} {args.lat})",  # insights wants WKT
         "take": 50,
     }
     if args.tag:
@@ -432,6 +474,7 @@ def cmd_heatmap(args) -> None:
 
 def cmd_raw(args) -> None:
     path = args.path if args.path.startswith("/") else "/" + args.path
+    path = urllib.parse.quote(path, safe="/?&=,.:-_()")
     call("raw-" + slug(path), path)
 
 
@@ -473,14 +516,18 @@ def main() -> None:
     p = sub.add_parser("radius", help="spike 5/6 — filter.location.radius granularity and units")
     p.add_argument("--lat", type=float)
     p.add_argument("--lon", type=float)
+    p.add_argument("--ids", help="optional signal ids if location alone is rejected")
     p.add_argument("--tag", help="optional filter.tags value (real tag urn)")
     p.set_defaults(fn=cmd_radius)
 
     p = sub.add_parser("variants", help="spikes 11 and 9 — paired parameter-name probes")
     p.add_argument("--entity", help="uuid for the filter.entities vs filter.results.entities pair")
     p.add_argument("--tag", help="real tag urn for the operator.exclude pair")
+    p.add_argument("--ids", help="signal ids for the base place and brand calls")
     p.add_argument("--lat", type=float)
     p.add_argument("--lon", type=float)
+    p.add_argument("--radius", type=float, default=2000, help="filter.location.radius (metres) for place probes")
+    p.add_argument("--skip-brand", action="store_true", help="skip the brand-side probes")
     p.set_defaults(fn=cmd_variants)
 
     p = sub.add_parser("entities", help="spike 16 — /entities by id and external.resy.ids round trip")
