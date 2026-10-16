@@ -17,19 +17,17 @@
 
 ## Setup
 
-PowerShell (per session):
+The runner reads the key from `$QLOO_API_KEY`; if that is unset it falls back to
+`TASTE_QLOO_API_KEY` (or `QLOO_API_KEY`) in the git-ignored `karum-infra/.env`.
+With `.env` in place:
 
 ```powershell
-$env:QLOO_API_KEY="..."
 python spike/run_spike.py key
 ```
 
-bash:
-
-```bash
-export QLOO_API_KEY=...
-python spike/run_spike.py key
-```
+Or set the env var explicitly for one session (PowerShell
+`$env:QLOO_API_KEY="..."`, bash `export QLOO_API_KEY=...`). The key is never
+printed, saved, or committed.
 
 `raw`-only escape hatch — no `spike/`, plain inline call:
 

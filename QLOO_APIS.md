@@ -33,7 +33,7 @@ Anything marked **verify** — or listed in the §5 spike checklist — goes thr
 | Pagination | `take` default 20, **max 50** on every endpoint except `/search` (exclusive max 200). `page` 1–100, default 1. `offset` arbitrary. Docs recommend `page` over `offset` |
 | Caching | Private server-side caching is allowed with **no time limit**, but **never store raw Qloo responses in a public repository** — the fixture pack must be redacted because Devpost requires public repos |
 | Response fields | The full response is always returned; fields cannot be filtered. Verbose payloads (`akas`, `short_descriptions`) must be trimmed client-side |
-| Quotas | **10,000 requests/month** per key (key received 16 Oct 2026); rate limit and reset timing recorded in spike 7; limits are raisable via Discord `#api-help`; keys are deactivated after the judging period |
+| Quotas | **10,000 requests/month** per key (key received 16 Oct 2026). Observed 16 Oct by probe: `X-Second-RateLimit-Limit: 5` (req/s), `X-Month-RateLimit-Limit: 10000`, `X-Month-RateLimit-Reset` counts down ≈ 2,592,000 s — a rolling ~30-day window, not a calendar-month reset; 429 behaviour still unprobed (spike 7). Limits are raisable via Discord `#api-help`; keys are deactivated after the judging period |
 
 ## 2. Endpoint inventory
 

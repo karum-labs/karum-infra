@@ -5,7 +5,9 @@ Works the 22-item spike checklist against https://hackathon.api.qloo.com.
 
 Rules this script enforces:
   - only the hackathon host is called (plus the opt-in DI-1 prod-host 401 check)
-  - the key comes from $QLOO_API_KEY and is never printed, saved, or committed
+  - the key comes from $QLOO_API_KEY — falling back to TASTE_QLOO_API_KEY (or
+    QLOO_API_KEY) in the git-ignored karum-infra/.env — and is never printed,
+    saved, or committed
   - raw responses land in spike/out/ (git-ignored): redact before promoting
     anything into the fixture pack — raw Qloo JSON never gets committed
   - parameter variants are always printed next to a no-parameter baseline,
@@ -31,6 +33,7 @@ import argparse
 import json
 import math
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -55,12 +58,24 @@ def fail(message: str) -> None:
     sys.exit(f"error: {message}")
 
 
+def key_from_env_file() -> str:
+    """Read TASTE_QLOO_API_KEY (or QLOO_API_KEY) from the git-ignored karum-infra/.env."""
+    env_path = HERE.parent / ".env"
+    if not env_path.exists():
+        return ""
+    for line in env_path.read_text(encoding="utf-8", errors="replace").splitlines():
+        match = re.match(r"\s*(?:TASTE_)?QLOO_API_KEY\s*=\s*(.+)", line)
+        if match:
+            return match.group(1).strip().strip('"').strip("'")
+    return ""
+
+
 def api_key() -> str:
-    key = os.environ.get("QLOO_API_KEY", "").strip()
+    key = os.environ.get("QLOO_API_KEY", "").strip() or key_from_env_file()
     if not key:
         fail(
-            "QLOO_API_KEY is not set. PowerShell: $env:QLOO_API_KEY=\"...\" / "
-            "bash: export QLOO_API_KEY=... — the key is never written to disk."
+            "no Qloo key found. Set $QLOO_API_KEY, or put TASTE_QLOO_API_KEY in the "
+            "git-ignored karum-infra/.env — PowerShell: $env:QLOO_API_KEY=\"...\""
         )
     return key
 

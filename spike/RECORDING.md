@@ -19,8 +19,8 @@ redact before promoting anything into the fixture pack. The key never leaves
 | 4 | `feature.explainability` shape and warning path | `explainability` | | | — | |
 | 5 | Radius granularity — 400 m filter, padding, 0 strictness, `filter.exclude.location.radius` | `radius --lat .. --lon ..` | | | — | |
 | 6 | Units and geometry — miles vs metres, WKT order, UUID `filter.location` | `radius` + `resolve` | | | — | |
-| 7 | 429 behaviour and quota headroom — headers, reset timing vs 10,000/month | any call; inspect `out/*.meta.json` headers | | | — | |
-| 8 | Data density — `filter.popularity`, `filter.price_level`, `/search` popularity | `resolve` + `raw` with both filters | | | — | |
+| 7 | 429 behaviour and quota headroom — headers, reset timing vs 10,000/month | any call; inspect `out/*.meta.json` headers | 16 Oct: `X-Second-RateLimit-Limit: 5` (req/s), `X-Month-RateLimit-Limit: 10000`, `X-Month-RateLimit-Reset` ≈ 2,592,000 s counting down in real time (rolling ~30-day window, not a calendar-month reset) | Partial — headers and reset window observed; 429 deliberately unprobed | — | 16 Oct 2026 |
+| 8 | Data density — `filter.popularity`, `filter.price_level`, `/search` popularity | `resolve` + `raw` with both filters | 16 Oct: brand `popularity` populated (0.933 on the top Colaba rec); `price_level` empty on that row; Mumbai and Bangalore retail places resolve; brand properties rich (`founded_year`, price bands, `key_markets`) | Partial — the full demo-city pass is still owed | — | 16 Oct 2026 |
 | 9 | Per-candidate affinity — `filter.results.entities`, `filter.results.tags` | `variants --entity <uuid>` | | | — | |
 | 10 | POST-only surface | `post` | | | DI-3 | |
 | 11 | Name-variant parameters — Resy triple, `price_range`, exclude operators, legacy `filter.entities` | `variants --entity <uuid> --tag <urn>` | | | DI-4, DI-5, DI-13, DI-14 | |
@@ -38,7 +38,17 @@ redact before promoting anything into the fixture pack. The key never leaves
 
 ## Summary log
 
-- **Calls spent this session:** —
-- **Calls spent total (quota ledger):** —
-- **Items settled:** 0 / 22
-- **Blockers found:** —
+- **Calls spent this session:** 7 (key probe 1 · Mumbai and Bangalore resolves 3 · Leopold Cafe exact 1 · brands 2 · affinity 1)
+- **Calls spent total (quota ledger):** 7 — `X-Month-RateLimit-Remaining: 9993` after the last call
+- **Items settled:** 0 / 22 (items 7 and 8 carry partial observations)
+- **Blockers found:** none
+
+## Coverage probe — India (16 Oct 2026)
+
+Side question, outside the 22 items: are Indian locations available? Seven calls.
+
+- **Places: yes.** `/search` around Mumbai (Colaba / Kala Ghoda: Ground Reality Tours, Booster store, SAMSONITE, ROYAL BUTTON) and Bangalore (Indiranagar: The Mad Teapot Cafe, Glens Bakehouse, Gokyo Outdoor Clothing & Gear, Just Bake, The Cupcake Company) returns real venues. Exact-name search finds "Leopold Cafe" → `68A744F0-1CE7-4C73-9A60-80C7A5713F72`.
+- **Brands: mixed.** "Café Coffee Day" resolves (`B6DA90E2-E073-4CE1-83CC-678F089C92EC`); "Amul" returns 0 — brand coverage is thinner than place coverage; record misses honestly.
+- **Core flow: works.** A brand-affinity call signalled by the Colaba block (Leopold Cafe plus three block stores) returned 20 brands, India-native fashion labels on top (The Label Life, AND, Shyamal & Bhumika, House of Masaba, Ritu Kumar, Tarun Tahiliani…), `popularity` populated (0.933 on the top record).
+- **Trap observed:** with `sort_by=distance` the name query behaves as "nearest venues" rather than a name match — use the default match sort to resolve a named entity.
+- Evidence: raw payloads in `spike/out/` (local-only; redact before any fixture use). Not promoted to PRODUCT.md or PLAN epic 10 — demo-city choice stays a product decision.
