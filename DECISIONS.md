@@ -43,11 +43,11 @@ Abandon Karum (decide by the coverage gate, before feature work continues) if an
 
 1. In 3 of 5 test blocks, brand or place outputs under location do not change meaningfully when the neighbours change — Qloo is not adding block-specific signal. **Preliminary 16 Oct:** the Colaba block passes — membership and rank shift clearly when the signal changes (7 new brand entities when `signal.location` was added; India-native labels surface with the block signal); the formal 3-of-5 pass runs in epic 10.
 2. Fewer than 70% of real neighbourhood venues resolve via `/search` in the demo cities. **Mumbai (a demo city), measured 16 Oct: 10 of 10 real Colaba venues resolved by plain name and landed within 2 km of the block point — passes.** The Western demo city is measured in epic 10.
-3. Top candidate brands are mostly non-retail or implausible for small units after filtering.
+3. Top candidate brands are mostly non-retail or implausible for small units after filtering. **Preliminary 16 Oct:** observed candidate sets skew retail / F&B (India-native fashion labels on Colaba); the filtered test runs after the epic 15 filters.
 4. The leave-one-out test beats the LLM-only baseline on fewer than 12 of 20 blocks.
 5. Median end-to-end latency stays above 20s after caching and parallelisation.
 6. Three non-technical testers cannot explain the recommendation after 60 seconds.
-7. The rules page prohibits the approach.
+7. The rules page prohibits the approach. **Checked 16 Oct:** the rules were read in full — nothing prohibits it ([PRODUCT.md](PRODUCT.md)).
 
 **Fallback: Shelfwise**, the independent bookstore and record-store buying agent. The pivot keeps the same gRPC boundaries — `ResolveEntities`, `ResolveTags`, `GetBlockProfile`, `ScoreCandidates`, and the AI RPCs keep their shapes; only the Qloo entity types inside `service-taste` change from places and brands to books and artists. The gateway, the client screens, and the evidence rules do not change.
 
@@ -60,7 +60,7 @@ Shared surface: `karum-infra/proto` is the contract between the sides — a chan
 
 ## 6. Qloo spike outcomes — 16 Oct 2026
 
-The coverage gate ran early: the 22-item spike is done (12 items settled, 3 partial, 7 deferred to build time), and it already touches kill rules 1–2 with measured data. Evidence: [spike/RECORDING.md](spike/RECORDING.md); parameter verdicts: [QLOO_APIS.md](QLOO_APIS.md) §5 and the closed §9 register (new DI-21).
+The coverage gate ran early: the 22-item spike is done (12 items settled, 3 partial, 7 deferred to build time), and it already touches kill rules 1–3 (preliminary) and clears rule 7. Evidence: [spike/RECORDING.md](spike/RECORDING.md); parameter verdicts: [QLOO_APIS.md](QLOO_APIS.md) §5 and the closed §9 register (new DI-21).
 
 What it locks for this page:
 

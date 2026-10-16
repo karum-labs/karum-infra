@@ -544,11 +544,11 @@ A weekend rebuild with Qloo plus an LLM would give the first screen, not the cal
 **Kill criteria (abandon by Oct 8–10 if any is true):**
 1. For at least 3 of 5 test blocks, Qloo's brand or place outputs under location do not change meaningfully when the neighbours change. That would mean Qloo is not adding block-specific signal (spike 1 tests exactly this). **Preliminary 16 Oct:** Colaba passes — outputs shift clearly with the signal; the formal 3-of-5 runs in epic 10.
 2. Fewer than 70% of real neighbourhood venues resolve via `/search` in the demo cities. **Mumbai measured 16 Oct: 10/10 Colaba venues resolved within 2 km of the block point — passes; the Western demo city measures in epic 10.**
-3. Top candidate brands are mostly non-retail or implausible for small units, even after filtering.
+3. Top candidate brands are mostly non-retail or implausible for small units, even after filtering. **Preliminary 16 Oct:** candidates skew retail / F&B; the real test runs after the epic 15 filters.
 4. The leave-one-out test does not beat LLM-only on at least 12 of 20 blocks.
 5. Median end-to-end latency stays above 20s after caching and parallelisation.
 6. Three non-technical testers cannot explain the recommendation after 60 seconds.
-7. The rules page prohibits the approach.
+7. The rules page prohibits the approach. **Checked 16 Oct** — the rules were read in full (above); nothing prohibits it.
 
 **Fallback:** switch to **Shelfwise**, the independent bookstore and record-store buying agent. It uses the same architecture (resolve entities, then affinity under location, then presence and saturation, then "stock / cut" lists) on book and artist entities, which may have stronger coverage.
 
