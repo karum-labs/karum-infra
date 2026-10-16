@@ -539,11 +539,11 @@ A weekend rebuild with Qloo plus an LLM would give the first screen, not the cal
 - **Another 2026 entrant may build retail site or tenant tools.** CulturePilot ("better market decisions") and others are adjacent, and I could only see public GitHub, not Devpost drafts.
 - **Real estate is unglamorous next to music and entertainment** for judges like Cedric the Entertainer. The demo must feel vivid (map, surprising pick, strong "do not lease" line).
 - **Willingness to pay is untested.** Small landlords are notoriously cheap, and the pricing above is a hypothesis.
-- ~~**I could not read the 2026 rules page or full Qloo docs.**~~ **Closed 16 Oct 2026:** the rules were read in full (no team cap; the Qloo integration must be new; judging Nov 2–16) and the API surface is mapped in [QLOO_APIS.md](QLOO_APIS.md). What remains unverified is spike behaviour — parameter acceptance, radius granularity, and the rate limit and reset timing behind the 10,000-request monthly quota; the open items are the [QLOO_APIS.md](QLOO_APIS.md) §5 checklist and every known doc conflict is registered in its §9.
+- ~~**I could not read the 2026 rules page or full Qloo docs.**~~ **Closed 16 Oct 2026:** the rules were read in full (no team cap; the Qloo integration must be new; judging Nov 2–16) and the API surface is mapped in [QLOO_APIS.md](QLOO_APIS.md). **Spike update 16 Oct:** parameter acceptance, radius granularity, and the location formats are verified ([spike/RECORDING.md](spike/RECORDING.md)); rate-limit headers and the rolling ~30-day reset are recorded (429 timing deliberately unprobed); what remains open is the [QLOO_APIS.md](QLOO_APIS.md) §5 deferred tier and the unclosed §9 rows (DI-6, DI-8, DI-9, DI-16; DI-10 and DI-12 partial).
 
 **Kill criteria (abandon by Oct 8–10 if any is true):**
-1. For at least 3 of 5 test blocks, Qloo's brand or place outputs under location do not change meaningfully when the neighbours change. That would mean Qloo is not adding block-specific signal (spike 1 tests exactly this).
-2. Fewer than 70% of real neighbourhood venues resolve via `/search` in the demo cities.
+1. For at least 3 of 5 test blocks, Qloo's brand or place outputs under location do not change meaningfully when the neighbours change. That would mean Qloo is not adding block-specific signal (spike 1 tests exactly this). **Preliminary 16 Oct:** Colaba passes — outputs shift clearly with the signal; the formal 3-of-5 runs in epic 10.
+2. Fewer than 70% of real neighbourhood venues resolve via `/search` in the demo cities. **Mumbai measured 16 Oct: 10/10 Colaba venues resolved within 2 km of the block point — passes; the Western demo city measures in epic 10.**
 3. Top candidate brands are mostly non-retail or implausible for small units, even after filtering.
 4. The leave-one-out test does not beat LLM-only on at least 12 of 20 blocks.
 5. Median end-to-end latency stays above 20s after caching and parallelisation.

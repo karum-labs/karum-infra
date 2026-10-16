@@ -40,7 +40,7 @@ redact before promoting anything into the fixture pack. The key never leaves
 
 - **Calls spent, first session (16 Oct, morning):** 7 (key probe 1 · Mumbai and Bangalore resolves 3 · Leopold Cafe exact 1 · brands 2 · affinity 1)
 - **Calls spent, item run (16 Oct, afternoon):** 64 (brand-location 6 · filter-type + explainability 7 · radius/rating/search probes 15 · variants 19 · heatmap 2 · post 1 · entities 2 · exclude/demographics/stray probes 12 — including 6 calls lost to the two location-format traps before they were understood)
-- **Calls spent total (quota ledger):** 71 — `X-Month-RateLimit-Remaining: 9929` after the last call
+- **Calls spent total (quota ledger):** 81 — `X-Month-RateLimit-Remaining: 9919` after the last call (the final 10 were the venue-resolution measurement below)
 - **Items settled:** 12 fully (1, 2, 4, 5, 6, 8, 9, 10, 11, 16, 17, 21); partial: 3 (count columns ride with 22), 7 (429 deliberately unprobed), 15 (both no-ops on the tested surface); deferred by design: 12, 13, 14, 18, 19, 22 and 20 (out of the MVP)
 - **Blockers found:** none
 
@@ -56,7 +56,7 @@ redact before promoting anything into the fixture pack. The key never leaves
 
 ## Coverage probe — India (16 Oct 2026)
 
-Side question, outside the 22 items: are Indian locations available? Seven calls.
+Side question, outside the 22 items: are Indian locations available? Seven calls initially; the venue-resolution measurement below adds ten.
 
 - **Places: yes.** `/search` around Mumbai (Colaba / Kala Ghoda: Ground Reality Tours, Booster store, SAMSONITE, ROYAL BUTTON) and Bangalore (Indiranagar: The Mad Teapot Cafe, Glens Bakehouse, Gokyo Outdoor Clothing & Gear, Just Bake, The Cupcake Company) returns real venues. Exact-name search finds "Leopold Cafe" → `68A744F0-1CE7-4C73-9A60-80C7A5713F72`.
 - **Brands: mixed.** "Café Coffee Day" resolves (`B6DA90E2-E073-4CE1-83CC-678F089C92EC`); "Amul" returns 0 — brand coverage is thinner than place coverage; record misses honestly.
@@ -64,3 +64,4 @@ Side question, outside the 22 items: are Indian locations available? Seven calls
 - **Trap observed:** with `sort_by=distance` the name query behaves as "nearest venues" rather than a name match — use the default match sort to resolve a named entity.
 - Evidence: raw payloads in `spike/out/` (local-only; redact before any fixture use).
 - **Decision (16 Oct, product):** Mumbai's Colaba block is adopted as the **second demo city** beside one Western lead city (NYC / London / Austin to be locked in PLAN epic 10). Carried into [PRODUCT.md](../PRODUCT.md) §India wedge and PLAN epic 10.
+- **Venue-resolution measurement (DECISIONS.md kill rule 2), 16 Oct:** 10 real Colaba venues resolved by plain name via `/search` (take 5, default match sort) and every one landed within 2 km of the block point (77 m … 1,643 m) — **10/10, the 70% gate passes for Mumbai**. Venues: Leopold Cafe, Mahesh Lunch Home, Gaylord Restaurant, Bayview Cafe, Shamiana, Burma Burma, Khyber, Sea Lounge, Copper Chimney, Kebab Korner. The Western demo city's rate is measured in epic 10.

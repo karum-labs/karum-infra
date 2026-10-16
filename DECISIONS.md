@@ -1,4 +1,4 @@
-# Karum decision record — 14 Oct 2026
+# Karum decision record — 14 Oct 2026 · updated 16 Oct 2026 (Qloo spike)
 
 One page that locks the shape of the five-repo build. Sources: [PRODUCT.md](PRODUCT.md) (the product and its must-builds) and [TECH.md](TECH.md) (the five-repo split). Anything not recorded here is out of scope until this page changes.
 
@@ -10,7 +10,7 @@ Every PRODUCT.md **must-build** has exactly one owning service. Other repos cont
 | --- | --- | --- |
 | Neighbour resolution with confirmation | `service-taste` | `ResolveEntities` ranks candidates; `server` owns the confirmation pause and `POST` confirm, `client` renders the confirm chips |
 | Block taste tags | `service-taste` | `GetBlockProfile` tag fan-out from confirmed neighbour ids |
-| Brand-affinity candidate generation under a location filter | `service-taste` | the location filter the Qloo spike verified; no undocumented parameters |
+| Brand-affinity candidate generation under a location filter | `service-taste` | `signal.location=POINT(<lon> <lat>)` — the filter the spike verified 16 Oct (`filter.location*` variants are silent no-ops, DI-11); no undocumented parameters |
 | Category saturation check | `service-taste` | category presence within the geocoded radius |
 | Three-part score and ranking | `service-taste` | `ScoreCandidates`: catchment fit, co-tenancy complement, cannibalisation penalty, deterministic ties |
 | "Do not lease" list | `service-taste` | machine-readable reason codes; `client` renders the column from those codes |
@@ -18,7 +18,7 @@ Every PRODUCT.md **must-build** has exactly one owning service. Other repos cont
 | Map with pins | `client` | OSM/CARTO tiles, radius ring, optional heatmap and site-visit polyline |
 | LLM-only comparison panel | `service-ai` | `LlmOnlyBaseline` on the same inputs; `client` labels it ungrounded |
 | Memo PDF and outreach email | `service-ai` | draft text comes from `DraftMemo` / `DraftOutreach` / `DraftListing`; `server` renders the PDF, `client` offers the actions |
-| Two pre-warmed sample blocks | `infra` | fixture pack, seed ids, Makefile `prewarm`; `service-taste` serves the prewarm RPC |
+| Two pre-warmed sample blocks | `infra` | fixture pack, seed ids, Makefile `prewarm`; `service-taste` serves the prewarm RPC — first block anchored 16 Oct: Mumbai Colaba (carries all spike evidence); the second locks with the Western demo city in epic 10 |
 | Public hosting, MIT licence, README with architecture and honesty rules | `infra` | Cloud Run manifests, Compose, shared run path; each repo carries its own `LICENSE` |
 
 Should-build and nice-to-have follow the same map: heatmap and compare are optional RPCs in `service-taste` behind a capability flag, demographics live in `GetBlockProfile`, probes in `service-ai`, saved vacancies and re-run diff in `server`, the leave-one-out CLI in `infra`, and the brand-side view and MCP tool stay in `server` + `client` behind flags that are off by default.
@@ -41,8 +41,8 @@ No login wall on the demo, no payments, no footfall feeds, no listing-site scrap
 
 Abandon Karum (decide by the coverage gate, before feature work continues) if any of these is true:
 
-1. In 3 of 5 test blocks, brand or place outputs under location do not change meaningfully when the neighbours change — Qloo is not adding block-specific signal.
-2. Fewer than 70% of real neighbourhood venues resolve via `/search` in the demo cities.
+1. In 3 of 5 test blocks, brand or place outputs under location do not change meaningfully when the neighbours change — Qloo is not adding block-specific signal. **Preliminary 16 Oct:** the Colaba block passes — membership and rank shift clearly when the signal changes (7 new brand entities when `signal.location` was added; India-native labels surface with the block signal); the formal 3-of-5 pass runs in epic 10.
+2. Fewer than 70% of real neighbourhood venues resolve via `/search` in the demo cities. **Mumbai (a demo city), measured 16 Oct: 10 of 10 real Colaba venues resolved by plain name and landed within 2 km of the block point — passes.** The Western demo city is measured in epic 10.
 3. Top candidate brands are mostly non-retail or implausible for small units after filtering.
 4. The leave-one-out test beats the LLM-only baseline on fewer than 12 of 20 blocks.
 5. Median end-to-end latency stays above 20s after caching and parallelisation.
@@ -53,7 +53,20 @@ Abandon Karum (decide by the coverage gate, before feature work continues) if an
 
 ## 5. Two-person split
 
-- **Side A — taste, score, agent, eval:** `karum-service-taste`, `karum-service-ai`, the coverage spike, the scoring rubric, the probe loop, and the leave-one-out harness in `karum-infra`.
+- **Side A — taste, score, agent, eval:** `karum-service-taste`, `karum-service-ai`, the coverage spike (done 16 Oct — [spike/RECORDING.md](spike/RECORDING.md)), the scoring rubric, the probe loop, and the leave-one-out harness in `karum-infra`.
 - **Side B — UI, map, drafts, deploy, Devpost:** `karum-client`, `karum-server`, the Cloud Run and Compose deploy path in `karum-infra`, the memo/outreach copy, and the Devpost text.
 
 Shared surface: `karum-infra/proto` is the contract between the sides — a change there needs a word from both. Each README carries this split as its ownership note.
+
+## 6. Qloo spike outcomes — 16 Oct 2026
+
+The coverage gate ran early: the 22-item spike is done (12 items settled, 3 partial, 7 deferred to build time), and it already touches kill rules 1–2 with measured data. Evidence: [spike/RECORDING.md](spike/RECORDING.md); parameter verdicts: [QLOO_APIS.md](QLOO_APIS.md) §5 and the closed §9 register (new DI-21).
+
+What it locks for this page:
+
+- **Location filter** (§1, row 3): `signal.location=POINT(<lon> <lat>)`; `filter.location` / `.query` / `.metro` are silently ignored.
+- **Kill rule 1:** Colaba passes preliminary (see above); the formal 3-of-5 pass runs in epic 10.
+- **Kill rule 2:** Mumbai passes 10/10 (see above); the Western city's rate is measured in epic 10.
+- **Demo cities:** Mumbai Colaba is the locked second demo city; the Western lead city (NYC / London / Austin) and both sample blocks lock in epic 10 ([PLAN.md](PLAN.md); [PRODUCT.md](PRODUCT.md) §India wedge).
+- **Code rules going into `service-taste`:** `/search` takes a bare `lat,lon` pair while Insights takes WKT only (DI-21); Insights point queries always carry an explicit `filter.location.radius` (omitted → zero rows); `warnings[].not_found` is surfaced, never silently scored on; only spike-verified spellings ship — the no-op variants are listed in the DI register.
+- **Quota:** 81 of the 10,000 monthly requests used (9,919 remaining, 16 Oct).
