@@ -87,7 +87,7 @@ Summary first, details after.
 - **The call:** `GET /v2/tags?filter.query=<chip text>&feature.typo_tolerance=true&feature.semantic_search=true&filter.tag.types=<optional namespace>&take=50`. The beta `feature.semantic_search` carries free-text constraints that have no exact match. `GET /v2/tags/types` returns the allow-list of tag namespaces (what Karum is able to explain in the UI).
 - **Where it lives:** [PLAN.md](PLAN.md) epic 13; [PRODUCT.md](PRODUCT.md) workflow step 4.
 - **Why it matters:** the user's constraints shape both the candidate set (as filters) and the ranking (as signals) — without this step the agent can only take plain addresses and neighbour names.
-- **Watch-outs:** the tag response carries **no confidence score** — Karum derives one (typo/semantic hit + name similarity) and labels it as an inference. A constraint with no confident match is returned as "unresolved" for the UI to show, not silently dropped. The `/v2/tags/types` response schema is not shown in the docs, and its `parents.types` enum contradicts itself (DI-8, spike 13).
+- **Watch-outs:** the tag response carries **no confidence score** — Karum derives one (typo/semantic hit + name similarity) and labels it as an inference. A constraint with no confident match is returned as "unresolved" for the UI to show, not silently dropped. The `/v2/tags/types` schema is now known (`results.tag_types[]`); it takes `urn:entity:*` parents and `filter.tag.types` works as a namespace restriction — settled in spike 13 (DI-8, DI-9 closed).
 
 ### 2.3 Block taste descriptors — Insights with `filter.type=urn:tag`
 
@@ -119,7 +119,7 @@ Summary first, details after.
 - **The call:** `GET /v2/insights?filter.type=urn:demographics&signal.interests.entities=<top candidate IDs>` (may combine with `signal.interests.tags`). Positive values mean stronger-than-average alignment with the taste profile.
 - **Where it lives:** [PLAN.md](PLAN.md) epic 14 (should-build); [PRODUCT.md](PRODUCT.md) call sequence #5.
 - **Why it matters:** it turns demographics into a **result** of taste rather than an input (Qloo's key difference from demographic targeting), and it adds a second human-readable evidence layer next to the tags.
-- **Watch-outs:** enum-absent like `urn:tag` — same 403 risk (DI-2). The age buckets have a coarse/fine conflict (DI-7, spike 17). If it fails, the mismatch warning is simply omitted; nothing else breaks.
+- **Watch-outs:** enum-absent like `urn:tag`, but no 403 in practice — it returned data (DI-2 closed, spike 2). The age buckets are fine-only (DI-7 closed, spike 17). If it fails, the mismatch warning is simply omitted; nothing else breaks.
 
 ### 2.7 Scoring inputs — documented Qloo dials that feed the three-part score
 
@@ -127,10 +127,10 @@ Summary first, details after.
   - **Popularity band** — `filter.popularity.min/max` (0–1): the "safe vs emerging" split.
   - **Price / rent proxy** — `filter.price_level.min/max` (1–4); hotel-style variant `filter.price_range.from/.to` (name conflict DI-5).
   - **Trends bias** — `bias.trends` (`off` … `very_high`, default `medium`): how much current momentum weighs.
-  - **Quality bias** — `bias.quality` + `sort_by=quality` (place only; weight-string conflict DI-6, spike 12).
+  - **Quality bias** — `bias.quality` + `sort_by=quality` (place only; accepted set `very_low…very_high` + `mid`, drops no-quality places — DI-6 closed, spike 12).
   - **Exclusions** — `filter.exclude.entities` (keep the vacancy's own neighbours out of the candidate list), `filter.exclude.tags` + operator (spike 11, DI-13).
   - **Per-candidate probes** — `filter.results.entities`: ask "what is the affinity for exactly these candidates?" in one call (spike 9). Same idea for tags: `filter.results.tags`.
-  - **Signal weights** — `signal.interests.entities.weight`, `.tags.weight`, etc. (numeric or `very_low`…`very_high`; spike 14, DI-16).
+  - **Signal weights** — `signal.interests.entities.weight`, `.tags.weight`, etc. (numeric or `very_low`…`very_high`; both accepted, but pair any weighting with a diff test — spike 14, DI-16 closed).
 - **Where it lives:** [PLAN.md](PLAN.md) epic 15; [QLOO_APIS.md](QLOO_APIS.md) §3.9.
 - **Why it matters:** this is what makes the ranking explainable and tunable without inventing numbers — every input is a documented field, and the formula is written into the evidence payload.
 - **Watch-outs:** several of these have multiple spellings across Qloo's docs, and the wrong spelling is silently ignored, not rejected. Spike 11 settles the names before any of them appears in code.
@@ -157,7 +157,7 @@ Summary first, details after.
 - **The call:** `GET /v2/analysis/compare?a.signal.interests.entities=<neighbour IDs>&b.signal.interests.entities=<candidate ID>&filter.type=urn:entity:brand&model=descriptive&filter.subtype=urn:tag:genre&filter.location.query=<locality>`.
 - **Where it lives:** [PLAN.md](PLAN.md) epic 16; [PRODUCT.md](PRODUCT.md) call sequence #7. Optional, capability-flagged.
 - **Why it matters:** a second angle of proof for the top pick, and a natural bridge to the brand-side view later.
-- **Watch-outs:** both `a.` and `b.` signals are **required** (a one-sided call errors). `take` max 50. Behaviour of `model` and `filter.subtype` goes through spike 19 before use.
+- **Watch-outs:** both `a.` and `b.` signals are **required** (a one-sided call errors). `take` max 50. `model` and `filter.subtype` settled in spike 19 — parse `results.matchEntities`: the envelope is `{tags, a, b, matchEntities}`, not the `/search` array (DI-22).
 
 ### 2.11 Card hydration — `GET /entities`
 
@@ -203,7 +203,7 @@ Three groups: **A** = cheap additions to the pipeline that already exists (same 
 - **The call:** `GET /v2/trending?filter.type=urn:entity:brand&signal.interests.entities=<brand ID>&filter.start_date=<YYYY-MM-DD>&filter.end_date=<YYYY-MM-DD>` — both dates are required; rows are weekly, newest first.
 - **Where it plugs in:** [PLAN.md](PLAN.md) epic 16's deliberately-out nice-to-have; card UI in epic 40; outreach draft text in epic 23. This is the strongest story-per-call of any addition.
 - **Why it's worth it:** adds a time dimension to a product judges will otherwise see as a snapshot — "sign now" is a broker's real instinct, and Qloo is the only source in the stack that can back it.
-- **Gates:** spike 20 (weekly cadence, date-window limits, sparse entities). Only build it after the must-build list is green — it is on the cut line, not above it.
+- **Gates:** spike 20 settled 16 Oct — weekly rows, `population_rank` is a string, windows under ~6 months return an empty list, sparse entities return 0 rows. Only build it after the must-build list is green — it is on the cut line, not above it.
 
 #### A2. "Probe any brand" — `filter.results.entities`
 
@@ -227,7 +227,7 @@ Three groups: **A** = cheap additions to the pipeline that already exists (same 
 - **The call:** add `signal.interests.tags=<tag IDs>` (and optional `.weight`) to the brand insights call; `operator.signal.interests.tags=union` to score by highest-affinity tags.
 - **Where it plugs in:** tag resolution (epic 13) feeds scoring's call assembly (epic 15).
 - **Why it's worth it:** it is the difference between "filter out what you don't want" and "tell me more like what you do" — a genuinely better answer from the same endpoint.
-- **Gates:** documented on all entity types, but weights have a numeric-vs-string conflict (spike 14, DI-16).
+- **Gates:** documented on all entity types; both numeric and string weight forms accepted, but neither showed an observable effect in the spike's single-signal test — pair any weighting with a diff test (spike 14, DI-16 closed).
 
 #### A5. Quality-credibility badges — `filter.external.exists` + Resy/rating fields
 
@@ -318,11 +318,11 @@ These are not hackathon-week features. They are the roadmap [PRODUCT.md](PRODUCT
 
 These use documented parameters, but only in the "deep-dive" spec or with open conflicts. Put each into the epic-9 session as an extra probe; only then decide whether the pay-off justifies the build.
 
-- **C1. `model=predictive` on compare** — a forward-looking overlap chart next to the descriptive one (spike 19 settles the model literals and response shape).
-- **C2. `bias.content_based` (0–1) + backfill dials** — a "novel vs expected" dial and suppression of low-confidence filler; both are deep-dive-only parameters (spike 18).
-- **C3. POST-only surface** — if spike 10 shows POST works, merged localities and weight arrays unlock real multi-district signals. Until then: off the table (DI-3).
-- **C4. Trending beyond brands** — `/v2/trending` with tags or localities (e.g. "is this district's scene rising?") — enum coverage is unspecified in the snapshot; extend spike 20 before believing it.
-- **C5. `diversify.by=properties.geocode.city|metro`** — spread a broker's results across markets (guide says tag-only, deep dive says general — DI-10, spike 15).
+- **C1. `model=predictive` on compare** — a forward-looking overlap chart next to the descriptive one (spike 19 settled: both models accepted with identical shape; the chart must parse `matchEntities` — DI-22).
+- **C2. `bias.content_based` (0–1) + backfill dials** — a "novel vs expected" dial and suppression of low-confidence filler; both are deep-dive-only — spike 18 settled the backfill dials as silently ignored on this surface.
+- **C3. POST-only surface** — spike 10 settled 16 Oct: POST works (DI-3 closed), so `signal.interests.entities.query` and `filter.exclude.entities.query` are usable via JSON bodies; weight-array shapes were rejected in spike 14 probes (400), so merged-locality arrays stay unverified.
+- **C4. Trending beyond brands** — `/v2/trending` with tags or localities (e.g. "is this district's scene rising?") — enum coverage is unspecified in the snapshot; spike 20 settled brand trending only (weekly, ≥ ~6-month windows, empty under that).
+- **C5. `diversify.by=properties.geocode.city|metro`** — spread a broker's results across markets. Spike 15 settled `diversify.by=subtype` on tag calls only (DI-10 closed); the city/metro form remains untested — treat as speculative.
 - **C6. `filter.exists=properties.image|description`** — a renderability guard so every card has visuals (deep-dive parameter; cheap to test).
 - **C7. Demographics as input** — `signal.demographics.age` / `.gender` (± weights) to steer candidate generation toward the catchment's skew. Deep-dive weights; audience IDs have no live source while `/v2/audiences` is deprecated (DI-7, DI-20).
 

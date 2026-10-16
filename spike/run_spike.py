@@ -475,7 +475,17 @@ def cmd_heatmap(args) -> None:
 def cmd_raw(args) -> None:
     path = args.path if args.path.startswith("/") else "/" + args.path
     path = urllib.parse.quote(path, safe="/?&=,.:-_()")
-    call("raw-" + slug(path), path)
+    raw_body = args.post
+    if raw_body is None and args.post_file:
+        raw_body = Path(args.post_file).read_text(encoding="utf-8")
+    if raw_body is not None:
+        try:
+            body = json.loads(raw_body)
+        except json.JSONDecodeError as exc:
+            fail(f"raw --post/--post-file expects JSON: {exc}")
+        call(args.label or "raw-post-" + slug(path), path, method="POST", body=body)
+    else:
+        call(args.label or "raw-" + slug(path), path)
 
 
 # --------------------------------------------------------------------------
@@ -546,6 +556,9 @@ def main() -> None:
 
     p = sub.add_parser("raw", help="generic GET, e.g. raw \"/v2/trending?...\"")
     p.add_argument("path")
+    p.add_argument("--post", help="inline JSON body — sends POST instead of GET (DI-3 surface)")
+    p.add_argument("--post-file", help="path to a JSON body file — sends POST (Windows quoting-safe)")
+    p.add_argument("--label", help="override the saved-file label")
     p.set_defaults(fn=cmd_raw)
 
     args = parser.parse_args()

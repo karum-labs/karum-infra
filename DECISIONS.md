@@ -60,7 +60,7 @@ Shared surface: `karum-infra/proto` is the contract between the sides — a chan
 
 ## 6. Qloo spike outcomes — 16 Oct 2026
 
-The coverage gate ran early: the 22-item spike is done (12 items settled, 3 partial, 7 deferred to build time), and it already touches kill rules 1–3 (preliminary) and clears rule 7. Evidence: [spike/RECORDING.md](spike/RECORDING.md); parameter verdicts: [QLOO_APIS.md](QLOO_APIS.md) §5 and the closed §9 register (new DI-21).
+The coverage gate ran early and the spike is complete: all 22 items carry verdicts (item 7's 429 deliberately unprobed; the deferred tier closed 12–14, 18–20, 22 and 15's tag half the same day). It already touches kill rules 1–3 (preliminary) and clears rule 7. Evidence: [spike/RECORDING.md](spike/RECORDING.md); parameter verdicts: [QLOO_APIS.md](QLOO_APIS.md) §5 and the closed §9 register (new: DI-21, DI-22, DI-23).
 
 What it locks for this page:
 
@@ -69,4 +69,6 @@ What it locks for this page:
 - **Kill rule 2:** Mumbai passes 10/10 (see above); the Western city's rate is measured in epic 10.
 - **Demo cities:** Mumbai Colaba is the locked second demo city; the Western lead city (NYC / London / Austin) and both sample blocks lock in epic 10 ([PLAN.md](PLAN.md); [PRODUCT.md](PRODUCT.md) §India wedge).
 - **Code rules going into `service-taste`:** `/search` takes a bare `lat,lon` pair while Insights takes WKT only (DI-21); Insights point queries always carry an explicit `filter.location.radius` (omitted → zero rows); `warnings[].not_found` is surfaced, never silently scored on; only spike-verified spellings ship — the no-op variants are listed in the DI register.
-- **Quota:** 81 of the 10,000 monthly requests used (9,919 remaining, 16 Oct).
+- **Compare RPC (epic 16):** parse `results.matchEntities` — the envelope is `{tags, a, b, matchEntities}`, not the `/search` array (DI-22); `model` and `filter.subtype` accepted with identical shape.
+- **Signal hygiene:** `signal.interests.entities.include` is a boolean (DI-23); `resolve_to` literals limited to `urn:reference:brand` / `both` (DI-16); scalar `weight` accepts number/string but showed no observable effect on the spike call — pair any weighting with a diff test. Trending needs ≥ ~6-month windows and stays out of the MVP (spike 20).
+- **Quota:** 123 of the 10,000 monthly requests used (9,877 remaining, 16 Oct; the DI-1 prod-host 401 is not metered).

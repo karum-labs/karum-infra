@@ -38,15 +38,16 @@ curl.exe -s "https://hackathon.api.qloo.com/" -H "X-Api-Key: $env:QLOO_API_KEY"
 ## Run order
 
 1. `key` — liveness of the hackathon key. Add `--check-prod-host` once to record the
-   DI-1 401 from `api.qloo.com`.
+   DI-1 401 from `api.qloo.com` — **done 16 Oct: 401 confirmed**.
 2. `resolve` — turn a few real places in a dense retail block into entity ids
    (writes `state.json`; every later command reads it). `/search` takes miles and a
    latitude-first bare pair.
 3. The gate items: `brand-location`, `filter-type`, `explainability`, `radius`,
    `variants`, `entities`, `post`. These settle spike items 1, 2, 4–8, 10, 11 —
    **all run 16 Oct, verdicts in [RECORDING.md](RECORDING.md)**.
-4. Next tier: `heatmap` (item 3, done 16 Oct), then item 16 via `entities --resy-id`
-   (done), then the feature-gated items 12–22 through `raw` as features come up.
+4. Deferred tier: `heatmap` (item 3) and `entities --resy-id` (item 16) ran 16 Oct,
+   then the feature-gated items 12–22 through `raw` — **all run 16 Oct; every item now
+   carries a verdict** (item 7's 429 deliberately unprobed).
 
 Record every answer in [RECORDING.md](RECORDING.md), then tick the item in
 QLOO_APIS.md §5, close the matching §9 row with the observed answer and a date, and
@@ -66,7 +67,7 @@ let the result flow into the PLAN epic that depends on it.
 | `entities [--ids a,b] [--resy-id <id>]` | 16 | `/entities` by id and `external.resy.ids` round trip |
 | `post` | 10 | One GET→POST attempt with a JSON body |
 | `heatmap [--lat .. --lon ..] [--tag urn]` | 3, 22 | `urn:heatmap` default boundary vs `urn:geohash` |
-| `raw "/path?params"` | 12–22 | Anything else; still saved and summarized |
+| `raw "/path?params" [--post <json> / --post-file <path>]` | 12–23 | Anything else (POST bodies; `--post-file` is quoting-safe on Windows); still saved and summarized |
 
 Every call writes `<stamp>-<label>.json` plus `<stamp>-<label>.meta.json` (status,
 duration, and all response headers — that is where item 7's rate-limit headers show
@@ -88,5 +89,11 @@ up) into `spike/out/`.
 - The script never bursts calls to watch a 429. If a rate-limit response shows up,
   record the headers and the reset timing by hand (item 7) — whether the quota resets
   before judging (Nov 2–16) matters.
-- Quota: 10,000 requests/month. The full spike used 71 calls (9,929 remaining,
-  16 Oct) — keep it that way: baseline-paired probes only.
+- Quota: 10,000 requests/month. The full spike used 123 calls (9,877 remaining,
+  16 Oct; the DI-1 prod-host 401 is not metered) — keep it that way: baseline-paired probes only.
+- **Validated vs silently ignored (16 Oct):** some parameters reject bad input loudly
+  (`bias.quality=bogus`, `include=<uuid>`, bad `resolve_to` → 400 with the reason) while
+  others no-op byte-identically (`backfill.*` dials). New traps 8–13 in RECORDING.md:
+  `include` is boolean (DI-23); `resolve_to` accepts `urn:reference:brand` / `both` only
+  (DI-16); compare returns `{tags, a, b, matchEntities}` (DI-22); trending windows under
+  ~6 months are empty.
