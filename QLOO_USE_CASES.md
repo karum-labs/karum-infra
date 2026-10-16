@@ -4,7 +4,7 @@
 >
 > **Status.** A planning aid, not a contract; [QLOO_APIS.md](QLOO_APIS.md) remains the authority for parameters and doc conflicts.
 >
-> **Reality check.** The Qloo spike ([PLAN.md](PLAN.md) epic 9) has not run yet. Every call below still passes through the 22-item spike checklist in [QLOO_APIS.md](QLOO_APIS.md) §5 before any client code depends on it. All calls use the single hackathon host `https://hackathon.api.qloo.com` with an `X-Api-Key` header.
+> **Reality check.** The Qloo spike ([PLAN.md](PLAN.md) epic 9) has not run yet — the hackathon key is in hand (16 Oct 2026; monthly quota 10,000 requests). Every call below still passes through the 22-item spike checklist in [QLOO_APIS.md](QLOO_APIS.md) §5 before any client code depends on it. All calls use the single hackathon host `https://hackathon.api.qloo.com` with an `X-Api-Key` header.
 
 ---
 
@@ -168,8 +168,8 @@ Summary first, details after.
 
 ### 2.12 Operational plumbing (invisible but load-bearing)
 
-- **Key-liveness probe** — `GET /` against the hackathon host confirms the key is live; the monthly quota is recorded before the spike leans on it ([PLAN.md](PLAN.md) epic 9, first checklist item).
-- **Quota and 429 handling** — rate-limit headers and reset timing are recorded (spike 7); this also bounds the eval harness (epic 33) and the prewarm strategy.
+- **Key-liveness probe** — the hackathon key is in hand (16 Oct 2026) and its monthly quota is recorded as 10,000 requests; `GET /` against the hackathon host confirms it stays live ([PLAN.md](PLAN.md) epic 9, first checklist item).
+- **Quota and 429 handling** — rate-limit headers and reset timing are recorded (spike 7); estimated internal use (spike, city choice, prewarm, and the 20-block eval) is 1,000–2,000 calls, leaving wide headroom for judge traffic once the 24h cache is in place — keep a simple ledger and check it before the eval run and the judging window.
 - **Caching** — private server-side caching is allowed with no time limit. Karum caches by canonical parameter hash for 24h with a single-flight lock, plus an in-process fallback if Redis is down (epic 17).
 - **Prewarm** — the two sample blocks are loaded on deploy and refreshed inside the cache TTL so a judge's first click is fast (epic 47).
 - **Fixtures** — the spike's redacted responses become the first fixture files; replay tests assert the typed client structures with no live network (epics 7, 11, 50).

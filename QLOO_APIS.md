@@ -33,7 +33,7 @@ Anything marked **verify** — or listed in the §5 spike checklist — goes thr
 | Pagination | `take` default 20, **max 50** on every endpoint except `/search` (exclusive max 200). `page` 1–100, default 1. `offset` arbitrary. Docs recommend `page` over `offset` |
 | Caching | Private server-side caching is allowed with **no time limit**, but **never store raw Qloo responses in a public repository** — the fixture pack must be redacted because Devpost requires public repos |
 | Response fields | The full response is always returned; fields cannot be filtered. Verbose payloads (`akas`, `short_descriptions`) must be trimmed client-side |
-| Quotas | Rate and monthly limits per key, raisable via Discord `#api-help`; keys are deactivated after the judging period |
+| Quotas | **10,000 requests/month** per key (key received 16 Oct 2026); rate limit and reset timing recorded in spike 7; limits are raisable via Discord `#api-help`; keys are deactivated after the judging period |
 
 ## 2. Endpoint inventory
 
@@ -273,7 +273,7 @@ Work every item against `https://hackathon.api.qloo.com` with the `X-Api-Key` he
 4. **`feature.explainability`** — accepted on brand and place calls? Per-result and aggregate shape, the ≥0.1 inclusion rule, and the warning path.
 5. **Radius granularity** — does `filter.location.radius=400` genuinely filter at 400 m (settles the kill-rule-1 granularity question); confirm the omitted-radius padding rule and `0` strictness; check `filter.exclude.location.radius`.
 6. **Units and geometry formats** — `/search` miles vs Insights metres; WKT longitude-first vs bare pair latitude-first; `/search` `filter.location` also accepts a Qloo UUID.
-7. **429 behaviour and quota headroom** — rate-limit headers, reset timing, monthly ceiling.
+7. **429 behaviour and quota headroom** — rate-limit headers, reset timing, and the observed ceiling against the reported 10,000 requests/month.
 8. **Data density** — `filter.popularity` and `filter.price_level` populated for retail brands in the demo cities; popularity present on `/search` results too.
 9. **Per-candidate affinity probes** — `filter.results.entities=<candidate>` returns just those entities with their affinity; same for `filter.results.tags`.
 
