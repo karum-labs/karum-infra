@@ -1,10 +1,20 @@
 # Karum implementation plan
 
-This is the build checklist for the whole system, not only infra. The product is the vacancy-to-tenant leasing agent in [PRODUCT.md](PRODUCT.md). The shape is the five-repo split in [TECH.md](TECH.md): Flutter client, Go gateway, `service-taste`, `service-ai`, and this infra repo for protos, Compose, and Cloud Run.
+This is the build checklist for the whole system. The product is the brand-operated expansion agent in [PRODUCT.md](PRODUCT.md). The shape is the five-repo split in [TECH.md](TECH.md): Flutter client, Go gateway, `service-taste`, `service-ai`, and this infra repo for protos, Compose, and Cloud Run.
 
-Today is 16 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Submit on 29 Oct. The old Oct 4–8 coverage window has passed, so the checklist follows dependencies, with fixtures unblocking the team until the hackathon key is verified.
+Today is 17 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Feature freeze is 27 Oct, the public no-login build is up on 28 Oct, and the submission goes in on 29 Oct. Cloud Run and the pre-warmed cache stay up through 23 Nov; judging runs 2–16 Nov.
 
-**Status — 16 Oct 2026.** Completed items are ticked below. The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix so they match their remotes (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done so far: repository scaffolding (MIT licences, READMEs, gitignores, CI on each repo), toolchain pins, a `GET /health` endpoint on all three backends, the shared `karum/health/v1` proto placeholder with buf lint and breaking checks, and the five-service Compose stack booting green on fixtures. **Section 0 closed 14 Oct:** the decision record lives in [DECISIONS.md](DECISIONS.md) (service map, stack deltas, non-goals, kill rules with the Shelfwise fallback, two-person split), every README carries an ownership note, and the gitleaks secret scan runs in all five repos. Epics 2 onward — the Qloo spike, domain protos, scoring, drafts, and the product screens — are untouched. **Docs synced 16 Oct:** [QLOO_APIS.md](QLOO_APIS.md) was rebuilt against the 16 Oct docs snapshot — parameter catalogue, a 22-item spike checklist, and the DI-1…DI-23 register — and [PRODUCT.md](PRODUCT.md) was re-aligned; epic 9 below maps onto that checklist, and no completed build item changed status. **Key in hand 16 Oct 2026:** the hackathon key has arrived and the monthly quota is recorded as 10,000 requests (epic 9, first checklist item). **Spike complete 16 Oct:** every checklist item now carries a verdict — 123 calls spent, 9,877 of 10,000 remaining (item 7's 429 deliberately unprobed); evidence in [spike/RECORDING.md](spike/RECORDING.md) and the verdict list in epic 9. Domain protos, scoring, drafts, and the product screens remain.
+On 17 Oct the product became the brand agent: a brand seed and a city go in, and doors, flagship corridors, collab partners, skip reasons, menu audits, and a field route come out. This checklist is that build. Platform work finished before the pivot stays ticked. Domain protos, scoring, drafts, and the product screens are still unbuilt, and they follow the sections below. [DECISIONS.md](DECISIONS.md) records the earlier leasing shape; where it disagrees with this file, this file wins. Qloo parameter facts stay in [QLOO_APIS.md](QLOO_APIS.md) and [spike/RECORDING.md](spike/RECORDING.md) — that catalogue still cites the old epic numbers, so new work cites section numbers and DI ids.
+
+**Status — 17 Oct 2026.** The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done: MIT licences, READMEs, gitignores, CI, gitleaks, toolchain pins in `versions.env`, `GET /health` on all three backends, the `karum/health/v1` proto with buf lint and breaking checks, Dockerfiles, and the five-service Compose stack booting green on fixtures. Flutter web and Windows analyse clean, with shared loading, empty, and error widgets and `GATEWAY_URL`. The Qloo spike is closed (16 Oct, 123 calls, 9,877 of 10,000 remaining). Redacted fixtures for the new campaign payloads are not saved yet.
+
+| Window | Sections | Outcome |
+| --- | --- | --- |
+| 17–18 Oct | 1–2 | Domain protos, stubs, and the three campaign seeds |
+| 18–21 Oct | 3–4 | Taste and AI, in parallel |
+| 21–26 Oct | 5–6 | Gateway and Flutter, overlapping once the protos land |
+| 26–28 Oct | 7 and 9 | Pre-warm, Cloud Run, the public client |
+| 28–29 Oct | 8–9 | Proof, Devpost, submit |
 
 ```mermaid
 flowchart TD
@@ -25,543 +35,410 @@ flowchart TD
 
 Service ownership:
 
-- **infra:** protos, Compose, Cloud Run, fixture pack, Makefile, CI glue
-- **service-taste:** Qloo client, resolution, tags, insights, the three-part score, Redis cache
-- **service-ai:** Gemini, search grounding, bounded probes, autopilot, memo, outreach, listing blurb, LLM-only baseline
-- **server:** geocoding, job orchestration, confirmation pause, Places enrichment, optional site-visit route, Postgres, rate limits, SSE
+- **infra:** protos, Compose, Cloud Run, fixture pack, Makefile, CI
+- **service-taste:** Qloo client, seed and tag resolution, door scouting, heatmap, compare, the affinity and demographic terms, Redis cache
+- **service-ai:** Gemini, search grounding, menu audit, SKU choice, pitch, battlecard, site brief, collab proposal, LLM-only baseline
+- **server:** city geocode, job orchestration, score assembly, Places, Routes, PDF, Postgres, rate limits, SSE
 - **client:** judge-ready Flutter web UI, plus the same screens on desktop
 
-Each epic below has a short implementation note, then a short checklist in implementation order. After the local stack boots on fixtures, client shell work can run in parallel with taste and AI — start epics 34–38 against fixture mode as soon as the domain protos land (4–7), because the schedule assumes that overlap. If the calendar tightens, cut in this order without touching the three-minute judge path: MCP tool (49), brand-side view (48), saved vacancies and magic-link sign-in (43), the compare chart (16), the site-visit route (32), then diff and scheduled watch (30).
-
-## 0. Lock the shape
-
-### 1. Record decisions
-
-Write a one-page service map that assigns every PRODUCT.md must-build to infra, `server`, `service-taste`, `service-ai`, or `client`. Record the stack deltas already chosen: Flutter web, server-rendered PDF, map tiles in the client, Places as pin enrichment, Routes as an optional broker site visit. List the non-goals (login wall on the demo, payments, footfall, scraping, multi-floor planner, custom ML, undocumented Qloo parameters) and the kill rules plus Shelfwise fallback, which keeps the same gRPC boundaries if the coverage gate fails. Name the split: taste, score, agent, and eval on one side; UI, map, drafts, deploy, and Devpost on the other.
-
-- [x] Write a one-page service map that assigns every PRODUCT.md must-build feature to one service — recorded in [`DECISIONS.md`](DECISIONS.md) §1
-- [x] Record the stack adaptations: Flutter web instead of Next.js, server-rendered PDF, Map tiles in the client, Places as pin enrichment, Routes as an optional broker site visit — `DECISIONS.md` §2
-- [x] Record the out-of-scope list: login wall on the demo, payments, footfall feeds, listing-site scraping, multi-floor mall planner, custom ML, undocumented Qloo parameters — `DECISIONS.md` §3
-- [x] Record the kill rules and the Shelfwise fallback so a failed coverage gate has a named exit that keeps the same service boundaries — `DECISIONS.md` §4, all seven criteria plus the fallback
-- [x] Name the two-person split: taste, score, agent, and eval on one side; UI, map, drafts, deploy, and Devpost on the other — `DECISIONS.md` §5
-
-### 2. Repositories and legal surface
-
-Create `client`, `server`, `service-taste`, and `service-ai` as siblings of this repo, each with an MIT `LICENSE` and a README whose run path and licence line can be pasted into the host About section. Add gitignores for `.env`, key files, notebook outputs, and build artifacts, plus an ownership note that matches the two-person split. Add a secret scan (gitleaks or equivalent) so a committed Qloo `X-Api-Key` or GCP credential fails before it lands on the remote.
-
-- [x] Create `client`, `server`, `service-taste`, and `service-ai` next to infra, each with an MIT `LICENSE` — done as `karum-client`, `karum-server`, `karum-service-taste`, `karum-service-ai`, all private on `karum-labs`
-- [x] Add a README run path and a licence line suitable for the host's About section
-- [x] Add gitignores for env files, keys, notebook outputs, and build artifacts
-- [x] Add an ownership note matching the two-person split — an `## Ownership` section naming each repo's side now sits in all five READMEs, pointing at `DECISIONS.md`
-- [x] Add a secret scan so Qloo and GCP credentials cannot be committed — gitleaks config and workflow live in infra and are now byte-identical copies in all four service repos
-
-### 3. Toolchains
-
-Pin Go, Python, and Flutter versions in infra so the other four repos read one source of truth. Check in gofmt, ruff, and `flutter analyze` config, plus buf lint and `buf breaking` against `main` for `infra/proto`. The infra Makefile exposes `up`, `down`, `test`, `prewarm`, and `eval`. Each repo’s CI runs its linter and unit tests on push.
-
-- [x] Pin Go, Python, and Flutter versions in infra — `versions.env` (Go 1.26.0, Python 3.13, uv 0.13.1, Flutter 3.47.6, Dart 3.13.5, buf 1.73.0)
-- [x] Add gofmt, ruff, and `flutter analyze` config — enforced in each repo's CI
-- [x] Add buf lint and breaking-change checks for protos — both run in `proto.yml`
-- [x] Add an infra Makefile with `up`, `down`, `test`, `prewarm`, and `eval` — `prewarm` and `eval` are TODO stubs until fixtures exist
-- [x] Add CI that runs lint and unit tests on each repo
+After the domain protos land, client work (sections 29–36) runs in parallel with taste and AI against fixture mode. If the calendar tightens, cut in this order and leave the three-minute path alone: the compare chart, run history beyond the live job, the sixty-second coach, then the observability dashboard. The path that stays is the Austin wholesale preset, a door card with citations, the evidence drawer, the skip list, the LLM toggle, the pitch and the route, then the Brooklyn flagship heatmap and its collab toggle.
 
 ## 1. Contracts and local platform
 
-### 4. Shared domain protos
+### 1. Shared domain protos
 
-In `infra/proto`, define the messages every service shares: vacancy, constraint, geopoint, entity ref, tag, sub-score, ranked candidate, do-not-lease, evidence call, and trace event. Add the job-state enum (`resolving`, `awaiting_confirmation`, `running`, `ready`, `degraded`, `failed`) and the error codes (`unresolved`, `empty`, `rate_limited`, `implausible_brand`, `upstream`, `validation`). Version the package and enforce buf breaking against `main`. Comment each field as a Qloo fact or a model inference so the UI and the memo can split them without guessing.
+In `infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `karum.agent.v1`. Shared messages: brand seed, entity ref, tag, geopoint, sub-score, door candidate, skip reason, heatmap point, locality cluster, evidence call, and trace event. Campaign mode is `WHOLESALE`, `FLAGSHIP`, or `COLLAB`. Job states are `resolving`, `running`, `ready`, `degraded`, and `failed`. Error codes are `unresolved`, `empty`, `rate_limited`, `upstream`, and `validation`. The seed builder confirms entity ids before `POST`, so a job has no confirmation pause. Comment each field as a Qloo fact or a model inference. Buf breaking stays enforced against `main`.
 
-- [ ] Define vacancy, constraint, geopoint, entity ref, tag, sub-score, ranked candidate, do-not-lease, evidence call, and trace event
-- [ ] Define job states: resolving, awaiting confirmation, running, ready, degraded, failed
-- [ ] Define error codes: unresolved, empty, rate limited, implausible brand, upstream, validation
-- [x] Version the proto package and enforce buf breaking checks against main — `buf breaking` runs in CI; only the `karum/health/v1` placeholder exists so far, domain messages still to define
+- [ ] Define brand seed, entity ref, tag, geopoint, sub-score, door candidate, skip reason, heatmap point, locality cluster, evidence call, and trace event
+- [ ] Define job states: resolving, running, ready, degraded, failed
+- [ ] Define error codes: unresolved, empty, rate limited, upstream, validation
+- [x] Version the proto packages and enforce buf breaking against main — `buf breaking` runs in CI; only `karum/health/v1` exists so far
 - [ ] Mark each field as a Qloo fact or a model inference in the proto comments
 
-### 5. Taste RPCs
+### 2. Taste RPCs
 
-Define the `service-taste` gRPC service the gateway calls. `ResolveEntities` returns ranked place or brand candidates plus a confidence. `ResolveTags` maps a constraint phrase to tag URNs. `GetBlockProfile` returns taste tags, brand candidates, saturation, and demographics for confirmed neighbour ids. `ScoreCandidates` returns the shortlist, the do-not-lease list, and the evidence bundle. `GetHeatmap` and `CompareSets` are optional RPCs behind a capability flag so the client can hide them when an endpoint is unavailable or its output is too thin to render — both settled as available (spikes 3/19); compare's `matchEntities` came back empty on the probed pairs (DI-22).
+`ResolveBrandSeed` returns ranked brand, place, or artist candidates and a derived confidence. `ResolveTags` maps a category or lifestyle chip to tag URNs. `ScoutDoors` takes confirmed seed ids, tags, the city point, an explicit metre radius, and a category tag, and returns recommended doors, the skip list, demographics, and the evidence bundle. `GetLocalityHeatmap` returns cells and, when requested, locality polygons. `CompareAudiences` returns the compare payload for one door, the emerging brand, and an incumbent. Heatmap and compare are first-class for flagship and conquest; the client hides a widget when that RPC reports itself unavailable.
 
-- [ ] `ResolveEntities` for places and brands, with ranked candidates and a confidence
-- [ ] `ResolveTags` for constraint phrases
-- [ ] `GetBlockProfile` for taste tags, brand candidates, saturation, and demographics
-- [ ] `ScoreCandidates` returning the shortlist, the do-not-lease list, and the evidence bundle
-- [ ] `GetHeatmap` and `CompareSets` as optional RPCs behind a capability flag
+- [ ] `ResolveBrandSeed` with ranked candidates and a confidence
+- [ ] `ResolveTags` for venue-category and lifestyle chips
+- [ ] `ScoutDoors` returning recommended doors, the skip list, demographics, and the evidence bundle
+- [ ] `GetLocalityHeatmap` for cells and locality polygons
+- [ ] `CompareAudiences` for a door, the brand, and an incumbent
 
-### 6. AI RPCs
+### 3. AI RPCs
 
-Define the `service-ai` gRPC service. `ProbeShortlist` checks contradictions and may request a bounded number of follow-up taste calls. `LlmOnlyBaseline` is the counterfactual for the same inputs with no Qloo payload. `DraftMemo`, `DraftOutreach`, and `DraftListing` return the three judge-facing texts. `CheckRetailPresence` is the search-grounded physical-retail check. Every response message carries `model_id`, `prompt_version`, and cited evidence ids so the gateway can persist provenance without parsing prose.
+`AuditMenu` is the search-grounded menu and shelf read. `DraftDoorPitch` returns the script, the battlecard, the recommended SKU, and the mode-specific paragraph (activation proposal or site-brief line). `LlmOnlyBaseline` is the counterfactual with no Qloo payload. Every response carries `model_id`, `prompt_version`, and cited evidence ids.
 
-- [ ] `ProbeShortlist` for contradiction checks and bounded follow-up probes
+- [ ] `AuditMenu` for menu verification, incumbents, shelf inputs, and grounding URLs
+- [ ] `DraftDoorPitch` for the script, battlecard, SKU, and the mode-specific paragraph
 - [ ] `LlmOnlyBaseline` for the counterfactual panel
-- [ ] `DraftMemo`, `DraftOutreach`, and `DraftListing`
-- [ ] `CheckRetailPresence` via search grounding
 - [ ] Every response carries model id, prompt version, and cited evidence ids
 
-### 7. Stubs and fixtures
+### 4. Stubs and fixtures
 
-`buf generate` emits Go stubs for the gateway and Python stubs for taste and AI, and CI runs that generate step inside Docker so laptop and CI stubs match. Ship a redacted fixture pack of recorded Qloo and model payloads for two sample blocks — **redacted, not raw**: Qloo's terms forbid storing their response data in a public repository, and the Devpost submission requires public repos, so strip anything Qloo considers their data down to the fields Karum consumes (see [QLOO_APIS.md](QLOO_APIS.md) §1). Fixture mode serves those recordings and makes no outbound network calls. A contract test round-trips the sample messages through both generated stubs.
+`buf generate` emits Go stubs for the gateway and Python stubs for taste and AI. CI runs that generate step inside Docker so laptop and CI stubs match. The fixture pack holds redacted recordings for the three judge campaigns — Austin wholesale, Brooklyn flagship, Brooklyn collab, and Mumbai wholesale. Redacted means the fields Karum consumes, never raw Qloo JSON ([QLOO_APIS.md](QLOO_APIS.md) §1). Fixture mode serves those recordings and makes no outbound calls. A contract test round-trips one campaign through both generated stubs.
 
 - [ ] Generate Go and Python stubs from `infra/proto` in CI
 - [ ] Generate inside Docker so local and CI stubs match
-- [ ] Ship a redacted fixture pack for two sample blocks
+- [ ] Ship a redacted fixture pack for the three judge campaigns, including the Brooklyn collab run
 - [ ] Add a fixture mode that serves those recordings with no network
-- [ ] Add a contract test that round-trips the sample messages through both stubs
+- [ ] Add a contract test that round-trips a campaign through both stubs
 
-### 8. Local Compose
+### 5. Local Compose
 
-`docker compose` brings up the Go gateway, taste, AI, Redis, and Postgres, with healthchecks and a fixed startup order so gRPC clients do not dial a process that is still booting. `.env.example` lists every variable and which process reads it. One Make target posts the sample vacancy in fixture mode and prints the shortlist JSON. Document host ports, where logs go, and the Flutter base-URL setting that points web at the gateway.
+`docker compose` brings up the gateway, taste, AI, Redis, and Postgres, with healthchecks and a fixed startup order. `.env.example` lists every variable and which process reads it. One Make target posts the Austin preset in fixture mode and prints the campaign JSON. Host ports, logs, and the Flutter base URL are documented.
 
 - [x] Compose gateway, taste, AI, Redis, and Postgres — all five containers boot healthy
-- [x] Add healthchecks and a deterministic startup order — `service_healthy` gates plus a `-healthcheck` flag for the distroless gateway
+- [x] Add healthchecks and a deterministic startup order
 - [x] Add `.env.example` listing every variable and which process reads it
-- [ ] Add one command that runs the sample vacancy on fixtures and prints the shortlist JSON
+- [ ] Add one command that runs the Austin preset on fixtures and prints the campaign JSON
 - [x] Document ports, logs, and how Flutter web points at the gateway
 
-## 2. Coverage gate
+## 2. Sample campaigns
 
-### 9. Qloo spike
+### 6. Lock the three presets
 
-Hit `https://hackathon.api.qloo.com` with the `X-Api-Key` header and work the spike checklist in [QLOO_APIS.md](QLOO_APIS.md) §5 — its 22 items are the script. Time-box it: items 1, 2, 4–8, 10, and 11 gate the must-builds and settle the names client code may use — run them first; 3 and 16 follow for the heatmap and card hydration; 9 and 12–22 run only when a feature depends on them (trending is already out). Settle the open questions before any client code: which location parameter narrows `urn:entity:brand`, probing `filter.location=POINT(<lon> <lat>)`, `signal.location`, `signal.location.query`, `filter.location.query`, then `filter.location.metro` in that order (the entity-type guide omits location for brands while the location use case advertises it — §3.4); whether `urn:tag` and `urn:demographics` return data or a 403 (both enum-absent, DI-2; `urn:entity:destination` is enum-absent too, while `urn:heatmap` is enum-confirmed); whether `feature.explainability=true` is accepted and what shape it returns; and that `filter.location.radius=400` genuinely filters at 400 m, which settles the kill-rule-1 granularity question. Mind the unit split — `/search` takes `filter.radius` in miles, Insights takes `filter.location.radius` in metres, WKT is longitude-first while a bare pair is latitude-first. Expect silently ignored parameters: a 200 is not proof. Record 429 headers and quota headroom, and the density of `filter.popularity` and `filter.price_level` for retail brands in the demo cities. Save the redacted raw JSON as the first fixture files the later replay tests load.
+The judge buttons are fixed: Austin (Sola: Madre Mezcal, Aesop, vinyl; wholesale), Brooklyn (ceramics and matcha; flagship and collab), Mumbai Colaba (specialty cacao and coffee; wholesale). Colaba already resolved on 16 Oct — 10 of 10 venue names landed within 2 km of the block point. This pass resolves the Austin and Brooklyn reference entities, confirms a downtown point returns place rows for a door query, and writes down the preset ids, the lat/lng, the radius, and the category tags the fixtures will replay. Door and collab queries use `filter.location` as WKT plus an explicit radius in metres (8 km unless a preset overrides; heatmap 10 km). A brand-type insights call, if any preset needs one, uses `signal.location` (DI-11). Spend is logged against the 9,877 requests remaining before anyone starts feature traffic.
 
-- [x] Confirm the hackathon key is in hand — received 16 Oct 2026; monthly quota is 10,000 requests. Observed 16 Oct by probe: 5 req/s (`X-Second-RateLimit-Limit`) and a month reset that counts down ≈ 30 days (rolling window, not a calendar month); 429 behaviour still to probe (spike 7)
-
-**Spike result — 16 Oct 2026.** The gate pass ran on the Colaba block with Leopold Cafe as the neighbour signal, and the deferred tier closed the rest the same day (123 calls total; 9,877 of the 10,000 monthly quota remaining; item 7's 429 deliberately unprobed). Headline verdicts, each with its §9 row closed: `signal.location` is the only working brand-location parameter (`filter.location` / `.query` / `.metro` are silently ignored — DI-11); no 403s anywhere — `urn:tag`, `urn:demographics`, `urn:entity:destination` all return data (DI-2); `feature.explainability=true` is accepted and dead inputs surface in `warnings` as `not_found`; radius is genuine metres, but a WKT point without a radius returns zero rows and `radius=0` falls back to the ~15 km default; the name-variant conflicts all settled (DI-4, DI-5, DI-13, DI-14) and POST works with JSON bodies (DI-3); `urn:heatmap` is the only heatmap spelling and `output.heatmap.boundary=urn:entity:locality` returns locality polygons instead of cells — dimensions and count columns closed 16 Oct (spikes 3 + 22, DI-12: `*_total_count` columns exist beyond the docs); `/entities` round-trips by id and by `external.resy.ids`. Deferred-tier verdicts: `bias.quality` takes the server enum `very_low…very_high` + `mid` and drops no-quality places (DI-6); `urn:entity:*` parents accepted and `filter.tag.types` is a working namespace restriction (DI-8, DI-9); `resolve_to` accepts only `urn:reference:brand` / `both` (DI-16) and `include` is a boolean (DI-23); compare returns `{tags, a, b, matchEntities}` (DI-22); backfill dials ignored; trending needs ≥ ~6-month windows (out of the MVP). New traps recorded as **DI-21** (bare pair vs WKT), **DI-22**, **DI-23**. Full evidence, counts, and file pointers: [spike/RECORDING.md](spike/RECORDING.md); checklist status: [QLOO_APIS.md](QLOO_APIS.md) §5.
-- [x] Confirm the hackathon base URL, header, and allowed endpoints — `GET /` answers as the key-liveness probe; all documented endpoints are live; `/recs` and `/recommendations` are forbidden; **settled 16 Oct: POST works** — `POST /v2/insights` 200 with a JSON body and `.query` params honoured (spike 10, DI-3 closed)
-- [x] Spike search, tags, and insights for place, brand, tag, and demographics — settled 16 Oct: zero 403s; `urn:tag`, `urn:demographics`, `urn:entity:destination`, `urn:entity:videogame` all return data; `urn:entity:locality` 400s without locality signals (DI-2 closed)
-- [x] Spike location filtering: brand candidates at point/radius granularity and the `filter.location.radius` behaviour, writing down the real granularity — settled 16 Oct: `signal.location` (WKT) is the working brand localiser; radius is genuine metres (400 m → max 394 m), but a point without a radius returns zero rows and `0` means the ~15 km default; the `/search` pair vs Insights WKT split is DI-21
-- [x] Spike heatmap, compare, and `feature.explainability`, recording availability and response shape — settled 16 Oct: heatmap (boundary: `urn:entity:locality` returns locality polygons; dimensions and count columns closed — DI-12) and explainability verified; compare settled (spike 19, DI-22) behind the epic 16 capability flag
-- [x] Settle the §9 name-variant conflicts with paired calls — all closed 16 Oct: `filter.external.resy.*`, `price_range.from/.to`, `filter.exclude.tags` (both operator spellings identical) and `filter.results.entities` win; every alternative is a silent no-op (DI-4, DI-5, DI-13, DI-14)
-- [x] Verify each parameter against a no-parameter baseline before it reaches client code — done 16 Oct; repeat runs replay byte-identically, so identical output counts as evidence (traps list in [spike/RECORDING.md](spike/RECORDING.md))
-- [x] Record each settled answer: tick the §5 item, close the §9 row with a date, and carry the result into the dependent epic (11–16) — §5 status block and the DI register updated 16 Oct; epic carries noted in 14 and 16
-- [ ] Save redacted raw responses as the first fixtures — never raw Qloo JSON, since fixtures ship public with the Devpost submission
-- [x] Keep a running quota ledger — requests used per day against the 10,000/month (the ledger lives in [spike/RECORDING.md](spike/RECORDING.md)) — and check it before the eval run and again before the judging window — ledger current: 123 used, 9,877 remaining (16 Oct; the DI-1 prod-host check is not metered); re-check before the eval run and the judging window
-
-### 10. City choice
-
-Script three cities by five blocks and measure entity resolution rate, how brand rank shifts when the neighbour set changes, and whether resolved tags are ones the product can explain. Score each block against the kill rules for signal, resolution, and retail plausibility, then lock two demo cities and two sample blocks — **Mumbai (Colaba) is pre-adopted as the second demo city** (16 Oct coverage-probe decision; every spike verdict sits on this block), so this pass decides the Western lead city (NYC / London / Austin) and the two sample blocks. Location is settled at block granularity — `signal.location` localises brand calls at the block point (spike 1, DI-11) — so the city-level fallback is recorded as not needed. If the gate fails, point the same gRPC services at Shelfwise before any feature work continues.
-
-- [ ] Run three cities by five blocks for resolution rate, brand shift when neighbours change, and tag usefulness
-- [ ] Score each block against the kill rules for signal, resolution, and retail plausibility
-- [ ] Pick two demo cities and two sample blocks that pass — half-decided: Mumbai (Colaba) locked 16 Oct as the second demo city; this pass picks the Western lead city and the sample blocks
-- [x] Record the neighbour-entity fallback if location is only city-level — not needed: `signal.location` (WKT) localises brand results at the block point (spike 1, DI-11); the profile query keeps the neighbour signal plus `signal.location`
-- [ ] If the gate fails, switch the same services to Shelfwise before feature work continues
+- [x] Colaba venue resolution measured 16 Oct — 10 of 10 within 2 km
+- [x] Location behaviour settled — place calls use WKT plus an explicit metre radius; brand-type insights use `signal.location` (DI-11, DI-21)
+- [ ] Resolve the Austin seed entities and confirm a downtown point returns doors
+- [ ] Resolve the Brooklyn seed entities and confirm a point returns doors and heatmap cells
+- [ ] Write the four preset payloads (ids, points, radii, category tags) into the fixture seeds
+- [ ] Update the quota ledger in [spike/RECORDING.md](spike/RECORDING.md) after this pass
 
 ## 3. service-taste
 
-### 11. Qloo HTTP client
+### 7. Qloo HTTP client
 
-Build the taste-service HTTP client with one typed method per endpoint the spike verified, and no method for an unverified parameter. Set timeouts, retries with backoff, and honor of Qloo rate-limit headers. Logs redact the API key; metrics expose status, latency, and call count. Map timeouts, 429s, and 5xx onto the shared proto error codes. Replay tests load the fixture pack and assert the typed structs, with no live network.
+One typed method per endpoint the spike verified, and no method for an unverified parameter. Timeouts, retries with backoff, and honour of the rate-limit headers (observed limit 5 requests/second). Logs redact the API key. Metrics expose status, latency, and call count. Timeouts, 429s, and 5xx map onto the shared error codes. Replay tests load the fixture pack and assert the typed structs, with no live network.
 
 - [ ] Typed methods for verified endpoints only
-- [ ] Timeouts, retries, backoff, and honor of rate-limit headers
+- [ ] Timeouts, retries, backoff, and honour of rate-limit headers
 - [ ] Redacting logs plus metrics for status, latency, and call count
 - [ ] Map upstream failures onto the shared error codes
 - [ ] Replay tests from the fixture pack
 
-### 12. Entity resolution
+### 8. Brand seed resolution
 
-`ResolveEntities` calls `GET /search` for places using the neighbour name plus the vacancy point — `filter.location=<lat>,<lon>` with `filter.radius` in **miles**, disambiguated by `filter.address` (recipe: [QLOO_APIS.md](QLOO_APIS.md) §3.1; keep the default match sort — `sort_by=distance` turns a name query into "nearest venues", trap 7) — and returns the top five candidates with a derived confidence — rank, distance, and name match, marked as a model inference in the proto because `/search` publishes no score ([QLOO_APIS.md](QLOO_APIS.md) §3.1). The same RPC searches brands when the caller passes a user shortlist. Low-confidence and ambiguous hits are flagged so the gateway can pause for confirmation instead of guessing an entity id. A total miss is an explicit `unresolved` error, not an empty success. Cache both hits and negative lookups under a short TTL.
+`ResolveBrandSeed` calls `GET /search` for the brand query and each fallback vibe query. Types are `urn:entity:brand`, `urn:entity:place`, and `urn:entity:artist`. Name lookup leaves `sort_by` at the default — `sort_by=distance` turns a name query into nearest venues ([QLOO_APIS.md](QLOO_APIS.md) §3.1). The RPC returns the top candidates with a derived confidence marked as a model inference. Low-confidence and ambiguous hits are flagged so the seed builder asks the operator to pick before scout starts. A total miss is `unresolved`, not an empty success. Hits and negative lookups are cached under a short TTL.
 
-- [ ] Search places with neighbour name plus vacancy point (`filter.location` + `filter.radius` in miles) and return the top five
-- [ ] Search brands for a user shortlist
-- [ ] Mark low-confidence and ambiguous hits for confirmation
+- [ ] Search the brand query and each fallback vibe query, and return ranked candidates
+- [ ] Derive confidence from rank and name match, and mark it as an inference
+- [ ] Flag low-confidence and ambiguous hits for the seed builder
 - [ ] Return an explicit miss when nothing resolves
 - [ ] Cache successful and negative lookups with a short TTL
 
-### 13. Tag and constraint resolution
+### 9. Tag resolution
 
-`ResolveTags` maps the product chips (no F&B, fitness, eyewear, and the other sample-block chips) onto tag URNs the spike verified. Free-text constraints are accepted only when tag search returns a confident hit — the score is derived from the typo/semantic hit and name similarity and marked as an inference, since `/v2/tags` publishes no score ([QLOO_APIS.md](QLOO_APIS.md) §3.2); otherwise the constraint is returned unresolved for the UI to show. An allow-list of tag types limits what scoring and the memo will try to explain. Fixture tests cover every chip the two sample blocks send.
+`ResolveTags` maps the preset chips (bars and restaurants, specialty retail, apparel, vinyl, galleries, and the other campaign categories) onto tag URNs the spike verified. Free-text chips are accepted only when tag search returns a confident hit; the score is derived and marked as an inference, because `/v2/tags` publishes no score (§3.2). Otherwise the chip comes back unresolved. An allow-list of tag types limits what the pitch will try to explain. Fixture tests cover every chip the three campaigns send.
 
-- [ ] Map product chips such as no F&B, fitness, and eyewear to verified tag URNs
-- [ ] Accept free-text constraints only when tag search returns a confident hit
-- [ ] Return unresolved constraints to the caller
-- [ ] Keep an allow-list of tag types the product knows how to explain
-- [ ] Fixture-test every chip the sample blocks use
+- [ ] Map the campaign category chips to verified tag URNs
+- [ ] Accept a free-text chip only when tag search returns a confident hit
+- [ ] Return unresolved chips to the caller
+- [ ] Keep an allow-list of tag types the pitch knows how to explain
+- [ ] Fixture-test every chip the three campaigns use
 
-### 14. Block profile queries
+### 10. Door scouting
 
-`GetBlockProfile` takes confirmed neighbour entity ids and fans out the verified insights calls: taste tags, brand affinities with `signal.location` at the block point (spike 1 — the only working location parameter), category presence for the saturation check, and demographics for the top candidates. The brand call sends `feature.explainability=true` so each candidate carries Qloo's own per-input contribution scores for the evidence drawer. The saturation call always sends an explicit `filter.location.radius` in metres — settled 16 Oct: a WKT point without a radius returns zero rows, and `0` falls back to the ~15 km default rather than "strictly inside" ([QLOO_APIS.md](QLOO_APIS.md) §3.5). Spike 2 cleared the `urn:tag` risk — it works — so the block-taste panel needs no fallback; keep the derived-descriptor path only as a degrade guard if responses thin out ([QLOO_APIS.md](QLOO_APIS.md) §3.3). Independent calls run in parallel under a fan-out cap so one block cannot stampede Qloo. The response is the raw-enough payload scoring needs, plus the evidence-call records the drawer will list. Recipes: [QLOO_APIS.md](QLOO_APIS.md) §3.
+`ScoutDoors` fans out the verified insights calls for a confirmed seed: place ranking with `signal.interests.entities`, `signal.interests.tags`, `filter.location` as WKT, an explicit `filter.location.radius` in metres, the category tag, and `feature.explainability=true` (§3.5, §3.8). A point with no radius returns zero rows, and `0` falls back to the ~15 km default, so the radius is always the preset value. Taste tags and demographics are fetched for the top doors, not the full `take=25` (§3.3, §3.6). Collab mode sends the non-competing category tags on the same place call. Independent calls run in parallel under a fan-out cap. The response includes the evidence-call records the drawer lists.
 
-- [ ] Fetch taste tags from confirmed neighbour ids, with the derived-descriptor fallback if `urn:tag` 403s (spike 2 settled 16 Oct: no 403 — the fallback stays only as a degrade guard)
-- [ ] Fetch brand affinities with `signal.location` at the block point (spike 1 settled), with `feature.explainability=true`
-- [ ] Fetch category presence for the saturation check — Insights `filter.location` as WKT + `filter.location.radius` in metres, always explicit (DI-21, spike 5)
-- [ ] Fetch demographics for the top candidates
-- [ ] Run independent calls in parallel under a fan-out cap
+- [ ] Rank places from the seed with explainability, WKT, and an explicit metre radius
+- [ ] Fetch taste tags for the top doors
+- [ ] Fetch demographics for the top doors
+- [ ] Apply the collab category tags on the same place call
+- [ ] Run independent calls in parallel under a fan-out cap, and attach evidence-call records
 
-### 15. Scoring
+### 11. Affinity score and the skip list
 
-`ScoreCandidates` computes catchment fit, co-tenancy complement, and the cannibalisation penalty from documented Qloo fields only. Normalize each sub-score to a stable 0–1 and write the formula and the inputs into the evidence payload. Return five ranked candidates and three do-not-lease items with machine-readable reasons, and break ties deterministically so the same inputs always produce the same order. Unit-test saturation, empty neighbours, an all-saturated block, and ties.
+From documented Qloo fields, compute `A_taste` and `D_demo` on a stable 0–1 scale and write the inputs beside each score. The gateway applies `O_shelf` and `P_saturation` later, once the menu audit exists. Doors with affinity below 0.45 go to the skip list with a machine-readable reason. Return the top recommended doors and the skip items, and break ties deterministically so the same inputs always produce the same order. Unit-test the affinity floor, an empty seed, a category that matches nothing, and ties.
 
-- [ ] Compute catchment fit, co-tenancy complement, and cannibalisation penalty from documented fields only
-- [ ] Normalize to a stable 0–1 scale and put the formula in the evidence payload
-- [ ] Return five ranked candidates and three do-not-lease items with machine-readable reasons
-- [ ] Tie-break deterministically and keep the inputs beside each score
-- [ ] Unit-test saturation, empty neighbours, an all-saturated block, and ties
+- [ ] Compute `A_taste` and `D_demo` from documented fields only
+- [ ] Normalize both to a stable 0–1 scale and put the inputs in the evidence payload
+- [ ] Place doors below 0.45 affinity on the skip list with a machine-readable reason
+- [ ] Tie-break deterministically
+- [ ] Unit-test the affinity floor, an empty seed, an empty category, and ties
 
-### 16. Optional graph extras
+### 12. Heatmap and audience compare
 
-`GetHeatmap` runs only when the capability flag is on and a signal tag is present; the flag can turn on now that the spike settled the heatmap facts (DI-18 closed; DI-12 closed 16 Oct — boundary literals, dimensions, and count columns all settled). Qloo accepts any entity or tag as the heatmap signal ([QLOO_APIS.md](QLOO_APIS.md) §3.7) — Karum deliberately anchors on a place-genre tag such as `urn:tag:genre:place:restaurant` as a design choice for interpretability, not because Qloo requires it. `CompareSets` is settled as well (spike 19, 16 Oct): the response is `{tags, a, b, matchEntities}` — chart the `tags` overlap, degrade cleanly when it comes back empty, and treat `matchEntities` as a bonus (it was empty on every probe; DI-22). If either call is missing, the response degrades to the pins plus the radius the saturation check already used. Demographic mismatch warnings attach beside the rubric. With the flag off, neither RPC is invoked and the client hides both widgets. `/v2/trending` (momentum badge and outreach line, [QLOO_APIS.md](QLOO_APIS.md) §3.11) is deliberately out of the MVP — revisit only after the must-build list is green.
+`GetLocalityHeatmap` calls `urn:heatmap` with the seed and the preset radius (§3.7). Cells are the density layer. `output.heatmap.boundary=urn:entity:locality` supplies the polygons the brief uses to name corridors; anchor neighbours are the strongest places already returned inside those corridors. `CompareAudiences` parses `{tags, a, b, matchEntities}` and degrades cleanly when `matchEntities` is empty (DI-22). If either call fails, the campaign still reaches `ready` with pins and the scout radius. Demographic mismatch warnings ride beside `D_demo`.
 
-- [ ] Call heatmap only when the capability flag is on and a signal tag is present (Karum's choice: a place-genre tag)
-- [ ] Call compare for the neighbour set versus a candidate — endpoint settled 16 Oct (spike 19); parse the `tags` overlap plus `matchEntities` and degrade when both are empty (DI-22)
-- [ ] Degrade to pins plus a radius when either call is missing
-- [ ] Attach demographic mismatch warnings beside the rubric
-- [ ] Hide both features from the client when the flag is off
+- [ ] Return heatmap cells for the seed at the preset radius
+- [ ] Return locality polygons and name the top corridors from them
+- [ ] Parse compare `tags` overlap, and degrade when `matchEntities` is empty
+- [ ] Keep the campaign ready when heatmap or compare fails
+- [ ] Attach demographic mismatch warnings beside `D_demo`
 
-### 17. Cache and prewarm
+### 13. Cache and prewarm
 
-Cache Qloo responses in Redis under a canonical hash of the request parameters, with a 24h TTL. A single-flight lock makes concurrent refreshes of the same key share one upstream call. If Redis is down, fall back to an in-process cache and flip the degraded health bit. A prewarm RPC loads the two sample blocks. Eval requests set a bypass flag that is never written back into the demo cache.
+Cache Qloo responses in Redis under a canonical hash of the request parameters, with a 24h TTL. A single-flight lock makes concurrent refreshes of the same key share one upstream call. If Redis is down, fall back to an in-process cache and flip the degraded health bit. A prewarm RPC loads the four preset payloads (three buttons, plus Brooklyn collab). Eval requests set a bypass flag that is never written back into the demo cache.
 
 - [ ] Redis cache keyed by a canonical parameter hash with a 24h TTL
 - [ ] Single-flight lock so a refresh cannot stampede Qloo
 - [ ] In-memory fallback when Redis is down, with a degraded health bit
-- [ ] Prewarm RPC for the two sample blocks
+- [ ] Prewarm RPC for the four preset payloads
 - [ ] Eval bypass that is never served back as a cached demo response
 
-### 18. Taste edge cases
+### 14. Taste edge cases
 
-Before scoring, collapse neighbours that resolve to the same entity id. Reject a neighbour whose resolved entity is the vacancy address itself, with a specific error the UI can show. Flag a neighbour that resolves outside the geocoded city so confirmation can drop or swap it. If zero neighbours are confirmed, return before `ScoreCandidates` and explain the miss. A partial confirmation is allowed, and the evidence payload states the reduced confidence.
+Before scoring, collapse venues that resolve to the same entity id. Drop a result that is one of the seed entities, so a reference venue used as vibe is not pitched as a door. Flag a venue that resolves outside the geocoded city. If the seed resolves to nothing, return `unresolved` before scoring and explain the miss. A partial seed — some vibe queries hit, one misses — is allowed, and the evidence payload states the reduced confidence. A category filter that matches nothing is `empty`, with the category named.
 
-- [ ] Collapse duplicate neighbours to one entity
-- [ ] Reject a neighbour that is the vacancy address itself, with a specific error
-- [ ] Flag a neighbour that resolves outside the geocoded city
-- [ ] Stop before scoring when zero neighbours are confirmed, and explain the miss
-- [ ] Allow a partial confirmation at reduced confidence, stated in the evidence
+- [ ] Collapse duplicate venues to one entity
+- [ ] Drop results that are themselves seed entities
+- [ ] Flag a venue that resolves outside the geocoded city
+- [ ] Stop before scoring when the seed resolves to nothing, and explain the miss
+- [ ] Allow a partial seed at reduced confidence, and return `empty` when the category matches nothing
 
 ## 4. service-ai
 
-### 19. Vertex client
+### 15. Vertex client
 
-Call Gemini 2.5 Flash through `google-genai`, with one Pydantic response model per RPC so invalid JSON fails closed. Set a timeout, a max output token cap, and a single retry when schema validation fails. Logs include model, region, and prompt version, and never the credentials. Failures return a typed error the gateway maps onto `degraded`. Replay tests inject a fake model that returns the fixture schemas.
+Call Gemini 2.5 Flash through `google-genai` with `vertexai=True`, and one Pydantic response model per RPC, so invalid JSON fails closed. Set a timeout, a max output token cap, and a single retry when schema validation fails. Logs include model, region, and prompt version, and never the credentials. Failures return a typed error the gateway maps onto `degraded`. Replay tests inject a fake model that returns the fixture schemas.
 
-- [ ] Pin Gemini 2.5 Flash through `google-genai` with a Pydantic schema per RPC
+- [ ] Pin Gemini 2.5 Flash through `google-genai` on Vertex, with a Pydantic schema per RPC
 - [ ] Set timeouts, max output tokens, and one retry on invalid JSON
 - [ ] Log model, region, and prompt version, and keep credentials out of logs
 - [ ] Return a typed error the gateway can degrade on
 - [ ] Replay tests with a fake model that returns the fixture schemas
 
-### 20. Grounded retail check
+### 16. Menu audit
 
-`CheckRetailPresence` uses Google Search grounding to test whether a shortlisted brand has a physical store. Online-only brands and implausible megabrands are demoted, and the grounding source is attached to the evidence. If grounding is unavailable, keep the Qloo rank and set presence to unknown. Cap grounding calls to the shortlist, not the full candidate pool. Grounded prose may name a brand only when that brand id is already in the Qloo payload.
+`AuditMenu` uses Google Search grounding to read the venue website, menu, or delivery listing. It reports whether the audit succeeded, which incumbents are stocked, a short menu summary, the `O_shelf` inputs, and the source URLs. Online-only or unverifiable venues keep their Qloo rank and set shelf opportunity to unknown. Grounding is capped to the working shortlist (the doors that can appear on the board, plus skip candidates the penalty might cite), not the full `take=25`. Grounded prose names a competitor only when that name is in the grounding sources or the Qloo payload.
 
-- [ ] Use Google Search grounding to check physical retail for a shortlisted brand
-- [ ] Demote online-only and implausible megabrands and attach the source
-- [ ] When grounding is unavailable, keep the Qloo rank and label presence unknown
-- [ ] Cap grounding calls to the shortlist
-- [ ] Cite a brand in grounded prose only when it appears in the Qloo payload
+- [ ] Audit the live menu or shelf with Google Search grounding
+- [ ] Return incumbents, a menu summary, shelf inputs, and source URLs
+- [ ] When grounding is unavailable, keep the Qloo rank and label the shelf unknown
+- [ ] Cap grounding calls to the working shortlist
+- [ ] Name a competitor in prose only when a grounding source or the Qloo payload contains it
 
-### 21. Probe loop
+### 17. Pitches, SKUs, and briefs
 
-`ProbeShortlist` sends the model only entity ids, tags, and scores, not raw user text. The prompt checks contradictions such as a high catchment fit on a saturated category, and may request a bounded number of extra taste calls for borderline candidates. When the probe budget is spent, return the deterministic shortlist unchanged. Drop any candidate the model names that is not in the Qloo set, so the model cannot invent a tenant.
+`DraftDoorPitch` returns the shopkeeper script, and every number cites an evidence id. When the audit found an incumbent, it also returns the displacement battlecard, using the compare tags when they exist and the affinity plus menu finding when they do not. The recommended SKU is chosen from the brand's own SKU list by the door's taste tags. Flagship mode adds the site-brief paragraph for the top corridors. Collab mode adds the activation proposal. `LlmOnlyBaseline` is stored beside the Qloo result and labeled ungrounded. Length caps keep each text short enough that a non-technical judge can finish it.
 
-- [ ] Pass only entities, tags, and scores into the prompt
-- [ ] Check contradictions such as high fit plus a saturated category
-- [ ] Allow a bounded number of follow-up taste calls for borderline candidates
-- [ ] Stop at the probe budget and return the deterministic shortlist
-- [ ] Drop any candidate the model adds that is absent from the Qloo set
-
-### 22. Deterministic autopilot
-
-If Vertex errors, times out, or returns JSON that fails the Pydantic schema, rank from the taste rubric alone and still emit do-not-lease items from the penalty rules. Mark the run `degraded` and skip any prose that would invent a reason. Fallback sentences are templates that interpolate evidence fields only. The test stops the AI process and asserts the gateway still returns a shortlist.
-
-- [ ] Rank from the rubric alone when Vertex errors, times out, or returns invalid output
-- [ ] Still return do-not-lease items from the penalty rules
-- [ ] Mark the run degraded and skip prose that would invent reasons
-- [ ] Use template sentences that only interpolate evidence fields
-- [ ] Test with the AI process stopped
-
-### 23. Drafts
-
-`DraftMemo` returns a one-page memo where every number cites an evidence id. `DraftOutreach` returns one email per shortlisted brand with a body that is safe to drop into a `mailto:` link. `DraftListing` returns a blurb aimed at the winning category. `LlmOnlyBaseline` is stored beside the Qloo result and labeled ungrounded so the client toggle cannot mix the two. Length caps keep each draft short enough that a non-technical judge can finish it.
-
-- [ ] One-page memo that cites an evidence id for every number
-- [ ] Outreach email per shortlisted brand, with a mailto-safe body
-- [ ] Listing blurb aimed at the winning category
+- [ ] Shopkeeper script that cites an evidence id for every number
+- [ ] Displacement battlecard when an incumbent is present
+- [ ] One recommended SKU from the brand's list, chosen with the door's taste tags
+- [ ] Site-brief paragraph in flagship mode, and an activation proposal in collab mode
 - [ ] LLM-only baseline stored beside the Qloo result and labeled ungrounded
-- [ ] Length caps a non-technical judge can finish quickly
 
-### 24. Draft edge cases
+### 18. Draft resilience
 
-Pass venue and brand names into the prompt as data, delimited so an instruction-shaped name cannot change the Pydantic schema. Drop any sentence whose cited evidence id is missing from the payload. Render broker notes in a separate field from Qloo facts. Regenerating one draft calls only that draft RPC and does not rerun Qloo. If a draft RPC fails, the shortlist response is still returned and the failed draft is the only error.
+If Vertex errors, times out, or returns JSON that fails the schema, the gateway still returns the taste ranking and the affinity skip list. The run is marked `degraded`, and template sentences interpolate evidence fields only. Venue and brand names enter the prompt as delimited data, so an instruction-shaped name cannot change the schema. A sentence whose cited evidence id is missing is dropped. Regenerating one pitch calls only that draft RPC and does not rerun Qloo. If a draft RPC fails, the door list is still returned and the failed draft is the only error. The test stops the AI process and asserts the gateway still returns doors.
 
+- [ ] Return the taste ranking and the affinity skip list when Vertex fails
+- [ ] Mark the run degraded and use template sentences that only interpolate evidence fields
 - [ ] Treat venue and brand names as data so instruction-shaped names cannot change the schema
-- [ ] Drop a sentence whose evidence id is missing
-- [ ] Render broker notes as notes, separate from Qloo facts
-- [ ] Regenerate one draft without rerunning Qloo
-- [ ] Leave the shortlist available when a draft fails
+- [ ] Drop a sentence whose evidence id is missing, and regenerate one pitch without rerunning Qloo
+- [ ] Test with the AI process stopped, and leave the door list available when a draft fails
 
 ## 5. Gateway
 
-### 25. HTTP API and jobs
+### 19. HTTP API and jobs
 
-The Gin gateway exposes `POST /api/v1/analyses`, which creates a job from address, neighbour text, and constraints and returns a job id. `GET` on that job returns the state and, while paused, the confirmation payload. `POST` confirm resumes with the chosen entity ids and the clarifying answers. Result `GET` and the draft `POST`s cover memo, outreach, and blurb. `GET /events` is an SSE stream keyed by a cursor so a refresh replays from the last trace event.
+`POST /api/v1/scout` creates a job from the confirmed seed, the city, the mode, and the SKU list, and returns a job id. `GET` returns the state and, once ready, the campaign payload. Draft `POST`s cover the run-sheet, the site brief, and a single-door pitch. `GET /events` is an SSE stream keyed by a cursor so a refresh replays from the last trace event.
 
-- [ ] `POST /api/v1/analyses` creates a job from address, neighbour text, and constraints
-- [ ] `GET` returns state and the confirmation payload while paused
-- [ ] `POST` confirm resumes with chosen entity ids and the clarifying answers
-- [ ] `GET` result plus `POST` draft endpoints for memo, outreach, and blurb
+- [ ] `POST /api/v1/scout` creates a job from seed, city, mode, and SKUs
+- [ ] `GET` returns state and, when ready, the campaign payload
+- [ ] `POST` draft endpoints for the run-sheet, the site brief, and a single-door pitch
 - [ ] SSE `/events` with a cursor so a refresh can resume the trace
 
-### 26. Geocoding
+### 20. City geocode
 
-Geocode the vacancy in the gateway before any taste RPC, and return candidate points when the address is ambiguous instead of picking one. Reject empty, non-street, and unusable coordinates with the `validation` error. Cache geocode results and follow the provider’s attribution rules in the API response. Persist a single lat/lng on the vacancy and reuse that point for the map pin, the saturation radius, and the Qloo location filter.
+Geocode the city in the gateway before any taste RPC, and return candidate points when the query is ambiguous instead of picking one. Reject an empty query and unusable coordinates with `validation`. Cache geocode results and follow the provider's attribution rules. Persist a single lat/lng on the campaign and reuse it for the map, the scout radius, the heatmap, and Places. The four presets skip the geocoder and post their stored points.
 
-- [ ] Geocode the vacancy before any taste call
-- [ ] Return candidates when the address is ambiguous
-- [ ] Reject empty, non-street, and unusable points with a specific error
+- [ ] Geocode the city before any taste call
+- [ ] Return candidates when the query is ambiguous
+- [ ] Reject an empty query and unusable points with a specific error
 - [ ] Cache geocodes and follow the provider's attribution rules
-- [ ] Store one lat/lng and reuse it for the map, the radius, and location filters
+- [ ] Store one lat/lng and reuse it; presets post stored points
 
-### 27. Orchestration
+### 21. Orchestration and score assembly
 
-The job runner calls resolve, pauses in `awaiting_confirmation`, then runs block profile, score, probe, and the LLM-only baseline. When a Places key is set, enrich pins with address, hours, and website; otherwise skip that hop. Independent taste RPCs run in parallel, and each completion writes a trace event the SSE stream emits. Persist the exact Qloo payloads on the run so a later cache refresh cannot rewrite history. A client abort cancels the downstream gRPC calls.
+The runner calls seed resolution only when the request still has raw queries; presets and confirmed seeds go straight to scout. Flagship adds the heatmap call. After Places and the menu audit, the gateway computes `S_door`, applies `P_saturation` (affinity under 0.45, or four or more direct niche competitors), and freezes the ordered doors and the skip list. Compare runs only for doors whose audit found an incumbent. Independent taste RPCs run in parallel, and each completion writes a trace event. The exact Qloo and grounding payloads are stored on the run. A client abort cancels the downstream gRPC calls.
 
-- [ ] Run resolve, pause for confirmation, then block profile, score, probe, and baseline
-- [ ] Enrich pins with Places address, hours, and website when a key exists
-- [ ] Parallelize independent taste calls and emit a trace event as each finishes
-- [ ] Persist the exact Qloo payloads on the run so later cache updates cannot rewrite history
+- [ ] Scout from a confirmed seed, and resolve raw queries only when the request has them
+- [ ] Add the heatmap call in flagship mode, and compare only after an incumbent is found
+- [ ] Compute `S_door` from `A_taste`, `O_shelf`, `D_demo`, and `P_saturation`, and freeze the order
+- [ ] Emit a trace event as each hop finishes, and persist the payloads on the run
 - [ ] Cancel downstream RPCs when the client aborts the job
 
-### 28. Clarifying questions
+### 22. Places enrichment
 
-The confirmation payload includes rent tier and whether F&B is allowed only when intake did not already send those constraints. Cap the interview at those two questions, apply defaults when the user skips them, and return the defaults in the payload so the UI can show them. Write the answers into the tag filters and the memo header. Editing an answer invalidates only the downstream stages, not the geocode. The sample-block path skips the questions because the seed already has answers.
+When a Places key is set, enrich the working set with address, opening hours, website, and open status. The website is the hint the menu audit searches from. Venues Places reports as closed are skipped with that reason. Missing key or a Places error leaves the Qloo door in the payload with enrichment marked unknown, and the job still reaches `ready`.
 
-- [ ] Ask rent tier and whether F&B is allowed only when the user has not already answered
-- [ ] Cap the interview at those two questions, apply defaults, and show the defaults
-- [ ] Feed the answers into tag filters and the memo header
-- [ ] Let the user change an answer and invalidate only downstream stages
-- [ ] Skip the questions on the sample-block path
+- [ ] Enrich the working set with address, hours, website, and open status
+- [ ] Pass the website through to the menu audit
+- [ ] Skip a venue Places reports as closed, with that reason
+- [ ] Keep the door and mark enrichment unknown when the key is missing or Places errors
 
-### 29. Persistence
+### 23. Field route
 
-Add Postgres tables for vacancies, runs, evidence snapshots, and drafts, applied with forward-only migrations. The HTTP API lists, gets, duplicates, and deletes a vacancy. Re-run inserts a new run row and a diff against the previous run rather than updating the old one. A seed migration or script loads the two sample blocks so fixture and live modes share the same ids.
+When a Routes key is set, order the qualified wholesale or collab doors with `optimizeWaypointOrder` and return legs the Flutter map draws as a polyline. Skip the call in flagship mode, when the key is missing, or when fewer than two doors qualified. A Routes error is isolated: the job still reaches `ready` with the door list. Include the Google attribution fields the response is required to carry.
 
-- [ ] Postgres schema for vacancies, runs, evidence snapshots, and drafts
+- [ ] Order qualified wholesale and collab doors with waypoint optimization
+- [ ] Return legs the map can draw
+- [ ] Skip routing in flagship mode, when the key is missing, or when fewer than two doors qualify
+- [ ] Keep the campaign ready when routing fails
+- [ ] Attribute Google data as required
+
+### 24. Run-sheet PDF
+
+The gateway renders the PDF. Wholesale and collab produce a field run-sheet: ordered stops, the three sub-scores, the SKU, the pitch, and the citations. Flagship produces a site-selection brief: the top corridors, the anchor neighbours, and the demographic line. Qloo facts and model inferences are visually distinct, using the split marked in the proto comments. A PDF failure leaves the on-screen campaign usable.
+
+- [ ] Render a field run-sheet for wholesale and collab
+- [ ] Render a site-selection brief for flagship
+- [ ] Keep Qloo facts and model inferences distinct in the PDF
+- [ ] Leave the on-screen campaign usable when PDF rendering fails
+
+### 25. Job persistence
+
+Postgres tables for campaigns, runs, evidence snapshots, and drafts, applied with forward-only migrations. The HTTP API gets a campaign by id so a refresh can restore it. A re-run inserts a new run row and leaves the previous snapshot untouched. A seed script loads the four presets so fixture and live modes share the same ids. There is no account table.
+
+- [ ] Postgres schema for campaigns, runs, evidence snapshots, and drafts
 - [ ] Forward-only migrations
-- [ ] List, get, duplicate, and delete a vacancy
-- [ ] Re-run creates a new run and a diff against the previous one
-- [ ] Seed the two sample blocks
+- [ ] Get a campaign by id
+- [ ] Re-run creates a new run and leaves the previous snapshot untouched
+- [ ] Seed the four presets
 
-### 30. Diff and watch
+### 26. Gateway resilience
 
-Diff two runs on rank, the three sub-scores, saturation, and the top pick, and return that struct for the client diff view. A manual re-run reads the taste cache unless the request sets a force-refresh flag. Leave scheduled re-run off in the public demo config. Raise an alert only when the recommended pick’s entity id changes. Runs stay immutable: a re-run never updates a previous row.
-
-- [ ] Diff rank, scores, saturation, and the top pick
-- [ ] Manual re-run uses the cache unless the user forces a refresh
-- [ ] Keep scheduled re-run off in the public demo
-- [ ] Surface an alert only when the recommended pick changes
-- [ ] Keep each run immutable
-
-### 31. Gateway resilience
-
-Set a deadline on every taste and AI gRPC call and a circuit breaker per dependency. Per-IP and global rate limits return a JSON error the client can map to copy. Require `Idempotency-Key` on create and confirm so a double-submit returns the original job. Validate neighbour count, text length, unit size, and rent band before any RPC. `GET /health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode as `live`, `fixture`, or `degraded`.
+Set a deadline on every taste and AI gRPC call and a circuit breaker per dependency. Per-IP and global rate limits return a JSON error the client can map to copy. Require `Idempotency-Key` on create so a double-submit returns the original job. Validate seed count (one to four entities), text length, SKU-list length, mode, and radius before any RPC. `GET /health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode as `live`, `fixture`, or `degraded`.
 
 - [ ] Deadlines on every gRPC call and a circuit breaker per dependency
 - [ ] Per-IP and global rate limits with a clear JSON error
-- [ ] `Idempotency-Key` on create and confirm
-- [ ] Validation limits for neighbour count, text length, size, and rent band
-- [ ] `/health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode: live, fixture, or degraded
-
-### 32. Site-visit route
-
-When a Routes key is set, the gateway orders the vacancy and the confirmed neighbour pins and returns legs the Flutter map can draw as a polyline. Skip the call when the key is missing or there are fewer than two stops. A Routes error is isolated: the job still reaches `ready` with the shortlist. Include the Google attribution fields the response is required to carry.
-
-- [ ] Optional Routes call that orders the vacancy and the confirmed neighbours
-- [ ] Return legs the map can draw
-- [ ] Skip routing when the key is missing or there are fewer than two stops
-- [ ] Keep the shortlist ready when routing fails
-- [ ] Attribute Google data as required
-
-### 33. Leave-one-out harness
-
-A CLI in infra or the gateway assembles about twenty blocks, each with a known strong tenant category held out of the neighbour list. It runs Karum and `LlmOnlyBaseline` on each block and scores whether the hidden category ranks above the baseline’s picks. Write the table, including the blocks that lose — time-box the run against the remaining monthly quota (a full 20-block run is roughly 200–250 calls against the 10,000/month budget), reuse the taste cache, and publish the completed table in the README and Devpost text (epic 56). If fewer than twelve of twenty win, change the rubric in `ScoreCandidates` before any UI polish.
-
-- [ ] Assemble about twenty blocks with a known strong tenant hidden
-- [ ] CLI-run Karum and the LLM-only baseline on each
-- [ ] Score whether the hidden category ranks above the baseline picks
-- [ ] Write the table, including the failures
-- [ ] If fewer than twelve of twenty win, fix the rubric before UI polish
+- [ ] `Idempotency-Key` on create
+- [ ] Validation limits for seed count, text length, SKU list, mode, and radius
+- [ ] `/health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode
 
 ## 6. Flutter client
 
-### 34. App shell
+### 27. App shell
 
-Ship Flutter web as the judge target and keep the same screens on desktop. The shared theme defines type scale, cards, chips, banners, and drawers, and every screen implements loading, empty, and error states against the gateway’s job states. Sample and free-entry analyses run with no account. The gateway base URL is a compile-time or env config so local Compose and the production host are a switch, not a code change.
+Flutter web is the judge target, with the same screens on desktop. The shared theme defines type scale, cards, chips, banners, and drawers, and every screen implements loading, empty, and error states against the gateway job states. Preset and free-entry scouts run with no account. The gateway base URL is a compile-time define so local Compose and the production host are a switch.
 
-- [x] Ship Flutter web as the judge target, with the same screens on desktop — web + windows targets build and analyse clean
+- [x] Ship Flutter web as the judge target, with the same screens on desktop
 - [ ] Add theme, type scale, cards, chips, banners, and drawers — theme, type scale, cards, chips, and the mode banner exist; drawers still to add
-- [x] Add loading, empty, and error states on every screen — shared widgets wired into the app shell
-- [ ] Let a sample and a free-entry analysis run with no account
+- [x] Add loading, empty, and error states on every screen
+- [ ] Let a preset and a free-entry scout run with no account
 - [x] Configure the gateway base URL for local and production — `--dart-define=GATEWAY_URL`
 
-### 35. Accessibility and layout
+### 28. Accessibility and layout
 
-The intake-to-memo path is operable from the keyboard, with focus order, labels, and contrast set for a short audit. The trace timeline honors the reduced-motion media query and stops nonessential animation. Layout breakpoints cover a laptop width and a narrow window. A list renders the same unit, neighbour, and competitor pins when the map is not the view being used.
+The path from the seed builder to the pitch is operable from the keyboard, with focus order, labels, and contrast set for a short audit. The trace honours the reduced-motion media query. Layout breakpoints cover a laptop width and a narrow window. A list renders the same recommended doors and skip doors when the map is not the view being used.
 
-- [ ] Support a keyboard path from address to memo
+- [ ] Support a keyboard path from the seed builder to the pitch
 - [ ] Set focus order, labels, and contrast for a quick audit
-- [ ] Honor reduced motion on the trace
+- [ ] Honour reduced motion on the trace
 - [ ] Lay out for a laptop width and a narrow window
-- [ ] Provide a non-map list of the same pins
+- [ ] Provide a non-map list of the same doors
 
-### 36. Intake
+### 29. Seed builder, modes, and presets
 
-The address field calls the gateway geocode suggestions and requires the user to confirm the selected point before submit. Neighbour typeahead calls `ResolveEntities` through the gateway cache, debounced with a minimum query length so keystrokes cannot burn the quota, and renders matches as confirm chips. Constraint chips cover size, rent, F&B, category include and exclude, and shortlist versus surprise me, and they serialize into the `POST /api/v1/analyses` body. Inline validation mirrors the gateway’s validation limits. Two “Try a sample block” actions post the seeded vacancy ids and skip typing.
+The brand field calls seed resolution through the gateway, debounced, with a minimum query length, and renders matches as confirm chips. Fallback vibe chips accept two to four reference entities. The SKU list is plain text on the seed. Mode pills are Wholesale, Flagship, and Collab, and they serialize into `POST /api/v1/scout`. Three preset buttons post the seeded ids and skip typing: Sola in Austin, ceramics and matcha in Brooklyn, cacao and coffee in Colaba. Switching Brooklyn from flagship to collab loads the second cached payload.
 
-- [ ] Address field with geocode suggestions and a selected-point confirmation
-- [ ] Neighbour typeahead backed by resolve — debounced and cached — shown as confirm chips
-- [ ] Chips for size, rent, F&B, category include and exclude, and shortlist versus surprise me
+- [ ] Brand typeahead, debounced and cached, shown as confirm chips
+- [ ] Two to four fallback vibe chips, plus a SKU list
+- [ ] Mode pills for Wholesale, Flagship, and Collab
 - [ ] Inline validation before submit
-- [ ] Two “Try a sample block” actions that skip typing
+- [ ] Three preset buttons, with Brooklyn flagship and collab both cached
 
-### 37. Confirmation
+### 30. Live trace
 
-While the job is `awaiting_confirmation`, render ambiguous place and brand candidates with category and city, and send confirm, swap, or remove back on the confirm `POST`. Show the rent-tier and F&B questions only when the payload still marks them unanswered. Back-edit returns to intake but keeps the geocoded address. Sample blocks arrive pre-confirmed so this screen is skipped on the judge path.
-
-- [ ] Show ambiguous place and brand matches with category and city
-- [ ] One-click confirm, swap, or remove
-- [ ] Show the two clarifying questions only when they are still unanswered
-- [ ] Allow back-edit while keeping the address
-- [ ] Deliver sample blocks pre-confirmed
-
-### 38. Live trace
-
-Subscribe to `GET /events` and render each trace event as a timeline row with stage name, elapsed time, and whether the step was a cache hit. On refresh, resume from the stored cursor instead of replaying the whole job. Cancel calls the abort endpoint and stops the stream. If `/health` or the job state says fixture or degraded autopilot, show that banner above the timeline.
+Subscribe to `GET /events` and render each trace event as a timeline row with stage name, elapsed time, and whether the step was a cache hit. The stages the judge should see are seed resolution, door ranking, Places, menu grounding, and the route. On refresh, resume from the stored cursor. Cancel calls the abort endpoint and stops the stream. If `/health` or the job state says fixture or degraded, show that banner above the timeline.
 
 - [ ] Render SSE events as a timeline
 - [ ] Show stage, elapsed time, and whether the step was cached
 - [ ] Resume from the event cursor after refresh
 - [ ] Cancel aborts the job
-- [ ] Show a banner when the run is on fixtures or degraded autopilot
+- [ ] Show a banner when the run is on fixtures or degraded
 
-### 39. Map
+### 31. Map
 
-Draw pins for the vacancy, confirmed neighbours, and competitor entities, with a legend tied to those three types. Draw the radius ring from the lat/lng and radius the saturation check used. Render the heatmap layer only when the capability flag is on and `GetHeatmap` returned cells. Render the site-visit polyline only when the Routes legs are present. Use OSM or CARTO tiles and keep the attribution visible.
+Draw numbered pins for the qualified doors and red pins for the skip list, with a legend. Draw the scout radius from the lat/lng and the radius the campaign used. Render the heatmap, and locality polygons when the payload has them, in flagship mode. Render the field-route polyline when Routes legs are present. Use OSM or CARTO tiles and keep the attribution visible, including Google attribution for Places and Routes data.
 
-- [ ] Pins for the unit, neighbours, and competitors, with a legend
-- [ ] Radius ring used by the saturation check
-- [ ] Optional heatmap when the capability flag is on
-- [ ] Optional site-visit polyline
+- [ ] Numbered door pins and red skip pins, with a legend
+- [ ] Radius ring used by the scout
+- [ ] Heatmap and locality polygons in flagship mode
+- [ ] Field-route polyline when legs are present
 - [ ] OSM or CARTO tiles with visible attribution
 
-### 40. Shortlist and do-not-lease
+### 32. Door board, evidence, and the baseline
 
-Render the five `RankedCandidate`s as cards with three labeled sub-score bars (catchment fit, co-tenancy complement, cannibalisation penalty) and the shared tags. Call out the recommended pick inside those five; do not re-sort on the client. The do-not-lease column reads the reason codes, including saturation distance when the payload has it. Demographic and retail-presence warnings come from those fields on the card. Display order is the server rank. Any card field the insights payload lacks — image, description — hydrates via `GET /entities` by entity id or external-ID namespace ([QLOO_APIS.md](QLOO_APIS.md) §3.12).
+Render the top recommended doors as cards with three labeled sub-score bars — cultural affinity, shelf opportunity, demographic alignment — the shared tags, and the SKU badge. Call out the first stop inside that list; do not re-sort on the client. The skip tab reads the reason codes, including low affinity and competitor count. Menu findings render as clickable grounding URLs. The evidence drawer lists each Qloo call's endpoint, parameters, and result count, plus the explainability weights, and styles Qloo facts differently from model inferences. The LLM-only toggle requests `LlmOnlyBaseline` for the same inputs and labels it ungrounded. Any card field the insights payload lacks hydrates via `GET /entities` ([QLOO_APIS.md](QLOO_APIS.md) §3.12).
 
-- [ ] Five cards with three labeled sub-score bars and shared tags
-- [ ] Call out the recommended pick separately within the five
-- [ ] Do-not-lease column with the reason, including saturation distance when known
-- [ ] Demographic and retail-presence warnings on the card
-- [ ] Match the server rank exactly
-- [ ] Hydrate missing card fields via `GET /entities` (id or external-ID namespace — spike 16 confirms the round-trip)
+- [ ] Cards with three labeled sub-score bars, shared tags, and a SKU badge
+- [ ] Skip tab with reason codes, including low affinity and competitor count
+- [ ] Menu findings as clickable grounding URLs
+- [ ] Evidence drawer listing each Qloo call, its parameters, its result count, and the explainability weights
+- [ ] LLM-only toggle labeled ungrounded, and server rank preserved
+- [ ] Hydrate missing card fields via `GET /entities`
 
-### 41. Evidence and counterfactual
+### 33. Pitch and run-sheet actions
 
-The evidence drawer lists each `EvidenceCall`: the Qloo endpoint, the parameters, and the result count, plus which neighbour audiences carried the affinity — read straight from `query.explainability` — accepted on brand and place calls, confirmed 16 Oct (spike 4; see [QLOO_APIS.md](QLOO_APIS.md) §3.8) — falling back to derived attribution when the payload is thin or a signalled id shows up in `warnings` (3 of 4 Colaba ids were `not_found`). Style Qloo-fact fields and model-inference fields differently, using the split marked in the proto comments. The LLM-only toggle requests `LlmOnlyBaseline` for the same inputs and labels it ungrounded. Copy-evidence writes the drawer as plain text.
+The pitch action opens the script and, when present, the battlecard or the activation proposal. The run-sheet action downloads the server-rendered PDF; flagship downloads the site brief instead. Copy-to-clipboard is available on the script. If a later draft request fails, the actions that already succeeded stay enabled.
 
-- [ ] Drawer listing each Qloo call, its parameters, and its result count
-- [ ] Show which neighbour audiences carried the affinity
-- [ ] Split Qloo facts from model inferences visually
-- [ ] LLM-only toggle for the same prompt
-- [ ] Copy-evidence as plain text
-
-### 42. Deliverable actions
-
-The memo action calls the draft endpoint and downloads the server-rendered PDF. Outreach supports copy-to-clipboard and a `mailto:` link built from the mailto-safe body. The listing blurb supports copy. The broker note is rendered in the memo footer, separate from Qloo facts. If a later draft request fails, the actions that already succeeded stay enabled.
-
-- [ ] Generate and download the memo PDF
-- [ ] Draft outreach with copy and mailto
-- [ ] Listing blurb with copy
-- [ ] Include the broker note in the memo footer
+- [ ] Open the pitch, and the battlecard or activation proposal when the payload has one
+- [ ] Download the run-sheet PDF, or the site brief in flagship mode
+- [ ] Copy the script
 - [ ] Keep completed actions available when a later draft fails
 
-### 43. Saved vacancies
+### 34. Client edge cases
 
-Magic-link sign-in is optional: the sample and free-entry paths stay usable with no session. Once signed in, the client calls list, get, duplicate, and delete, then re-run and the diff endpoint. A finished run exposes a read-only share link. Logged-out users can still export the current run’s shortlist and drafts without creating an account.
-
-- [ ] Magic-link sign-in that leaves the demo path open
-- [ ] Save, list, open, duplicate, and delete
-- [ ] Re-run and a diff view
-- [ ] Shareable read link for a finished run
-- [ ] Logged-out export of the current run
-
-### 44. Client edge cases
-
-Put the job id in the URL and, on load, `GET` the job so a refresh restores an in-flight analysis. Double-submit sends the same `Idempotency-Key` and renders the one job the gateway returns. Map HTTP 429, 409, and validation errors to specific copy rather than a generic failure. An `empty` shortlist explains the miss and routes the user back to constraint edit. If the SSE stream drops, poll `GET` job until the state is terminal.
+Put the job id in the URL and, on load, `GET` the job so a refresh restores an in-flight scout. Double-submit sends the same `Idempotency-Key` and renders the one job the gateway returns. Map HTTP 429, 409, and validation errors to specific copy. An `empty` result explains the miss and routes the operator back to the seed. If the SSE stream drops, poll `GET` until the state is terminal.
 
 - [ ] Restore an in-flight job from the URL after refresh
 - [ ] Collapse double-submit into one job
 - [ ] Map 429, 409, and validation errors to specific copy
-- [ ] Explain an empty shortlist and offer a constraint edit
+- [ ] Explain an empty result and offer a return to the seed
 - [ ] Fall back from a dead SSE stream to job polling
 
 ## 7. Demo quality
 
-### 45. Judge-path copy
+### 35. Judge-path copy
 
-The landing line states that a wrong tenant is a multi-year mistake, and the button labels match the three-minute script the team will click during judging. The generic-LLM contrast renders only the live `LlmOnlyBaseline` text, never a hardcoded sample paragraph. The second sample block is the other chosen city. The free-entry form still reaches a shortlist without using a seeded vacancy.
+The landing line states that brands lose the account by knocking on the wrong door, and the button labels match the three-minute script in [PRODUCT.md](PRODUCT.md) §6.2. The generic-LLM contrast renders only the live `LlmOnlyBaseline` text. The three presets are Austin, Brooklyn, and Colaba. The free-entry form still reaches a door list without using a seeded campaign. Live screens render scores the API returned; the illustrative percentages in the demo script are not hardcoded.
 
-- [ ] Landing line: a wrong tenant is a multi-year mistake
+- [ ] Landing line: brands lose the account by knocking on the wrong door
 - [ ] Button labels that match the three-minute script
 - [ ] Show the generic-LLM contrast only from the live baseline text
-- [ ] Second sample in the other chosen city
-- [ ] Free-entry path that still reaches a shortlist
+- [ ] Presets for Austin, Brooklyn, and Colaba
+- [ ] Free-entry path that still reaches a door list, with no hardcoded sample scores
 
-### 46. Comprehension
+### 36. Comprehension
 
-Use one set of plain-English names for the three sub-scores in the Flutter cards, the memo template, and the outreach template, matching the fields `ScoreCandidates` returns. A dismissible sixty-second coach runs on the first sample only. The formula tooltip reads the same expression the scoring code writes into the evidence payload. Radius and area use one unit system end to end. Three non-technical read-throughs produce a punch list of lines to rewrite.
+Use one set of plain-English names for the three sub-scores in the Flutter cards, the run-sheet, and the pitch, matching the fields the gateway returns: cultural affinity, shelf opportunity, and demographic alignment. A dismissible sixty-second coach runs on the first preset only. The formula tooltip reads the same expression the gateway writes into the evidence payload. Radius uses metres end to end, and the UI may show a kilometre label for the city-scale ring. Three non-technical read-throughs produce a punch list of lines to rewrite.
 
-- [ ] Use the same plain-English score names in the UI, the memo, and the email
-- [ ] Add a dismissible sixty-second coach on the first sample only
+- [ ] Use the same plain-English score names in the UI, the run-sheet, and the pitch
+- [ ] Add a dismissible sixty-second coach on the first preset only
 - [ ] Add a formula tooltip that matches the scoring code
-- [ ] Show radius and area in one consistent unit system
+- [ ] Show radius in one consistent unit system
 - [ ] Run three non-technical read-throughs and fix any line they cannot explain
 
-### 47. Prewarm and latency
+### 37. Prewarm and latency
 
-Call the taste prewarm RPC for both sample blocks on deploy and again before the 24h cache TTL expires. Target a cached sample in a few seconds and an uncached run under twenty seconds, and keep SSE trace events emitting on the slow path so the timeline does not look stuck. Set Cloud Run min instances above zero during the judging window to avoid cold starts. Record p50 and p95 for the sample path and for free entry.
+Call the taste prewarm RPC for all four preset payloads on deploy and again before the 24h TTL expires. A cached preset targets under a second. A live free-entry scout targets under eight seconds, and SSE events keep emitting on that path so the timeline does not look stuck. Set Cloud Run min instances above zero during the judging window. Record p50 and p95 for a preset and for free entry.
 
-- [ ] Prewarm both samples on deploy and again inside the cache TTL
-- [ ] Aim for a cached sample in a few seconds and an uncached run under twenty seconds
+- [ ] Prewarm all four presets on deploy and again inside the cache TTL
+- [ ] Aim for a cached preset under a second and a live scout under eight seconds
 - [ ] Keep the trace moving on the slow path
-- [ ] Set Cloud Run min instances during the judging window to avoid cold starts
-- [ ] Record p50 and p95 for the sample and for free entry
-
-### 48. Brand-side view
-
-Given a brand entity id, rank the user’s saved vacancies with the same `ScoreCandidates` rubric and reuse the do-not-lease reason codes as why a unit is a poor fit. The evidence drawer is the same widget as the landlord view. Matches stay in-app; this path does not send email. Ship it behind a flag that is off in the default judge build.
-
-- [ ] Given a brand, rank saved vacancies with the same rubric
-- [ ] Reuse do-not-lease reasons as why this unit is a poor fit
-- [ ] Use the same evidence drawer
-- [ ] Keep matches in-app, with no outbound email blast
-- [ ] Ship the flag off in the default judge build
-
-### 49. Optional MCP tool
-
-Expose one MCP tool whose input is an address plus neighbours and whose output is the shortlist JSON. The tool calls `POST /api/v1/analyses` on the gateway so resolution, scoring, and evidence rules are not reimplemented. Protect it with a documented demo token and the same rate limits as the HTTP API. The README states that the judge path is the Flutter web app. The tool’s flag stays off until the core demo is green.
-
-- [ ] Expose one tool that accepts an address and neighbours and returns the shortlist JSON
-- [ ] Call the gateway so evidence rules stay in one place
-- [ ] Protect it with a documented, rate-limited demo token
-- [x] State in the README that the judge path is the web app
-- [ ] Ship the flag off until the core demo is green
+- [ ] Set Cloud Run min instances during the judging window
+- [ ] Record p50 and p95 for a preset and for free entry
 
 ## 8. Proof and failure
 
-### 50. Automated tests
+### 38. Automated tests
 
-`service-taste` owns the scoring unit tests and the Qloo fixture replay tests. `service-ai` owns the Pydantic schema tests and the autopilot tests that run with Vertex stubbed out. The gateway tests dial in-process fakes of taste and AI and assert job state, confirmation pause, and error mapping. Flutter widget tests cover intake, confirmation, trace, the shortlist board, and the error copy. A Compose smoke script posts one sample block and asserts a five-item shortlist.
+`service-taste` owns the affinity unit tests and the Qloo fixture replay tests. `service-ai` owns the Pydantic schema tests and the fallback tests that run with Vertex stubbed out. The gateway tests dial in-process fakes of taste and AI and assert job state, score assembly, and error mapping. Flutter widget tests cover the seed builder, the trace, the door board, and the error copy. A Compose smoke script posts the Austin preset and asserts a door list, a skip list, and a route.
 
-- [ ] Keep scoring unit tests and taste fixture tests in `service-taste`
-- [ ] Keep AI schema tests and autopilot tests in `service-ai`
+- [ ] Keep affinity unit tests and taste fixture tests in `service-taste`
+- [ ] Keep AI schema tests and fallback tests in `service-ai`
 - [ ] Add gateway tests with fake taste and AI
-- [ ] Add Flutter tests for intake, confirmation, trace, board, and errors
-- [ ] Add a Compose smoke script for one sample block
+- [ ] Add Flutter tests for the seed builder, the trace, the board, and errors
+- [ ] Add a Compose smoke script for the Austin preset
 
-### 51. Failure drills
+### 39. Failure drills
 
-Run the sample block with taste down, AI down, Redis down, and Postgres down, and with Qloo returning 429 and 500 through the fixture mode. Also run invalid model JSON and a venue name that looks like an instruction, plus cancel mid-flight and a browser refresh. For each case, write the expected job state and the expected Flutter copy into a one-page runbook so judging week has a known-good response.
+Run the Austin preset with taste down, AI down, Redis down, and Postgres down, and with Qloo returning 429 and 500 through fixture mode. Also run invalid model JSON and a venue name that looks like an instruction, plus cancel mid-flight and a browser refresh. For each case, write the expected job state and the expected Flutter copy into a one-page runbook.
 
 - [ ] Drill taste down, AI down, Redis down, and Postgres down
 - [ ] Drill Qloo 429 and Qloo 500
@@ -569,42 +446,42 @@ Run the sample block with taste down, AI down, Redis down, and Postgres down, an
 - [ ] Drill cancel mid-flight and refresh
 - [ ] Write the expected UI for each drill into a one-page runbook
 
-### 52. Honesty rules
+### 40. Honesty rules
 
-An `unresolved` or `empty` result is rendered as a miss in the API and in the UI, with no filled-in guess. Undocumented Qloo parameters stay out of taste client code, fixtures, and prompts — every parameter used resolves to a [QLOO_APIS.md](QLOO_APIS.md) §6/§7 catalogue row, with any §9 conflict behind it closed and dated. Numbers that appear only as examples in PRODUCT.md stay out of live screens and drafts. Degraded autopilot is visible both as the job state and in `GET /health`. When a run reaches `ready`, its evidence snapshot is frozen and later cache updates do not rewrite it.
+An `unresolved` or `empty` result is rendered as a miss in the API and in the UI, with no filled-in guess. Undocumented Qloo parameters stay out of taste client code, fixtures, and prompts — every parameter used resolves to a [QLOO_APIS.md](QLOO_APIS.md) §6 or §7 row. Illustrative numbers in the product brief stay out of live screens and drafts. Degraded mode is visible as the job state and in `GET /health`. When a run reaches `ready`, its evidence snapshot is frozen.
 
 - [ ] Label every miss as a miss
-- [ ] Keep undocumented Qloo parameters out of every repo — every parameter used maps to a [QLOO_APIS.md](QLOO_APIS.md) §6/§7 row
+- [ ] Keep undocumented Qloo parameters out of every repo
 - [ ] Keep illustrative numbers from the product brief out of live screens
 - [ ] Make degraded mode visible in the UI and in `/health`
 - [ ] Freeze evidence snapshots when the run completes
 
 ## 9. Ship and submit
 
-### 53. Containers and Cloud Run
+### 41. Containers and Cloud Run
 
-Write Dockerfiles for the Go gateway, taste, and AI, and publish the Flutter web build on the public demo host. Infra holds the Cloud Run service manifests and the env wiring that points each service at the others, and provisions a managed Postgres for the demo — the Compose container does not follow to Cloud Run, while Redis stays optional behind epic 17's in-process fallback. Secrets live in a secret manager; a preview revision can boot in fixture mode with no Qloo key. CORS allows only the client origin, and the Qloo key is injected into taste, never into the browser.
+Dockerfiles for the gateway, taste, and AI already run in Compose. Publish the Flutter web build on the public demo host. Infra holds the Cloud Run service manifests and the env wiring, and provisions a managed Postgres for the demo — the Compose container does not follow to Cloud Run, while Redis stays optional behind the in-process fallback. Secrets live in a secret manager; a preview revision can boot in fixture mode with no Qloo key. CORS allows only the client origin. The Qloo key is injected into taste, never into the browser.
 
-- [x] Dockerfiles for gateway, taste, and AI — all three build and run in Compose (distroless gateway, uv multi-stage Python images)
+- [x] Dockerfiles for gateway, taste, and AI
 - [ ] Publish the Flutter web build on the public demo host
 - [ ] Add Cloud Run manifests and env wiring in infra
-- [ ] Provision a managed Postgres for the demo (Redis optional behind the epic 17 fallback)
+- [ ] Provision a managed Postgres for the demo, with Redis optional behind the in-process fallback
 - [ ] Store secrets in a secret manager, and allow preview to run on fixtures
 - [ ] Restrict CORS to the client origin and keep the Qloo key server-side
 
-### 54. Security pass
+### 42. Security pass
 
-The gateway enforces the same length limits as intake validation and does not fetch a URL supplied by the client. Magic-link tokens are short-lived, single-purpose, and stored hashed. Delete cascades from vacancy to runs, drafts, and notes. CI runs dependency and container scans on gateway, taste, and AI. A short rotation note covers the Qloo key and the GCP service account used by Cloud Run.
+The gateway enforces the same length limits as the seed builder and does not fetch a URL supplied by the client. Grounding URLs are citations returned by the model, not fetch targets. Delete removes a campaign along with its runs and drafts. CI runs dependency and container scans on gateway, taste, and AI. A short rotation note covers the Qloo key and the GCP service account used by Cloud Run.
 
 - [ ] Enforce input length limits and block user-controlled URL fetch on the gateway
-- [ ] Make magic-link tokens short-lived and single-purpose
-- [ ] Delete a vacancy along with its runs, drafts, and notes
+- [ ] Treat grounding URLs as citations, not fetch targets
+- [ ] Delete a campaign along with its runs and drafts
 - [ ] Run dependency and container scans in CI
 - [ ] Write a rotation note for the Qloo key and the GCP service account
 
-### 55. Observability
+### 43. Observability
 
-Generate a trace id on `POST /api/v1/analyses` and propagate it from Flutter through the gateway into taste and AI log lines. Record latency and error rate per outbound dependency: Qloo, Vertex, Places, Routes, Redis, and Postgres. Keep a dashboard or a saved log query scoped to the judging window. Alert when the Qloo error rate spikes. Point an uptime check at `GET /health`.
+Generate a trace id on `POST /api/v1/scout` and propagate it from Flutter through the gateway into taste and AI log lines. Record latency and error rate per outbound dependency: Qloo, Vertex, Places, Routes, Redis, and Postgres. Keep a dashboard or a saved log query scoped to the judging window. Alert when the Qloo error rate spikes. Point an uptime check at `GET /health`.
 
 - [ ] Propagate a trace id from Flutter through taste and AI logs
 - [ ] Record latency and error rate per outbound dependency
@@ -612,25 +489,25 @@ Generate a trace id on `POST /api/v1/analyses` and propagate it from Flutter thr
 - [ ] Alert on a Qloo error spike
 - [ ] Point an uptime check at `/health`
 
-### 56. Docs and Devpost
+### 44. Docs and Devpost
 
-The public README covers the five-repo layout, the Compose run path, the honesty rules, and the MIT licence line. Devpost text maps the build onto the four judging criteria and includes the leave-one-out table. Screenshots show the sample shortlist, a do-not-lease card, the evidence drawer, and the baseline toggle. Team size, originality, and key terms were checked against the rules on 16 Oct 2026 — no team cap, the Qloo integration must be new, judges keep free access until Nov 16 — recorded in [PRODUCT.md](PRODUCT.md) §1. Submit at least 24 hours before 30 Oct 2026, 11:45pm EDT.
+The public README covers the five-repo layout, the Compose run path, the honesty rules, and the MIT licence line, rewritten for the brand agent. Devpost text maps the build onto the four judging criteria and includes the three presets, the skip list, and the LLM contrast. Screenshots show a door card, a skip card, the evidence drawer, the baseline toggle, and the flagship heatmap. Team size, originality, and key terms were checked against the rules on 16 Oct 2026. Submit at least 24 hours before 30 Oct 2026, 11:45pm EDT.
 
-- [x] README with architecture, local run, honesty rules, and licence — lives in the infra README; adapt it for the public submission when the demo ships
-- [ ] Devpost text mapped to the four judging criteria, including the eval result
-- [ ] Screenshots of the sample, the do-not-lease card, the evidence drawer, and the baseline toggle
-- [x] Check team size, originality, and key terms against the rules page — done 16 Oct 2026; findings in [PRODUCT.md](PRODUCT.md) §1 (no team cap, Qloo integration must be new, originality clause, judging Nov 2–16)
+- [x] README with architecture, local run, honesty rules, and licence — retarget the prose to the brand agent before the repos go public
+- [ ] Devpost text mapped to the four judging criteria
+- [ ] Screenshots of a door card, a skip card, the evidence drawer, the baseline toggle, and the heatmap
+- [x] Check team size, originality, and key terms against the rules page — done 16 Oct 2026; findings in [PRODUCT.md](PRODUCT.md) §1
 - [ ] Make the submitted repositories public with an open-source licence visible in each About section, and put the live demo URL in the README and the Devpost text
-- [ ] Keep the demo free and reachable through Nov 16, 2026 (judging end), with every submission material in English
+- [ ] Keep the demo free and reachable through 16 Nov 2026, with every submission material in English
 - [ ] Submit at least 24 hours before 30 Oct 2026, 11:45pm EDT
 
-### 57. Judging week
+### 45. Judging week
 
-Re-run entity resolution against the live hackathon key for both sample blocks and confirm the seeded entity ids still hit. Re-run prewarm and the Compose smoke script pointed at production. Click the three-minute script on a clean browser profile, then the second sample and one free-entry address. Keep the previous Cloud Run revision available so a bad deploy can roll back without a rebuild.
+Re-run seed resolution against the live hackathon key for all three presets and confirm the seeded entity ids still hit. Re-run prewarm and the Compose smoke script pointed at production. Click the three-minute script on a clean browser profile, then Brooklyn collab and one free-entry city. Keep the previous Cloud Run revision available so a bad deploy can roll back without a rebuild. Leave the demo live and no-login through 16 Nov 2026.
 
-- [ ] Re-verify both sample blocks still resolve
+- [ ] Re-verify all three presets still resolve
 - [ ] Re-run prewarm and the smoke script against production
 - [ ] Click the three-minute script on a clean browser profile
-- [ ] Check the second sample and one free-entry address
+- [ ] Check the Brooklyn collab toggle and one free-entry city
 - [ ] Keep a rollback to the previous Cloud Run revision
-- [ ] Leave the demo live and no-login through Nov 16, 2026 — the judging window runs Nov 2–16
+- [ ] Leave the demo live and no-login through 16 Nov 2026
