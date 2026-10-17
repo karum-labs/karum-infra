@@ -66,7 +66,7 @@ Conquest and SKU assortment are wholesale outputs, not extra pills. When the men
 
 Judge presets, each pre-warmed:
 
-- Austin — Sola yuzu mezcal (Madre Mezcal, Aesop, vinyl) — wholesale
+- Austin — Sola yuzu mezcal (Ilegal Mezcal, Aesop, Khruangbin — Madre Mezcal is absent from Qloo coverage; 17 Oct extension) — wholesale
 - Brooklyn — minimalist ceramics and matcha — flagship, plus a cached collab run so the mode toggle is instant
 - Mumbai, Colaba — specialty cacao and coffee — wholesale
 
@@ -76,22 +76,23 @@ Judge presets, each pre-warmed:
 
 `S_door = 0.50 · A_taste + 0.30 · O_shelf + 0.20 · D_demo − P_saturation`
 
-- **A_taste** — Qloo affinity between the seed and the venue, with explainability contributions attached.
+- **A_taste** — Qloo affinity between the seed and the venue, displayed as a percentile inside the returned shortlist (raw affinity bands shift with seed type — brand seeds sat near 0.85, place seeds near 0.97 on 17 Oct), with explainability contributions attached and the raw value kept in the evidence.
 - **O_shelf** — high when grounding finds a complementary menu and no exclusive lock from a direct peer; lower when the shelf is already crowded with niche competitors.
 - **D_demo** — alignment between the venue's `urn:demographics` age buckets and the brand's target cohort, plus heatmap intensity for the block.
-- **P_saturation** — applied when affinity is below 0.45, or when the audit finds four or more direct niche competitors. Those doors are returned on the skip list with the reason code.
+- **P_saturation** — applied when affinity falls below the returned shortlist's floor (its minimum or bottom decile — the absolute 0.45 threshold was retired 17 Oct; ranked sets observed 0.83–0.98), or when the audit finds four or more direct niche competitors. Those doors are returned on the skip list with the reason code.
 
 Ties break deterministically. The client renders server rank and does not re-sort. When grounding is unavailable, `O_shelf` is unknown, the penalty uses affinity alone, and the card says the menu was not verified.
 
 ## Qloo calls the spike settled
 
-All requests use `https://hackathon.api.qloo.com` and the `X-Api-Key` header. A 200 does not prove a parameter was honoured. The client in `service-taste` implements only spellings the 16 Oct spike verified.
+All requests use `https://hackathon.api.qloo.com` and the `X-Api-Key` header. A 200 does not prove a parameter was honoured. The client in `service-taste` implements only spellings the 16 Oct spike and the 17 Oct extension verified.
 
 | Step | Call | Settled constraint |
 | --- | --- | --- |
-| Resolve the seed | `GET /search` | Bare `filter.location=<lat>,<lon>` and `filter.radius` in miles. WKT is rejected here. Leave `sort_by` at the default for name lookup. |
-| Resolve a chip | `GET /v2/tags` | `feature.typo_tolerance=true`. Namespace restriction via `filter.tag.types` works. |
-| Rank doors | `GET /v2/insights` with `filter.type=urn:entity:place` | `filter.location=POINT(<lon> <lat>)` plus an explicit `filter.location.radius` in metres. Omitting the radius on a point returns zero rows. `feature.explainability=true`. |
+| Resolve the seed | `GET /search` | Bare `filter.location=<lat>,<lon>` and `filter.radius` in miles. WKT is rejected here. Leave `sort_by` at the default for name lookup. Types `place`/`brand`/`artist` all resolve (17 Oct); the top row is not necessarily the right city — check the geocode city. |
+| Resolve a chip | `GET /v2/tags` | `feature.typo_tolerance=true`. Namespace restriction via `filter.tag.types` works. Rows key the URN as `id` (not `tag_id` — DI-24). |
+| Rank doors | `GET /v2/insights` with `filter.type=urn:entity:place` | `filter.location=POINT(<lon> <lat>)` plus an explicit `filter.location.radius` in metres. Omitting the radius on a point returns zero rows. `feature.explainability=true`. A brand (or mixed brand/place/artist) seed ranks venue rows (17 Oct). Send `filter.tags=<category>` — unfiltered top slots are landmarks and retail, not doors. |
+| Score skip candidates | Same call plus `filter.results.entities=<id>,<id>,…` | Batch-verified 17 Oct: one call returns every candidate with `query.affinity`, so the skip list compares the naive-plan venues against the returned shortlist's floor (relative, not absolute). |
 | Localise a brand-type insights call | `signal.location=POINT(<lon> <lat>)` | `filter.location`, `filter.location.query`, and `filter.location.metro` are silent no-ops on `urn:entity:brand` (DI-11). Door ranking itself is a place call, so it uses the place filter above. |
 | Door fingerprint | `GET /v2/insights` with `filter.type=urn:tag` | Returns data. The type is absent from the Insights enum (DI-2). Signal with the venue id. |
 | Flagship heatmap | `GET /v2/insights` with `filter.type=urn:heatmap` | `urn:heatmap` is the only spelling. `output.heatmap.boundary=urn:entity:locality` returns locality polygons instead of cells. |

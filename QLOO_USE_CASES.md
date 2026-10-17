@@ -4,7 +4,7 @@
 >
 > **Status.** A planning aid, not a contract; [QLOO_APIS.md](QLOO_APIS.md) remains the authority for parameters and doc conflicts.
 >
-> **Reality check.** The Qloo spike ([PLAN.md](PLAN.md) epic 9) is **complete** — 16 Oct 2026, 123 calls, 9,877 of the 10,000 monthly quota remaining, and every call below settled against [QLOO_APIS.md](QLOO_APIS.md) §5 and the evidence in [spike/RECORDING.md](spike/RECORDING.md). All calls use the single hackathon host `https://hackathon.api.qloo.com` with an `X-Api-Key` header.
+> **Reality check.** The Qloo spike ([PLAN.md](PLAN.md) epic 9) is **complete** — 16 Oct 2026, 123 calls, plus the 17 Oct extension probes (21 calls; 9,856 of the 10,000 monthly quota remaining), and every call below settled against [QLOO_APIS.md](QLOO_APIS.md) §5 and the evidence in [spike/RECORDING.md](spike/RECORDING.md). All calls use the single hackathon host `https://hackathon.api.qloo.com` with an `X-Api-Key` header.
 
 ---
 
@@ -169,7 +169,7 @@ Summary first, details after.
 ### 2.12 Operational plumbing (invisible but load-bearing)
 
 - **Key-liveness probe** — the hackathon key is in hand (16 Oct 2026) and its monthly quota is recorded as 10,000 requests; `GET /` against the hackathon host confirms it stays live ([PLAN.md](PLAN.md) epic 9, first checklist item).
-- **Quota and 429 handling** — rate-limit headers and the rolling ~30-day reset window are recorded (spike 7; 429 deliberately unprobed — zero 429s across 123 calls). Estimated remaining internal use (city choice, prewarm, and the 20-block eval) fits comfortably inside the 9,877 left — keep the ledger and check it before the eval run and the judging window.
+- **Quota and 429 handling** — rate-limit headers and the rolling ~30-day reset window are recorded (spike 7; 429 deliberately unprobed — zero 429s across 144 calls). Estimated remaining internal use (city choice, prewarm, and the 20-block eval) fits comfortably inside the 9,856 left — keep the ledger and check it before the eval run and the judging window.
 - **Caching** — private server-side caching is allowed with no time limit. Karum caches by canonical parameter hash for 24h with a single-flight lock, plus an in-process fallback if Redis is down (epic 17).
 - **Prewarm** — the two sample blocks are loaded on deploy and refreshed inside the cache TTL so a judge's first click is fast (epic 47).
 - **Fixtures** — the spike's redacted responses become the first fixture files; replay tests assert the typed client structures with no live network (epics 7, 11, 50).

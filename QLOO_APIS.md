@@ -2,7 +2,7 @@
 
 Every Qloo endpoint Karum may call, with the exact parameters, mapped to the epics in [PLAN.md](PLAN.md). Sources: the [Qloo Knowledge Center](https://docs.qloo.com) pages (documentation dated 2025-10-27 → 2026-07-20) and the official [Qloo Agentic Hackathon Developer Guide](https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide) (page updated 2026-10-07). **Snapshot: 16 Oct 2026.**
 
-The §5 spike checklist ran to completion on 16 Oct 2026 (123 calls; evidence in [spike/RECORDING.md](spike/RECORDING.md)) — every parameter Karum uses is settled or explicitly marked do-not-use before it reaches client code. Every doc-vs-doc conflict carries an ID in §9; a closed row carries the observed answer and the date.
+The §5 spike checklist ran to completion on 16 Oct 2026 (123 calls; evidence in [spike/RECORDING.md](spike/RECORDING.md)) — every parameter Karum uses is settled or explicitly marked do-not-use before it reaches client code. The 17 Oct extension probes (brand→places, skip-pool, artist) add 21 calls — ledger 9,856 remaining — and are recorded in the same file. Every doc-vs-doc conflict carries an ID in §9; a closed row carries the observed answer and the date.
 
 | § | Section | What it covers |
 | --- | --- | --- |
@@ -28,12 +28,12 @@ The §5 spike checklist ran to completion on 16 Oct 2026 (123 calls; evidence in
 | Forbidden | **`/recs` and `/recommendations`** — legacy endpoints, explicitly unsupported |
 | Silent failures | Unsupported parameters are **ignored, not rejected**: you get 200 with an empty result. Verify every parameter against §7 (per-entity guide) before assuming a data gap |
 | Insights `filter.type` | `urn:entity:{artist, book, brand, locality, movie, person, place, podcast, tv_show, videogame}` + `urn:heatmap` + `urn:entity:audience` (deprecated). Notes: the enum spells `videogame` with no underscore; `urn:entity:destination`, `urn:tag` and `urn:demographics` are **absent** from the enum but all three return data — no 403s anywhere (DI-2 closed 16 Oct). `urn:entity:locality` is partially supported: only `signal.interests.entities` when the provided entities are localities (400s otherwise) |
-| `/search` types | Not the same set as Insights `filter.type` — the enum adds search-only legacy types (`actor`, `album`, `author`, `director`, `locality`) and (oddly) `urn:heatmap` and `urn:entity:audience`. Karum searches `urn:entity:place` and `urn:entity:brand` only (DI-17) |
+| `/search` types | Not the same set as Insights `filter.type` — the enum adds search-only legacy types (`actor`, `album`, `author`, `director`, `locality`) and (oddly) `urn:heatmap` and `urn:entity:audience`. Karum searches `urn:entity:place`, `urn:entity:brand`, and `urn:entity:artist` (artist verified 17 Oct) (DI-17) |
 | Error map | 401 wrong base URL or header · 403 unsupported entity type · 400 missing or invalid signal ("at least one valid signal or filter is required") · 429 rate limit |
 | Pagination | `take` default 20, **max 50** on every endpoint except `/search` (exclusive max 200). `page` 1–100, default 1. `offset` arbitrary. Docs recommend `page` over `offset` |
 | Caching | Private server-side caching is allowed with **no time limit**, but **never store raw Qloo responses in a public repository** — the fixture pack must be redacted because Devpost requires public repos |
 | Response fields | The full response is always returned; fields cannot be filtered. Verbose payloads (`akas`, `short_descriptions`) must be trimmed client-side |
-| Quotas | **10,000 requests/month** per key (key received 16 Oct 2026). Observed 16 Oct by probe: `X-Second-RateLimit-Limit: 5` (req/s), `X-Month-RateLimit-Limit: 10000`, `X-Month-RateLimit-Reset` counts down ≈ 2,592,000 s — a rolling ~30-day window, not a calendar-month reset; 429 deliberately unprobed (spike 7 — partial by design: zero 429s across 123 calls, 9,877 remaining). Limits are raisable via Discord `#api-help`; keys are deactivated after the judging period |
+| Quotas | **10,000 requests/month** per key (key received 16 Oct 2026). Observed 16 Oct by probe: `X-Second-RateLimit-Limit: 5` (req/s), `X-Month-RateLimit-Limit: 10000`, `X-Month-RateLimit-Reset` counts down ≈ 2,592,000 s — a rolling ~30-day window, not a calendar-month reset; 429 deliberately unprobed (spike 7 — partial by design: zero 429s across 144 calls (123 spike + 21 extension), 9,856 remaining). Limits are raisable via Discord `#api-help`; keys are deactivated after the judging period |
 
 ## 2. Endpoint inventory
 
@@ -72,7 +72,7 @@ These are the calls Karum makes, each with the full documented parameter surface
         # sort_by: leave unset (default match) for name lookups — distance means "nearest venues" (trap 7)
 ```
 
-Shortlist brands: `types=urn:entity:brand`. Other supported parameters: `filter.tags` (+ `operator.filter.tags=union|intersection`, default `union`), `filter.popularity` (min, 0–1), `filter.rating` (min, 0–5), `filter.exists` (e.g. `external.resy`, `external.michelin` — pattern `^external\.\w+$`; `filter.exists=external.resy` returned NYC Resy venues on the first try, 16 Oct).
+Shortlist brands: `types=urn:entity:brand`; artists resolve as `urn:entity:artist` (verified 17 Oct — Khruangbin → 3 rows). Other supported parameters: `filter.tags` (+ `operator.filter.tags=union|intersection`, default `union`), `filter.popularity` (min, 0–1), `filter.rating` (min, 0–5), `filter.exists` (e.g. `external.resy`, `external.michelin` — pattern `^external\.\w+$`; `filter.exists=external.resy` returned NYC Resy venues on the first try, 16 Oct).
 
 > **Unit trap:** `/search` radius is `filter.radius` in **miles** (default 10). Insights radius is `filter.location.radius` in **metres** (default 15000). Different names, different units.
 
@@ -200,7 +200,7 @@ This gives epic 41's "which neighbour audiences carried the affinity" straight f
 | Trends bias | `bias.trends` (`off`…`very_high`, default `medium`) | All types |
 | Content-based bias | `bias.content_based` (0–1, default 0.5) | Deep-dive-only; balances metadata vs behavioural signal |
 | Backfill dials | `backfill.cross_domain.take` (≤20), `backfill.content_based.take` (≤10) | Deep-dive-only; **settled 16 Oct (spike 18):** silently ignored on a standard place call (byte-identical to baseline) — do not use |
-| Direct affinity probe | `filter.results.entities=<candidate>` | Returns just those entities with their affinity (`query.affinity`, observed 0.832) — spike 9 settled 16 Oct; the legacy `filter.entities` spelling works but adds `warnings: deprecated` |
+| Direct affinity probe | `filter.results.entities=<candidate>,<candidate>…` | Returns just those entities with their affinity (`query.affinity`, observed 0.832) — spike 9 settled 16 Oct; **batch-verified 17 Oct: a comma-separated candidate list returns all of them in one call (no `warnings` when every id exists)**. The legacy `filter.entities` spelling works but adds `warnings: deprecated` |
 | Tag affinity probe | `filter.results.tags=<tag IDs>` | **No-op** — byte-identical to baseline on the tested place call (spike 9, 16 Oct); do not rely on it |
 | Exclude neighbours | `filter.exclude.entities=<ids>` | Stops the vacancy's own neighbours ranking as candidates |
 | Signal weights | `signal.interests.entities.weight`, `signal.interests.tags.weight`, `signal.location.weight`, `signal.demographics.*.weight` | Number ≥0 or weight string `very_low`…`very_high`; **settled 16 Oct (spike 14):** `=high` and `=0.5` both accepted but byte-identical to the no-weight baseline on a single-signal brand call — accepted syntax, no observable effect there; pair any weighting with a diff test |
@@ -248,6 +248,39 @@ Weekly rows, ordered by date descending: `population_percentile`, `population_ra
 
 Full entity records (description, image, properties) by ID, plus lookups by 22 external namespaces: `external.facebook.ids`, `external.goodreads.ids`, `external.goodreads_author.ids`, `external.igdb.ids`, `external.imdb.ids`, `external.instagram.ids`, `external.isbn10.ids`, `external.isbn13.ids`, `external.itunes.ids`, `external.lastfm.ids`, `external.library_of_congress.ids`, `external.metacritic.ids`, `external.michelin.ids`, `external.musicbrainz.ids`, `external.rottentomatoes.ids`, `external.soundcloud.ids`, `external.spotify.ids`, `external.tablet.ids`, `external.twitch.ids`, `external.twitter.ids`, `external.wikidata.ids`, `external.resy.ids`. Misses return a 404-style body, not empty results. Lets candidate and neighbour cards render Qloo-known data even where no Google Places key is set.
 
+### 3.13 Door ranking — brand → places (the ScoutDoors direction) — verified 17 Oct
+
+```
+/v2/insights?filter.type=urn:entity:place
+             &signal.interests.entities=<seed ids>          # brand, place, and artist mix in one signal (17 Oct)
+             &signal.interests.tags=<lifestyle tag URNs>    # optional; combines with entities (17 Oct)
+             &filter.location=POINT(<lon> <lat>)            # WKT only (DI-21)
+             &filter.location.radius=<metres>               # always explicit — a point without radius returns 0 rows
+             &filter.tags=<venue category URN>              # e.g. urn:tag:genre:place:restaurant:bar — keeps the board door-shaped
+             &feature.explainability=true
+             &take=25
+```
+
+**Locked by the 17 Oct extension (21 calls; evidence in [spike/RECORDING.md](spike/RECORDING.md)):**
+
+- **The direction works.** A brand-seeded place call returns ranked venues with per-row `query.affinity` and explainability. Colaba: Café Coffee Day → 25 rows, affinity 0.937–0.965; the place-signalled control shared **0/25** results, so the brand signal genuinely changes the ranking (it is not ignored). Austin composite seed (Aesop + Ilegal Mezcal + Khruangbin) → 25 rows, 0.847–0.866, three explainability contributions per result.
+- **Send `filter.tags`.** Unfiltered top slots are taste anchors (Franklin Barbecue, Uncommon Objects, Cathedral of Junk, Blanton Museum). With `urn:tag:genre:place:restaurant:bar` the same seed returns bars (Mezcalería Tobalá, Midnight Cowboy, Clark's Oyster Bar, …), 0.828–0.859.
+- **Raw affinity bands shift with seed type.** Brand-seeded sets sit near 0.85, place-seeded near 0.97; per-entity values are stable across calls. Display `A_taste` as a percentile inside the returned set; keep raw affinity in the evidence.
+- **Seed coverage is thin — resolve before locking a preset.** Madre Mezcal missed both the brand-typed search and an any-type search; Qloo-verified substitutes (Ilegal Mezcal, Aesop, Khruangbin) resolve cleanly (PLAN §6).
+
+### 3.14 Skip-candidate probe — `filter.results.entities` batch — verified 17 Oct
+
+```
+/v2/insights?filter.type=urn:entity:place
+             &signal.interests.entities=<seed ids>
+             &filter.location=POINT(<lon> <lat>)
+             &filter.location.radius=<metres>
+             &filter.results.entities=<candidate id>,<candidate id>,…   # one call scores the whole candidate list
+             &take=25
+```
+
+**Locked by the 17 Oct extension:** comma-separated candidates return in one call, each with `query.affinity`, no `warnings` when every id exists. This is the Doors-to-Skip mechanism: score the venues a naive plan would visit against the same seed, then skip the ones below the returned shortlist's floor. Observed on the Austin seed: ranked set 0.839–0.866 (n=50); Franklin Barbecue 0.8655, Whisler's 0.8343, Uchiko Austin 0.8306, Maggie Mae's 0.8160, Blind Pig Pub 0.8115 — four of five below every ranked door. An absolute 0.45 floor never fires; the floor is relative to the campaign's returned set (PLAN §11).
+
 ## 4. Do-not-use list (honesty rules)
 
 - `/recs` and `/recommendations` — explicitly forbidden for the hackathon.
@@ -266,6 +299,8 @@ Full entity records (description, image, properties) by ID, plus lookups by 22 e
 Work every item against `https://hackathon.api.qloo.com` with the `X-Api-Key` header. Record for each: the exact request, the redacted response, and the observed behaviour. When an item settles, mark it here and close the matching §9 row; the answer then flows into [PLAN.md](PLAN.md) epics 11–16. Expect unsupported parameters to be **silently ignored** — a non-empty result is not proof a parameter was honoured; compare against a no-parameter call.
 
 **Status — 16 Oct 2026 (spike complete, 123 calls):** all 22 items carry verdicts — settled: 1, 2, 3 (closed with 22), 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15 (tag half settled by the deferred-tier run), 16, 17, 18, 19, 20, 21, 22. Partial by design: 7 (429 deliberately unprobed — zero 429s across 123 calls). New register rows from the deferred tier: DI-22 (compare envelope), DI-23 (`include` boolean). Full observations, counts, and evidence filenames live in [spike/RECORDING.md](spike/RECORDING.md); the quota ledger there reads 123 calls spent · 9,877 remaining.
+
+**Extension probes — 17 Oct 2026 (21 calls, ledger 9,856):** brand→place direction verified (§3.13), skip-candidate batch probe verified (§3.14), artist search verified; seed locking gained one caution — Madre Mezcal is absent from Qloo's brand coverage, so preset seeds lock only after they resolve. New register row: DI-24 (`/v2/tags` row shape).
 
 **Original scope:**
 
@@ -597,6 +632,8 @@ With `heatmap.dimensions`, each cell adds `<dim>_affinity_rank` (0–1) and `<di
 
 **Observed 16 Oct (spike 13):** `results.tag_types[]`, each `{parents: [{type}], type}`; unfiltered calls return an arbitrary parent mix (actor/album), and `filter.parents.types=urn:entity:place,urn:entity:brand` narrows to those parents.
 
+**Observed 17 Oct (extension):** a `/v2/tags` row keys the URN as `id` — keys `{id, name, type, parents, popularity, properties, tags}` — not the sample's `tag_id`/`types`/`tag_value` (DI-24).
+
 ### 8.7 Compare — `GET /v2/analysis/compare`
 
 **Observed 16 Oct (spike 19):** `results` is an object `{tags, a, b, matchEntities}` — **not** the `/search` envelope (DI-22). `a`/`b` carry per-signal tag rows; `tags` the overlap (58 for a same-type place pair, 0 for a place-vs-brand pair); `matchEntities` was empty in every probe. Both `a.` and `b.` signals are required; `filter.subtype` and `model` accepted with identical shape.
@@ -646,11 +683,12 @@ Every conflict found in the 16 Oct 2026 snapshot, each mapped to the §5 spike i
 | DI-14 | Parameter reference lists legacy `filter.entities` (mapped from `filter.entity_ids`); the deep dive uses `filter.results.entities` | **Closed 16 Oct** — both work; `filter.entities` returns the entity plus `warnings: deprecated`; `filter.results.entities` is the current, clean spelling (spike 11) |
 | DI-15 | `filter.types` and `filter.distance.max` appear only in the location use-case prose — absent from every schema | **Closed 16 Oct** — both silently ignored on `/search` (`filter.types=urn:entity:brand` left results as places; `filter.distance.max` identical to its control) (spike 21) |
 | DI-16 | `resolve_to` literals: `place` / `brand` / `both` (deep-dive schema) vs `self` / `urn:reference:brand` / `both` (parameter-reference prose) | **Closed 16 Oct** — accepted set is `{urn:reference:brand, both}`: `urn:reference:brand` resolved to the brand entity (`B6DA90E2…`); `both` resolved to a *place* row + `not_found` warning; `place` / `brand` / `self` / `urn:reference:place` / junk → 400 "All of the provided signal.interests.entities were invalid" (spike 14) |
-| DI-17 | `/search` `types` enum includes `urn:heatmap` and `urn:entity:audience`, and legacy names (`actor`, `album`, `author`, `director`, `locality`) exist for search only | **Closed 16 Oct (awareness)** — Karum searches `place` / `brand` only; the legacy enums have no impact (spike 21) |
+| DI-17 | `/search` `types` enum includes `urn:heatmap` and `urn:entity:audience`, and legacy names (`actor`, `album`, `author`, `director`, `locality`) exist for search only | **Closed 16 Oct (awareness), updated 17 Oct** — Karum searches `place`, `brand`, and `artist` (`urn:entity:artist` verified: Khruangbin → 3 rows); the legacy enums have no impact (spike 21 + extension) |
 | DI-18 | Heatmap `filter.type` spelling: `urn:heatmap` (current enum) vs `urn:entity:heatmap` (older material and entrant repos) | **Closed 16 Oct** — `urn:heatmap` is the only accepted spelling; `urn:entity:heatmap` → 400 "not supported for filter.type" (spike 3) |
 | DI-19 | `filter.rating`: deep dive describes "Point of Interest", parameter reference scopes it to Movie / TV Show | **Closed 16 Oct** — `filter.rating.min=4.5` accepted and effective on place results (50 → 28 rows): not movie/TV-only (spike 2) |
 | DI-20 | `/v2/audiences` and `/v2/audiences/types` are deprecated, yet `signal.demographics.audiences` says IDs come from that route | **Closed 16 Oct (out of scope)** — audiences routes deprecated; Karum does not use `signal.demographics.audiences`; demographics work via entity/tag signals and per-input profile rows (spike 17) |
 | DI-21 | Location format: the docs describe `filter.location` as "a lat/lon pair, WKT, or a Qloo UUID" on both surfaces, but each surface accepts only one form | **Closed 16 Oct** — split by surface: `/search` takes the bare `lat,lon` pair only (WKT and UUID rejected: "must be in the form lat,lon"); Insights takes WKT `POINT(<lon> <lat>)` only (bare pair → "WKT format is invalid") (spike 6) |
 | DI-22 | `/v2/analysis/compare` is documented as returning the same envelope as `/search` ("a `results` array of entities"); the real response is `results = {tags, a, b, matchEntities}` | **Closed 16 Oct** — observed shape; `a`/`b` = per-signal tag rows, `tags` = overlap (58 same-type vs 0 cross-type), `matchEntities` empty in every probe; parse `matchEntities`, not a results list (spike 19) |
 | DI-23 | `signal.interests.entities.include` is documented as a comma-separated id list ("force entities into affinity scoring"); the server requires a boolean | **Closed 16 Oct** — `include=<uuid>` → 400 "signal.interests.entities.include must be a boolean"; `include=true` accepted, byte-identical on the test call (spike 14) |
+| DI-24 | `/v2/tags` row shape: the documentation sample keys the URN as `tag_id` (and shows `types` / `tag_value`); compare output also uses `tag_id` | **Closed 17 Oct** — observed `/v2/tags` rows key it as `id`, keys `{id, name, type, parents, popularity, properties, tags}`, no `types`/`tag_value` (e.g. `urn:tag:genre:place:restaurant:bar` for Bar); parse `id` here and `tag_id` in compare output (extension) |
 

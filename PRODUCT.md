@@ -381,10 +381,10 @@ Rather than showing an opaque number, Karum computes a transparent composite sco
 
 $$S_{\text{door}} = 0.50 \cdot A_{\text{taste}} + 0.30 \cdot O_{\text{shelf}} + 0.20 \cdot D_{\text{demo}} - P_{\text{saturation}}$$
 
-1. **Cultural Affinity Fit ($A_{\text{taste}}$):** Normalized Qloo affinity score between the Brand Seed and the Venue entity, weighted by `feature.explainability` signal strength.
+1. **Cultural Affinity Fit ($A_{\text{taste}}$):** Qloo affinity score between the Brand Seed and the Venue entity, shown as a percentile inside the returned shortlist (raw affinity bands shift with seed type — brand seeds sat near 0.85, place seeds near 0.97 on 17 Oct — so raw values are not comparable across campaigns), with `feature.explainability` signal weights attached.
 2. **Shelf / Menu Opportunity ($O_{\text{shelf}}$):** Derived from Vertex AI Search Grounding. High score if the venue carries complementary categories (e.g., craft cocktails, small-batch goods) without an exclusive lock from a direct craft twin; triggers Conquest Mode if they only stock a legacy mass-market incumbent.
 3. **Demographic & Locality Alignment ($D_{\text{demo}}$):** Alignment between the venue's `urn:demographics` age buckets and the brand's target cohort, plus neighborhood heatmap intensity.
-4. **Saturation / Mismatch Penalty ($P_{\text{saturation}}$):** Pushes a venue into the **"Doors to Skip"** column if Qloo affinity is low ($< 0.45$) or if live menu verification shows the venue already stocks $4+$ direct niche competitors.
+4. **Saturation / Mismatch Penalty ($P_{\text{saturation}}$):** Pushes a venue into the **"Doors to Skip"** column when its Qloo affinity falls below the returned shortlist's floor (computed per campaign — an absolute cutoff never fires, 17 Oct evidence) or when live menu verification shows the venue already stocks $4+$ direct niche competitors.
 
 ---
 
@@ -421,11 +421,11 @@ $$S_{\text{door}} = 0.50 \cdot A_{\text{taste}} + 0.30 \cdot O_{\text{shelf}} + 
   - *"Emerging brands die on the shelf—not because their product is bad, but because their sales reps knock on the wrong doors and open pop-ups on the wrong blocks. Today, brands guess using Yelp lists. Karum uses Qloo's Taste Graph and live Google Search Grounding to tell a brand exactly which shopkeepers' customers already love their vibe, what is on their menu right now, and how to pitch them."*
 - **0:25 – 0:55 (Brand Seed & Live Agent Trace):**
   - Click **Try Sample: Sola Yuzu Mezcal in Austin, TX**.
-  - Show the composite cultural seed (*Madre Mezcal + Aesop + Indie Vinyl*) and 3 SKUs.
+  - Show the composite cultural seed (*Aesop + Ilegal Mezcal + Khruangbin* — the 17 Oct probe's Qloo-verified seed; Madre Mezcal is absent from Qloo coverage) and 3 SKUs.
   - Watch the live trace stream across `service-taste` (Qloo), `server` (Google Places/Routes), and `service-ai` (Vertex AI Search Grounding).
 - **0:55 – 1:40 (The Magic Moment — Door Cards + Menu Grounding + Negative Space):**
-  - Click **Door #1 (Whisler's)**. Open the **Evidence Drawer**: show the $94\%$ Qloo cultural affinity, the shared tags (`craft_cocktails`, `indie_rock`, `sustainable_design`), and the live menu verification with real web URLs confirming their Oaxacan cocktail focus and recommends pitching *SKU #2 (Yuzu Blanco)*.
-  - Click the **"Doors to Skip"** tab: show a famous downtown steakhouse bar that a plain LLM recommended, flagged in red by Karum because Qloo shows low cultural overlap and Search Grounding shows a locked corporate distributor menu.
+  - Click **Door #1** (top of the locked preset's bar list — Mezcalería Tobalá in the 17 Oct probe, $86\%$ Qloo affinity). Open the **Evidence Drawer**: show the Qloo cultural affinity, the shared tags (`craft_cocktails`, `indie_rock`, `sustainable_design`), and the live menu verification with real web URLs confirming their Oaxacan cocktail focus and recommends pitching *SKU #2 (Yuzu Blanco)*.
+  - Click the **"Doors to Skip"** tab: show the famous Sixth Street venues a plain LLM recommended (The Blind Pig Pub, Maggie Mae's in the 17 Oct probe — both score below every returned door), flagged in red by Karum because Qloo shows low relative affinity and Search Grounding shows a locked corporate distributor menu.
 - **1:40 – 2:15 (Counterfactual & Sales Action):**
   - Toggle **"Compare with Plain LLM"** to show the generic tourist list side-by-side against Karum's culturally grounded route.
   - Click **"Generate Pitch & Run-Sheet"**: preview the tailored email/script citing Qloo's shared audience insights and the optimized 6-stop Google Maps sales route.
@@ -433,6 +433,8 @@ $$S_{\text{door}} = 0.50 \cdot A_{\text{taste}} + 0.30 \cdot O_{\text{shelf}} + 
   - Toggle to **Flagship & Pop-Up Scout**. The Qloo `urn:heatmap` lights up East 6th / Cesar Chavez as the #1 micro-corridor for a weekend pop-up, alongside 3 non-competing apparel/vinyl shops (`Brand Collabs` mode) to co-host the tasting.
 - **2:50 – 3:00 (Close):**
   - *"From first stockist to first flagship store, Karum turns Qloo's cultural graph into revenue."*
+
+**Seed & door check (17 Oct 2026):** the names above track the verified Qloo probe. Madre Mezcal does not resolve in Qloo (brand-typed and any-type searches miss; only same-name places elsewhere) — Ilegal Mezcal, Aesop, and Khruangbin all resolve. The bar-filtered door list tops out at Mezcalería Tobalá (0.859), Midnight Cowboy, Clark's Oyster Bar; without the category tag the ranking is taste-anchor-shaped (Franklin Barbecue, Uncommon Objects, Cathedral of Junk), and Sixth Street bars (Blind Pig 0.812, Maggie Mae's 0.816) score below every returned door (pool floor 0.828) — the skip-list story. Re-render the script's names and percentages from the locked preset before the demo.
 
 ---
 

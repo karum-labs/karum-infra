@@ -2,6 +2,8 @@
 """Qloo hackathon spike runner — PLAN epic 9, QLOO_APIS.md §5.
 
 Works the 22-item spike checklist against https://hackathon.api.qloo.com.
+Extension probes (17 Oct): `brand-doors` proves the brand->place direction the
+product depends on; `skip-pool` calibrates the Doors-to-Skip mechanism.
 
 Rules this script enforces:
   - only the hackathon host is called (plus the opt-in DI-1 prod-host 401 check)
@@ -24,6 +26,8 @@ Typical flow (see spike/README.md and spike/RECORDING.md):
   python spike/run_spike.py entities --resy-id <id>
   python spike/run_spike.py post
   python spike/run_spike.py heatmap --lat 30.2672 --lon -97.7431
+  python spike/run_spike.py brand-doors --lat 30.2672 --lon -97.7431
+  python spike/run_spike.py skip-pool --candidates <uuid>,<uuid> --lat 30.2672 --lon -97.7431
   python spike/run_spike.py raw "/v2/trending?filter.type=urn:entity:brand&..."
 """
 
@@ -98,17 +102,22 @@ def load_state() -> dict:
 
 def save_state(state: dict) -> None:
     STATE.write_text(json.dumps(state, indent=2), encoding="utf-8")
-    print(f"state -> {STATE.name} ({len(state['places'])} places, {len(state['brands'])} brands)")
+    counts = ", ".join(f"{len(rows)} {name}" for name, rows in state.items() if isinstance(rows, dict))
+    print(f"state -> {STATE.name} ({counts})")
 
 
-def place_ids(state: dict, override: str | None) -> list[str]:
+def bucket_ids(state: dict, bucket: str, override: str | None) -> list[str]:
     if override:
         ids = [chunk.strip() for chunk in override.split(",") if chunk.strip()]
     else:
-        ids = [row.get("entity_id") for row in state.get("places", {}).values() if row.get("entity_id")]
+        ids = [row.get("entity_id") for row in state.get(bucket, {}).values() if row.get("entity_id")]
     if not ids:
-        fail("no resolved places yet — run `resolve` first, or pass --ids a,b,c")
+        fail(f"no resolved {bucket} yet - run `resolve` first, or pass explicit ids a,b,c")
     return ids
+
+
+def place_ids(state: dict, override: str | None) -> list[str]:
+    return bucket_ids(state, "places", override)
 
 
 def row_label(row) -> str:
@@ -272,8 +281,156 @@ def report_explanations(payload) -> None:
 
 
 # --------------------------------------------------------------------------
+# extension analysis — brand->place affinity and skip-pool calibration
+# --------------------------------------------------------------------------
+
+def row_labels(payload) -> set[str]:
+    return {row_label(row) for row in result_rows(payload) if isinstance(row, dict)}
+
+
+def affinity_rows(payload) -> list[tuple[str, float]]:
+    """(label, query.affinity) for every result row that carries an affinity."""
+    rows = []
+    for row in result_rows(payload):
+        if isinstance(row, dict):
+            query = row.get("query")
+            if isinstance(query, dict) and isinstance(query.get("affinity"), (int, float)):
+                rows.append((row_label(row), float(query["affinity"])))
+    return rows
+
+
+def affinity_stats(payload) -> dict | None:
+    values = sorted(value for _, value in affinity_rows(payload))
+    if not values:
+        return None
+
+    def pick(q: float) -> float:
+        return values[min(len(values) - 1, max(0, round(q * (len(values) - 1))))]
+
+    return {"count": len(values), "min": values[0], "p25": pick(.25), "p50": pick(.50), "p75": pick(.75), "max": values[-1]}
+
+
+def print_affinity(payload) -> None:
+    stats = affinity_stats(payload)
+    if not stats:
+        print("    affinity: absent on every row - inspect the saved JSON")
+        return
+    print(
+        "    affinity: {count} rows | min {min:.3f} p25 {p25:.3f} median {p50:.3f} "
+        "p75 {p75:.3f} max {max:.3f}".format(**stats)
+    )
+
+
+def percentile_rank(values: list[float], point: float) -> float:
+    """Share of `values` at or below `point` (1.0 = the point tops the set)."""
+    if not values:
+        return float("nan")
+    return sum(1 for value in values if value <= point) / len(values)
+
+
+def subtype_mix(payload) -> dict[str, int]:
+    mix: dict[str, int] = {}
+    for row in result_rows(payload):
+        if isinstance(row, dict):
+            subtype = str(row.get("subtype") or "?")
+            mix[subtype] = mix.get(subtype, 0) + 1
+    return mix
+
+
+def report_doors(payload, check_explainability: bool = True) -> None:
+    """One line of subtype mix + affinity stats + explainability presence."""
+    mix = subtype_mix(payload)
+    if mix:
+        top = sorted(mix.items(), key=lambda item: -item[1])[:6]
+        print("    subtypes: " + ", ".join(f"{name} x{count}" for name, count in top))
+    print_affinity(payload)
+    if check_explainability:
+        report_explanations(payload)
+
+
+# --------------------------------------------------------------------------
 # commands
 # --------------------------------------------------------------------------
+
+def cmd_brand_doors(args) -> None:
+    """R1 extension — the ScoutDoors direction: a brand signal ranking urn:entity:place rows."""
+    if args.lat is None or args.lon is None:
+        fail("brand-doors needs --lat and --lon")
+    state = load_state()
+    brands = bucket_ids(state, "brands", args.brands)
+    base = {
+        "filter.type": "urn:entity:place",
+        "signal.interests.entities": ",".join(brands),
+        "filter.location": f"POINT({args.lon} {args.lat})",  # insights wants WKT, longitude-first
+        "filter.location.radius": args.radius,  # metres — a WKT point without radius returns 0 rows
+        "take": 25,
+        "feature.explainability": "true",
+    }
+    baseline, _ = call("brand-doors-baseline", "/v2/insights?" + qs(base))
+    report_doors(baseline)
+
+    if args.control_ids or state.get("places"):
+        controls = bucket_ids(state, "places", args.control_ids)
+        control, _ = call(
+            "brand-doors-control-place-signal",
+            "/v2/insights?" + qs({**base, "signal.interests.entities": ",".join(controls)}),
+        )
+        report_doors(control)
+        shared = row_labels(baseline) & row_labels(control)
+        print(f"    brand vs place signal overlap: {len(shared)} shared of {len(row_labels(baseline))} - 0 or few proves the brand signal is honoured")
+    else:
+        print("    control skipped - no resolved places; pass --control-ids for the place-signalled control")
+
+    distribution, _ = call("brand-doors-take50", "/v2/insights?" + qs({**base, "take": 50}))
+    report_doors(distribution)
+
+    if args.tag:
+        tagged, _ = call("brand-doors-plus-tags", "/v2/insights?" + qs({**base, "signal.interests.tags": args.tag}))
+        report_doors(tagged)
+    else:
+        print("    mixed signal skipped - pass --tag <urn> to prove entities + tags combine on a place call")
+    print("R1 verdict: venue subtypes + per-row affinity = brand -> places works. 0 rows or non-venue rows = fall back to place/tag seeds (PLAN section 6).")
+
+
+def cmd_skip_pool(args) -> None:
+    """R2 extension — score naive-plan venues against the seed and calibrate the skip floor."""
+    if args.lat is None or args.lon is None:
+        fail("skip-pool needs --lat and --lon")
+    if not args.candidates:
+        fail("skip-pool needs --candidates <uuid,uuid> - venues a naive plan would visit")
+    state = load_state()
+    seeds = bucket_ids(state, "brands", args.seeds)
+    candidates = [chunk.strip() for chunk in args.candidates.split(",") if chunk.strip()]
+    base = {
+        "filter.type": "urn:entity:place",
+        "signal.interests.entities": ",".join(seeds),
+        "filter.location": f"POINT({args.lon} {args.lat})",
+        "filter.location.radius": args.radius,
+    }
+    if args.tag:
+        base["signal.interests.tags"] = args.tag
+
+    ranked, _ = call("skip-pool-ranked", "/v2/insights?" + qs({**base, "take": 50}))
+    report_doors(ranked, check_explainability=False)
+    ranked_values = sorted(value for _, value in affinity_rows(ranked))
+
+    probe, _ = call(
+        "skip-pool-batch-probe",
+        "/v2/insights?" + qs({**base, "take": 25, "filter.results.entities": ",".join(candidates)}),
+    )
+    probed = affinity_rows(probe)
+    if not probed:
+        print("    batch probe returned no affinity rows - filter.results.entities did not batch; fall back to one probe per candidate")
+        return
+    for label, value in probed:
+        print(f"    candidate: {label:<45} affinity={value:.4f}  percentile vs ranked={percentile_rank(ranked_values, value):.2f}")
+    if len(probed) != len(candidates):
+        print(f"    note: {len(probed)} of {len(candidates)} candidates returned - check warnings for not_found")
+    if ranked_values:
+        floor = sorted(ranked_values)[max(0, len(ranked_values) // 10)]
+        print(f"    ranked set spans {ranked_values[0]:.3f} .. {ranked_values[-1]:.3f}; bottom-decile floor {floor:.3f}")
+        print("R2 verdict: candidates with a percentile near the ranked set's bottom are data-backed skips; an absolute 0.45 floor never fires on ranked results.")
+
 
 def cmd_key(args) -> None:
     call("key-probe", "/")
@@ -284,7 +441,7 @@ def cmd_key(args) -> None:
 
 def cmd_resolve(args) -> None:
     state = load_state()
-    bucket = "places" if args.type == "place" else "brands"
+    bucket = {"place": "places", "brand": "brands", "artist": "artists"}[args.type]
     for name in args.names:
         params = {"query": name, "types": f"urn:entity:{args.type}", "take": 5, "page": 1}
         if args.type == "place" and args.lat is not None and args.lon is not None:
@@ -298,7 +455,10 @@ def cmd_resolve(args) -> None:
             continue
         for row in rows[:5]:
             if isinstance(row, dict):
-                print(f"    candidate: {row.get('name')} | {row.get('entity_id')} | {row.get('subtype')}")
+                props = row.get("properties") or {}
+                geo = props.get("geocode") or {}
+                where = geo.get("city") or geo.get("address") or "?"
+                print(f"    candidate: {row.get('name')} | {row.get('entity_id')} | {str(where)[:40]}")
         top = rows[0]
         state.setdefault(bucket, {})[name] = {
             "entity_id": top.get("entity_id"),
@@ -306,7 +466,7 @@ def cmd_resolve(args) -> None:
             "subtype": top.get("subtype"),
         }
     save_state(state)
-    print("verify the picks above; edit state.json if the preferred match is not the top row.")
+    print("verify the picks above; edit state.json if the preferred match is not the top row. Check the city for chains and common names.")
 
 
 def cmd_brand_location(args) -> None:
@@ -500,9 +660,9 @@ def main() -> None:
     p.add_argument("--check-prod-host", action="store_true", help="also probe the production host once for the DI-1 401")
     p.set_defaults(fn=cmd_key)
 
-    p = sub.add_parser("resolve", help="resolve place/brand names to entity ids via /search; writes state.json")
+    p = sub.add_parser("resolve", help="resolve place/brand/artist names to entity ids via /search; writes state.json")
     p.add_argument("--name", action="append", required=True, dest="names", help="repeat per name")
-    p.add_argument("--type", choices=("place", "brand"), default="place")
+    p.add_argument("--type", choices=("place", "brand", "artist"), default="place")
     p.add_argument("--lat", type=float)
     p.add_argument("--lon", type=float)
     p.add_argument("--radius", type=float, default=3.0, help="filter.radius in MILES (/search rule)")
@@ -553,6 +713,24 @@ def main() -> None:
     p.add_argument("--lon", type=float)
     p.add_argument("--tag")
     p.set_defaults(fn=cmd_heatmap)
+
+    p = sub.add_parser("brand-doors", help="extension R1 — brand signal ranking urn:entity:place rows (the ScoutDoors direction)")
+    p.add_argument("--brands", help="comma-separated brand ids (defaults to state.json brands)")
+    p.add_argument("--control-ids", help="comma-separated place ids for the place-signalled control (defaults to state.json places)")
+    p.add_argument("--lat", type=float)
+    p.add_argument("--lon", type=float)
+    p.add_argument("--radius", type=float, default=8000, help="filter.location.radius in METRES")
+    p.add_argument("--tag", help="optional tag urn added to the brand signal (mixed-signal probe)")
+    p.set_defaults(fn=cmd_brand_doors)
+
+    p = sub.add_parser("skip-pool", help="extension R2 — score naive-plan venues vs the ranked set to calibrate the skip floor")
+    p.add_argument("--seeds", help="comma-separated seed entity ids (defaults to state.json brands)")
+    p.add_argument("--candidates", help="comma-separated place ids a naive plan would visit")
+    p.add_argument("--lat", type=float)
+    p.add_argument("--lon", type=float)
+    p.add_argument("--radius", type=float, default=8000, help="filter.location.radius in METRES")
+    p.add_argument("--tag", help="optional tag urn added to the seed signal")
+    p.set_defaults(fn=cmd_skip_pool)
 
     p = sub.add_parser("raw", help="generic GET, e.g. raw \"/v2/trending?...\"")
     p.add_argument("path")
