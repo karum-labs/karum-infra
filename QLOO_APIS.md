@@ -265,7 +265,7 @@ Full entity records (description, image, properties) by ID, plus lookups by 22 e
 
 - **The direction works.** A brand-seeded place call returns ranked venues with per-row `query.affinity` and explainability. Colaba: Café Coffee Day → 25 rows, affinity 0.937–0.965; the place-signalled control shared **0/25** results, so the brand signal genuinely changes the ranking (it is not ignored). Austin composite seed (Aesop + Ilegal Mezcal + Khruangbin) → 25 rows, 0.847–0.866, three explainability contributions per result.
 - **Send `filter.tags`.** Unfiltered top slots are taste anchors (Franklin Barbecue, Uncommon Objects, Cathedral of Junk, Blanton Museum). With `urn:tag:genre:place:restaurant:bar` the same seed returns bars (Mezcalería Tobalá, Midnight Cowboy, Clark's Oyster Bar, …), 0.828–0.859.
-- **Raw affinity bands shift with seed type.** Brand-seeded sets sit near 0.85, place-seeded near 0.97; per-entity values are stable across calls. Display `A_taste` as a percentile inside the returned set; keep raw affinity in the evidence.
+- **Raw affinity bands move with the seed and the city — not by a fixed rule.** 17 Oct: Austin brand seed 0.847–0.866 vs place control 0.973–0.983; Colaba brand 0.937–0.965 vs place control 0.947–0.967 (overlapping). Per-entity values are stable across calls. Display `A_taste` as a percentile inside the returned set; keep raw affinity in the evidence.
 - **Seed coverage is thin — resolve before locking a preset.** Madre Mezcal missed both the brand-typed search and an any-type search; Qloo-verified substitutes (Ilegal Mezcal, Aesop, Khruangbin) resolve cleanly (PLAN §6).
 
 ### 3.14 Skip-candidate probe — `filter.results.entities` batch — verified 17 Oct

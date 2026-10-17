@@ -76,7 +76,7 @@ Judge presets, each pre-warmed:
 
 `S_door = 0.50 · A_taste + 0.30 · O_shelf + 0.20 · D_demo − P_saturation`
 
-- **A_taste** — Qloo affinity between the seed and the venue, displayed as a percentile inside the returned shortlist (raw affinity bands shift with seed type — brand seeds sat near 0.85, place seeds near 0.97 on 17 Oct), with explainability contributions attached and the raw value kept in the evidence.
+- **A_taste** — Qloo affinity between the seed and the venue, displayed as a percentile inside the returned shortlist (raw affinity bands move with the seed and the city — Austin: brand seed 0.85 vs place 0.97; Colaba: both ~0.94–0.97 on 17 Oct), with explainability contributions attached and the raw value kept in the evidence.
 - **O_shelf** — high when grounding finds a complementary menu and no exclusive lock from a direct peer; lower when the shelf is already crowded with niche competitors.
 - **D_demo** — alignment between the venue's `urn:demographics` age buckets and the brand's target cohort, plus heatmap intensity for the block.
 - **P_saturation** — applied when affinity falls below the returned shortlist's floor (its minimum or bottom decile — the absolute 0.45 threshold was retired 17 Oct; ranked sets observed 0.83–0.98), or when the audit finds four or more direct niche competitors. Those doors are returned on the skip list with the reason code.

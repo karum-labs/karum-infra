@@ -101,9 +101,10 @@ up) into `spike/out/`.
 - Quota: 10,000 requests/month. The full spike used 123 calls, the 17 Oct extension
   21 more (144 total; 9,856 remaining on 17 Oct; the DI-1 prod-host 401 is not metered) —
   keep it that way: baseline-paired probes only.
-- **Affinity bands shift with seed type** (brand-seeded sets sat near 0.85, place-seeded
-  near 0.97 on 17 Oct): score percentiles within the returned set and cut against the
-  relative floor `skip-pool` prints — no fixed raw threshold (0.45 retired).
+- **Affinity bands move with the seed and the city** (17 Oct: Austin brand seed 0.847–0.866
+  vs place control 0.973–0.983; Colaba: both ~0.94–0.97): score percentiles within the
+  returned set and cut against the relative floor `skip-pool` prints — no fixed raw
+  threshold (0.45 retired).
 - **`filter.tags=<category>` keeps door lists door-shaped** — unfiltered brand-seeded
   rankings surface landmarks and retail instead of venues (17 Oct, trap 15).
 - **Validated vs silently ignored (16 Oct):** some parameters reject bad input loudly
