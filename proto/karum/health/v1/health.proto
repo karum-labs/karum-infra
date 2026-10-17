@@ -17,6 +17,7 @@ service HealthService {
 }
 
 // HealthCheckRequest asks for the status of one named service.
+// HealthCheckRequest asks for the status of one named service.
 message HealthCheckRequest {
   // service is the stable process name, e.g. "service-taste". An empty value
   // asks for the overall server status.

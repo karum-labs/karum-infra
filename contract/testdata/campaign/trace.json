@@ -1,0 +1,14 @@
+{
+  "id": "te-0007",
+  "jobId": "job-20261017-austin-01",
+  "traceId": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "sequence": "7",
+  "cursor": "b3B1ZTctMjAyNi0xMC0xN1QxNDowMDoyMVo=",
+  "stage": "TRACE_STAGE_DOOR_RANKING",
+  "status": "TRACE_STATUS_FINISHED",
+  "cacheHit": true,
+  "elapsedMs": 412,
+  "message": "ranked 25 places; 3 board doors, 2 skips",
+  "occurredAt": "2026-10-17T14:00:21Z",
+  "errorCode": "ERROR_CODE_UNSPECIFIED"
+}

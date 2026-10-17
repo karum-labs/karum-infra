@@ -3,11 +3,26 @@
 # This Makefile is the operator surface for the local dev stack. The prewarm and
 # eval targets are stubs until the sample-block fixtures and the leave-one-out
 # harness land (PLAN.md epics 7 and 5).
+#
+# Proto tooling: `make generate` emits the Go and Python stubs; `make
+# check-protos` runs lint, the provenance-marker check, and the cross-language
+# contract test. CI runs the generate step inside Docker (PLAN.md §1.4);
+# `make generate-docker` is the local equivalent.
+
+include versions.env
 
 COMPOSE ?= docker compose
 BUF ?= buf
+GO ?= go
+CONTRACT_OUT ?= contract/.out
+BUF_DOCKER_IMAGE ?= bufbuild/buf:$(BUF_VERSION)
 
-.PHONY: help up down logs test prewarm eval lint-proto breaking generate spike
+# Prefer the repo venv for the Python half of the contract test when it exists
+# (protobuf==7.36.2 lives there; see contract/pyrelay/requirements.txt).
+VENV_PYTHON := $(firstword $(wildcard .venv/Scripts/python.exe) $(wildcard .venv/bin/python))
+PYTHON ?= $(if $(VENV_PYTHON),$(VENV_PYTHON),python)
+
+.PHONY: help up down logs test prewarm eval lint-proto breaking generate generate-docker check-proto-docs contract-test check-protos spike
 
 ## help: list available targets.
 help:
@@ -51,9 +66,29 @@ lint-proto:
 breaking:
 	@python scripts/breaking.py --buf "$(BUF)"
 
-## generate: emit Go and Python stubs from the shared protos.
+## generate: emit Go and Python stubs from the shared protos (pinned BSR plugins).
 generate:
 	cd proto && $(BUF) generate
+
+## generate-docker: emit stubs inside the pinned buf container (the CI path).
+generate-docker:
+	docker run --rm -v "$(CURDIR):/workspace" -w /workspace/proto $(BUF_DOCKER_IMAGE) generate
+
+## check-proto-docs: enforce the Qloo-fact / model-inference markers on every domain field.
+check-proto-docs:
+	@python -c "import pathlib; pathlib.Path('gen').mkdir(exist_ok=True)"
+	cd proto && $(BUF) build --as-file-descriptor-set -o ../gen/descriptor.binpb
+	$(GO) run ./tools/doccheck gen/descriptor.binpb
+
+## contract-test: round-trip the sample campaign through the Go and Python stubs (needs `make generate`).
+contract-test:
+	@python -c "import pathlib; pathlib.Path('$(CONTRACT_OUT)').mkdir(parents=True, exist_ok=True)"
+	$(GO) run ./contract/roundtrip emit contract/testdata/campaign $(CONTRACT_OUT)
+	$(PYTHON) contract/pyrelay/roundtrip.py contract/testdata/campaign $(CONTRACT_OUT)
+	$(GO) run ./contract/roundtrip verify contract/testdata/campaign $(CONTRACT_OUT)
+
+## check-protos: lint, doc markers, and the stub contract test (run `make generate` first).
+check-protos: lint-proto check-proto-docs contract-test
 
 ## spike ARGS="key": run the Qloo spike runner (see spike/README.md).
 spike:

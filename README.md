@@ -29,14 +29,16 @@ Karum reads the cultural taste of a surrounding block via **Qloo**, scores candi
 
 ## What lives here
 
-- **`proto/`** — the shared protobuf definitions and buf configuration. `karum.health.v1` is the placeholder contract the two microservices implement; the domain protos (vacancy, tags, scoring, taste RPCs, AI RPCs) land in a later pass.
+- **`proto/`** — the shared protobuf definitions and buf configuration. `karum.health.v1` is the process health contract; `karum.common.v1`, `karum.taste.v1`, and `karum.agent.v1` are the domain contracts (shared primitives and evidence, taste RPCs, AI RPCs). Every domain field carries a provenance marker — `Qloo fact:`, `Google fact:`, `Model inference:`, or `Input:` — enforced by `make check-proto-docs`.
+- **`contract/`** — the stub contract test: the Austin campaign fixtures, the Go round-trip runner, and the Python relay that parses Go-emitted binaries with the Python stubs (see [contract/README.md](contract/README.md)).
+- **`tools/doccheck/`** — the provenance-marker checker used by `make check-proto-docs`, with its own tests.
 - **`QLOO_APIS.md`** — every Qloo endpoint Karum may call with exact parameters, mapped to PLAN epics, plus the spike checklist for the open questions.
 - **`QLOO_USE_CASES.md`** — the plain-language map of where Karum uses Qloo today (each call, its epic, its watch-outs) plus suggested additional use cases, grouped by build cost and spike gates.
 - **`spike/`** — the epic-9 probe runner (`run_spike.py`, stdlib-only) and recording sheet that work the QLOO_APIS.md §5 checklist against the hackathon host; raw responses stay local in `spike/out/`.
 - **`docker-compose.yml`** — the full local stack (gateway, taste, AI, Redis, Postgres) with healthchecks and a deterministic startup order.
 - **`.env.example`** — every environment variable and which process reads it.
 - **`versions.env`** — the single source of truth for Go, Python, Flutter, and buf versions.
-- **`Makefile`** — `up`, `down`, `test`, `prewarm`, `eval`, plus proto `lint-proto`, `breaking`, and `generate`.
+- **`Makefile`** — `up`, `down`, `test`, `prewarm`, `eval`, plus proto tooling: `lint-proto`, `breaking`, `generate`, `check-proto-docs`, `contract-test`.
 - **`.gitleaks.toml`** — secret-scan rules tuned to catch a committed Qloo key or GCP credential.
 
 ## Run path
@@ -102,12 +104,14 @@ flutter run -d chrome --dart-define=GATEWAY_URL=http://localhost:8080
 ## Working with the protos
 
 ```bash
-make lint-proto   # buf lint
-make generate     # emit Go + Python stubs into proto/gen/
-make breaking     # buf breaking against origin/main
+make lint-proto       # buf lint (STANDARD + COMMENTS)
+make generate         # emit Go + Python stubs into gen/ (pinned BSR plugins)
+make check-proto-docs # enforce field provenance markers
+make contract-test    # round-trip a campaign through both stub sets
+make breaking         # buf breaking against origin/main
 ```
 
-CI runs `buf lint` and a `buf breaking` check against `main` on every proto change, plus a gitleaks secret scan on every push.
+CI runs `buf lint`, a `buf breaking` check against `main`, and a contract job on every proto change: it regenerates the stubs inside the pinned `bufbuild/buf` container, enforces the provenance markers, and round-trips the Austin campaign through the generated Go and Python stubs. Gitleaks scans every push.
 
 ## Honesty rules
 

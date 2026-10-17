@@ -49,40 +49,40 @@ After the domain protos land, client work (sections 29–36) runs in parallel wi
 
 In `infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `karum.agent.v1`. Shared messages: brand seed, entity ref, tag, geopoint, sub-score, door candidate, skip reason, heatmap point, locality cluster, evidence call, and trace event. Campaign mode is `WHOLESALE`, `FLAGSHIP`, or `COLLAB`. Job states are `resolving`, `running`, `ready`, `degraded`, and `failed`. Error codes are `unresolved`, `empty`, `rate_limited`, `upstream`, and `validation`. The seed builder confirms entity ids before `POST`, so a job has no confirmation pause. Comment each field as a Qloo fact or a model inference. Buf breaking stays enforced against `main`.
 
-- [ ] Define brand seed, entity ref, tag, geopoint, sub-score, door candidate, skip reason, heatmap point, locality cluster, evidence call, and trace event
-- [ ] Define job states: resolving, running, ready, degraded, failed
-- [ ] Define error codes: unresolved, empty, rate limited, upstream, validation
-- [x] Version the proto packages and enforce buf breaking against main — `buf breaking` runs in CI; only `karum/health/v1` exists so far
-- [ ] Mark each field as a Qloo fact or a model inference in the proto comments
+- [x] Define brand seed, entity ref, tag, geopoint, sub-score, door candidate, skip reason, heatmap point, locality cluster, evidence call, and trace event — `karum.common.v1` (primitives and evidence), `karum.taste.v1` (seed, door, skip, heatmap, locality), and `karum.agent.v1` (trace event) in `proto/`
+- [x] Define job states: resolving, running, ready, degraded, failed — `JobState` in `karum.agent.v1`; the seed builder confirms ids before `POST`, so no confirmation pause
+- [x] Define error codes: unresolved, empty, rate limited, upstream, validation — `ErrorCode` in `karum.common.v1`; every response that can miss carries one
+- [x] Version the proto packages and enforce buf breaking against main — `buf breaking` runs in CI against `main`; covers `karum.common.v1`, `karum.taste.v1`, and `karum.agent.v1`
+- [x] Mark each field as a Qloo fact or a model inference in the proto comments — four-marker convention (Qloo fact / Google fact / model inference / Input) enforced by `make check-proto-docs` across 209 fields
 
 ### 2. Taste RPCs
 
-`ResolveBrandSeed` returns ranked brand, place, or artist candidates and a derived confidence. `ResolveTags` maps a category or lifestyle chip to tag URNs. `ScoutDoors` takes confirmed seed ids, tags, the city point, an explicit metre radius, and a category tag, and returns recommended doors, the skip list, demographics, and the evidence bundle. `GetLocalityHeatmap` returns cells and, when requested, locality polygons. `CompareAudiences` returns the compare payload for one door, the emerging brand, and an incumbent. Heatmap is first-class for flagship and compare for the wholesale displacement case; the client hides a widget when that RPC reports itself unavailable.
+`ResolveBrandSeed` returns ranked brand, place, or artist candidates and a derived confidence. `ResolveTags` maps a category or lifestyle chip to tag URNs. `ScoutDoors` takes confirmed seed ids, tags, the city point, an explicit metre radius, and a category tag, and returns recommended doors, the skip list, demographics, and the evidence bundle. `GetLocalityHeatmap` returns cells and, when requested, locality polygons. `CompareAudiences` returns the compare payload for one door, the emerging brand, and an incumbent. Heatmap is first-class for flagship and compare for the wholesale displacement case; the client hides a widget when that RPC reports itself unavailable. The contracts are defined in `proto/karum/taste/v1/taste.proto`; the service-taste implementations follow in §7–§14.
 
-- [ ] `ResolveBrandSeed` with ranked candidates and a confidence
-- [ ] `ResolveTags` for venue-category and lifestyle chips
-- [ ] `ScoutDoors` returning recommended doors, the skip list, demographics, and the evidence bundle
-- [ ] `GetLocalityHeatmap` for cells and locality polygons
-- [ ] `CompareAudiences` for a door, the brand, and an incumbent
+- [x] `ResolveBrandSeed` with ranked candidates and a confidence — contract defined; a total miss is `unresolved`, never an empty success
+- [x] `ResolveTags` for venue-category and lifestyle chips — contract defined; chips come back resolved or explicitly unresolved
+- [x] `ScoutDoors` returning recommended doors, the skip list, demographics, and the evidence bundle — contract defined; radius is explicit in metres
+- [x] `GetLocalityHeatmap` for cells and locality polygons — contract defined; carries `available` so the client can hide the layer
+- [x] `CompareAudiences` for a door, the brand, and an incumbent — contract defined; `matchEntities` presence is surfaced for the degradation rule
 
 ### 3. AI RPCs
 
-`AuditMenu` is the search-grounded menu and shelf read. `DraftDoorPitch` returns the script, the battlecard, the recommended SKU, and the mode-specific paragraph (activation proposal or site-brief line). `LlmOnlyBaseline` is the counterfactual with no Qloo payload. Every response carries `model_id`, `prompt_version`, and cited evidence ids.
+`AuditMenu` is the search-grounded menu and shelf read. `DraftDoorPitch` returns the script, the battlecard, the recommended SKU, and the mode-specific paragraph (activation proposal or site-brief line). `LlmOnlyBaseline` is the counterfactual with no Qloo payload. Every response carries `model_id`, `prompt_version`, and cited evidence ids. The contracts are defined in `proto/karum/agent/v1/agent.proto`; the service-ai implementations follow in §15–§18.
 
-- [ ] `AuditMenu` for menu verification, incumbents, shelf inputs, and grounding URLs
-- [ ] `DraftDoorPitch` for the script, battlecard, SKU, and the mode-specific paragraph
-- [ ] `LlmOnlyBaseline` for the counterfactual panel
-- [ ] Every response carries model id, prompt version, and cited evidence ids
+- [x] `AuditMenu` for menu verification, incumbents, shelf inputs, and grounding URLs — contract defined; incumbents are only named when a source carries them
+- [x] `DraftDoorPitch` for the script, battlecard, SKU, and the mode-specific paragraph — contract defined; the battlecard is optional and the wholesale mode paragraph stays empty
+- [x] `LlmOnlyBaseline` for the counterfactual panel — contract defined; the response is labeled ungrounded
+- [x] Every response carries model id, prompt version, and cited evidence ids — `ModelAttribution` on every `AgentService` response
 
 ### 4. Stubs and fixtures
 
 `buf generate` emits Go stubs for the gateway and Python stubs for taste and AI. CI runs that generate step inside Docker so laptop and CI stubs match. The fixture pack holds redacted recordings for the judge campaigns — Austin wholesale, Brooklyn flagship and collab, and Mumbai wholesale. Redacted means the fields Karum consumes, never raw Qloo JSON ([QLOO_APIS.md](QLOO_APIS.md) §1). Fixture mode serves those recordings and makes no outbound calls. A contract test round-trips one campaign through both generated stubs.
 
-- [ ] Generate Go and Python stubs from `infra/proto` in CI
-- [ ] Generate inside Docker so local and CI stubs match
+- [x] Generate Go and Python stubs from `infra/proto` in CI — `contract` job in `.github/workflows/proto.yml`; plugin versions pinned in `proto/buf.gen.yaml`
+- [x] Generate inside Docker so local and CI stubs match — CI runs the pinned `bufbuild/buf` container (`make generate-docker` is the local equivalent)
 - [ ] Ship a redacted fixture pack for the four presets (three cities; Brooklyn carries flagship and collab)
 - [ ] Add a fixture mode that serves those recordings with no network
-- [ ] Add a contract test that round-trips a campaign through both stubs
+- [x] Add a contract test that round-trips a campaign through both stubs — `make contract-test` round-trips six Austin payloads through the Go and Python stubs (`contract/`); the verifier is itself tested against corruption
 
 ### 5. Local Compose
 

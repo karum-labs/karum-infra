@@ -1,0 +1,6 @@
+# Runtime for the Python half of the contract round-trip (contract/pyrelay).
+#
+# Must match the generator pin buf.build/protocolbuffers/python:v36.2 in
+# proto/buf.gen.yaml; the generated modules carry
+# "Protobuf Python Version: 7.36.2" and validate the runtime version on import.
+protobuf==7.36.2

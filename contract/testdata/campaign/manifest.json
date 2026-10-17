@@ -1,0 +1,10 @@
+{
+  "messages": [
+    { "name": "seed", "type": "karum.taste.v1.ResolveBrandSeedResponse", "file": "seed.json" },
+    { "name": "scout", "type": "karum.taste.v1.ScoutDoorsResponse", "file": "scout.json" },
+    { "name": "audit", "type": "karum.agent.v1.AuditMenuResponse", "file": "audit.json" },
+    { "name": "pitch", "type": "karum.agent.v1.DraftDoorPitchResponse", "file": "pitch.json" },
+    { "name": "baseline", "type": "karum.agent.v1.LlmOnlyBaselineResponse", "file": "baseline.json" },
+    { "name": "trace", "type": "karum.agent.v1.TraceEvent", "file": "trace.json" }
+  ]
+}

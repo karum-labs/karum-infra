@@ -1,0 +1,197 @@
+syntax = "proto3";
+
+// Package karum.common.v1 holds the vocabulary shared by the two domain
+// contracts: geographic and entity primitives, provenance markers, the error
+// taxonomy, evidence records, and the per-request metadata every RPC carries.
+//
+// Provenance marker convention (PLAN.md §1, §24, §32, §40). Every field of the
+// domain packages (karum.common.v1, karum.taste.v1, karum.agent.v1) opens its
+// comment with exactly one marker, enforced by `make check-proto-docs`:
+//
+//   Qloo fact:        the value comes from Qloo.
+//   Google fact:      the value comes from Google (Geocoder, Places, Routes).
+//   Model inference:  the value is derived by Karum or written by Gemini.
+//   Input:            operator-supplied or bookkeeping; never rendered as
+//                     evidence.
+//
+// Fields of a message whose name ends in "Request" always use "Input:". The
+// Flutter client and the run-sheet PDF render Qloo facts and model inferences
+// visually distinct, using these markers as the single source of truth.
+package karum.common.v1;
+
+// GeoPoint is a WGS-84 point with decimal degrees.
+//
+// Qloo location parameters are surface-specific (DI-21): `/search` takes a
+// bare `lat,lon` pair, insights calls take WKT `POINT(lon lat)` plus an
+// explicit metre radius. This message holds the point itself; each caller
+// formats it for its own surface.
+message GeoPoint {
+  // Qloo fact: latitude in decimal degrees (WGS-84) of a venue or cell row;
+  // request payloads reuse this message for the geocoded city point and note
+  // the Google provenance on the request field itself.
+  double latitude = 1;
+
+  // Qloo fact: longitude in decimal degrees (WGS-84) of a venue or cell row;
+  // request payloads reuse this message for the geocoded city point.
+  double longitude = 2;
+}
+
+// EvidenceSource names where a value or a call record came from. It is the
+// machine-readable half of the honesty rules (PLAN.md §40): the client styles
+// by source, the PDF splits facts from inferences by this field.
+enum EvidenceSource {
+  // EVIDENCE_SOURCE_UNSPECIFIED is unset; never sent on the wire.
+  EVIDENCE_SOURCE_UNSPECIFIED = 0;
+
+  // EVIDENCE_SOURCE_QLOO is the Qloo Taste Graph API.
+  EVIDENCE_SOURCE_QLOO = 1;
+
+  // EVIDENCE_SOURCE_GOOGLE is Google, across the Geocoder, Places, and Routes
+  // APIs.
+  EVIDENCE_SOURCE_GOOGLE = 2;
+
+  // EVIDENCE_SOURCE_VERTEX is Gemini on Vertex AI, including Google Search
+  // grounding.
+  EVIDENCE_SOURCE_VERTEX = 3;
+
+  // EVIDENCE_SOURCE_KARUM is a Karum-internal derivation: normalization,
+  // scoring, joins, and rank freezing.
+  EVIDENCE_SOURCE_KARUM = 4;
+}
+
+// ErrorCode is the shared failure taxonomy (PLAN.md §1). Every response that
+// can miss or fail carries one; ERROR_CODE_UNSPECIFIED means success.
+enum ErrorCode {
+  // ERROR_CODE_UNSPECIFIED means the call succeeded.
+  ERROR_CODE_UNSPECIFIED = 0;
+
+  // ERROR_CODE_UNRESOLVED means a seed or a chip resolved to nothing. It is a
+  // miss rendered as a miss, never a filled-in guess (PLAN.md §8, §14, §40).
+  ERROR_CODE_UNRESOLVED = 1;
+
+  // ERROR_CODE_EMPTY means the query ran but matched nothing, for example a
+  // category filter with no doors; the response names the category
+  // (PLAN.md §14).
+  ERROR_CODE_EMPTY = 2;
+
+  // ERROR_CODE_RATE_LIMITED means an upstream refused the call for rate; the
+  // caller may retry after the backoff the client already applied.
+  ERROR_CODE_RATE_LIMITED = 3;
+
+  // ERROR_CODE_UPSTREAM means an upstream returned an unexpected error; the
+  // detail stays in the redacted evidence record.
+  ERROR_CODE_UPSTREAM = 4;
+
+  // ERROR_CODE_VALIDATION means the request itself was unusable and nothing
+  // was sent upstream.
+  ERROR_CODE_VALIDATION = 5;
+}
+
+// EntityRef identifies one resolved entity: a venue, brand, or artist row the
+// seed builder confirms before POST.
+message EntityRef {
+  // Qloo fact: the Qloo entity id (UUID form), e.g.
+  // "68A744F0-1CE7-4C73-9A60-80C7A5713F72" for Leopold Cafe.
+  string id = 1;
+
+  // Qloo fact: the entity type URN; one of urn:entity:place,
+  // urn:entity:brand, or urn:entity:artist — the three types the 17 Oct
+  // extension verified as resolving on `/search` (E5).
+  string type = 2;
+
+  // Qloo fact: the display name as Qloo returns it.
+  string name = 3;
+
+  // Google fact: the geocoded city label used for the name-collision check —
+  // Perry's resolves to San Antonio, Uchi to London, Blind Pig to Kharkiv
+  // (RECORDING.md trap 16).
+  string city = 4;
+}
+
+// Tag is one resolved tag URN.
+message Tag {
+  // Qloo fact: the tag URN, e.g. "urn:tag:genre:place:restaurant:bar" — the
+  // spelling the 17 Oct extension verified for door-shaped rankings (E3).
+  string urn = 1;
+
+  // Qloo fact: the human-readable label, e.g. "Bars".
+  string label = 2;
+
+  // Qloo fact: the tag namespace, e.g. "urn:tag:genre". The namespace
+  // allow-list limits what the pitch tries to explain (PLAN.md §9).
+  string type = 3;
+
+  // Model inference: derived confidence for an accepted free-text chip.
+  // `/v2/tags` publishes no score, so a chip is accepted only on a confident
+  // derived hit (PLAN.md §9); preset chips carry the confidence the mapping
+  // assigns.
+  double score = 4;
+}
+
+// SubScore is one 0–1 term of the door composite, with its inputs written
+// beside it so every number can be audited (PLAN.md §11). The gateway computes
+// S_door = 0.50 · A_taste + 0.30 · O_shelf + 0.20 · D_demo from these terms
+// and displays 100 × S_door; when the shelf term is unknown the composite
+// renormalizes over affinity and demographics.
+message SubScore {
+  // Input: the stable machine name, e.g. "cultural_affinity",
+  // "shelf_opportunity", or "demographic_alignment".
+  string name = 1;
+
+  // Model inference: the normalized 0–1 value used in the composite. For
+  // cultural affinity this is the percentile inside the returned shortlist,
+  // because raw affinity bands move with the seed and the city (trap 14).
+  double value = 2;
+
+  // Qloo fact: the raw upstream value retained for the evidence drawer — for
+  // cultural affinity the raw affinity (Austin brand seed observed 0.847–0.866
+  // on 17 Oct).
+  double raw_value = 3;
+
+  // Qloo fact: the inputs recorded beside the score — rank, weights, and the
+  // upstream call that produced the raw value.
+  repeated string inputs = 4;
+
+  // Input: which upstream produced the raw value.
+  EvidenceSource source = 5;
+}
+
+// EvidenceCall is one outbound call the evidence drawer lists (PLAN.md §32):
+// endpoint, redacted parameters, result count, latency, and failure detail.
+// A call id is the citation drafts use — every number in the pitch cites one.
+message EvidenceCall {
+  // Input: the citation id, e.g. "ev-0007", unique inside a run.
+  string id = 1;
+
+  // Input: the upstream this call went to.
+  EvidenceSource source = 2;
+
+  // Input: the redacted endpoint, e.g. "GET /v2/insights".
+  string endpoint = 3;
+
+  // Input: the redacted request parameters. The API key never appears here
+  // (PLAN.md §7).
+  string parameters = 4;
+
+  // Qloo fact: how many rows the call returned.
+  int32 result_count = 5;
+
+  // Input: measured wall time in milliseconds.
+  int32 latency_ms = 6;
+
+  // Input: the failure classification; ERROR_CODE_UNSPECIFIED on success.
+  ErrorCode error_code = 7;
+
+  // Input: redacted failure detail for the drawer; empty on success.
+  string error_message = 8;
+}
+
+// RequestMeta travels on every RPC so one trace id follows a campaign from
+// Flutter through the gateway into taste and AI log lines (PLAN.md §43).
+message RequestMeta {
+  // Input: the trace id generated on POST /api/v1/scout.
+  string trace_id = 1;
+
+  // Input: the gateway job id the call belongs to.
+  string job_id = 2;
+}

@@ -7,8 +7,9 @@
 credentials*.json
 service-account*.json
 
-# Generated proto stubs (emitted by `make generate`, not committed)
-proto/gen/
+# Generated proto stubs and descriptor sets (emitted by `make generate`, not
+# committed)
+gen/
 
 # Tool / build caches
 .buf/
@@ -36,5 +37,11 @@ coverage.out
 spike/out/
 spike/state.json
 
+# Contract-test artifacts (binaries emitted during the stub round-trip).
+contract/.out/
+
 # Python bytecode
 __pycache__/
+
+# Local virtualenvs (proto contract test, spikes).
+.venv/

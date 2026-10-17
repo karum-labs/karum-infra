@@ -10,6 +10,7 @@ modules:
 lint:
   use:
     - STANDARD
+    - COMMENTS
   except:
     # Package version suffix (v1) is already enforced by DIRECTORY_SAME_PACKAGE;
     # we keep RPC request/response naming conventional.

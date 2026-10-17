@@ -1,0 +1,205 @@
+{
+  "doors": [
+    {
+      "entity": {
+        "id": "1F0E9D8C-7B6A-4593-8C2D-1E0F2A3B4C10",
+        "type": "urn:entity:place",
+        "name": "Whisler's",
+        "city": "Austin"
+      },
+      "affinity": {
+        "name": "cultural_affinity",
+        "value": 1.0,
+        "rawValue": 0.8655,
+        "inputs": ["rank 1 of 25 returned", "seed: Ilegal Mezcal, Aesop, Khruangbin"],
+        "source": "EVIDENCE_SOURCE_QLOO"
+      },
+      "demographicAlignment": {
+        "name": "demographic_alignment",
+        "value": 0.82,
+        "inputs": ["age 25_34 delta +0.18", "age 35_44 delta +0.09", "male delta -0.04", "female delta +0.06"],
+        "source": "EVIDENCE_SOURCE_KARUM"
+      },
+      "sharedTags": [
+        { "urn": "urn:tag:genre:place:restaurant:bar", "label": "Bars", "type": "urn:tag:genre", "score": 0.91 },
+        { "urn": "urn:tag:genre:place:restaurant:cocktail_bar", "label": "Cocktail Bars", "type": "urn:tag:genre", "score": 0.88 }
+      ],
+      "explainability": [
+        { "entityId": "5C2C4D4C-3E3F-4A3A-9F2E-2F0A6C7B1A01", "score": 0.354, "label": "Ilegal Mezcal" },
+        { "entityId": "9D8C7B6A-5E4F-4D3C-2B1A-0F9E8D7C6B03", "score": 0.211, "label": "Khruangbin" }
+      ],
+      "demographics": {
+        "ageBuckets": [
+          { "label": "25_34", "delta": 0.18 },
+          { "label": "35_44", "delta": 0.09 },
+          { "label": "45_54", "delta": 0.03 }
+        ],
+        "maleDelta": -0.04,
+        "femaleDelta": 0.06
+      },
+      "distanceMeters": 1240.5,
+      "outsideCity": false,
+      "rank": 1,
+      "evidenceIds": ["ev-0001", "ev-0004"]
+    },
+    {
+      "entity": {
+        "id": "2A1B0C3D-4E5F-4A6B-9C8D-7E6F5A4B3C20",
+        "type": "urn:entity:place",
+        "name": "Here Nor There",
+        "city": "Austin"
+      },
+      "affinity": {
+        "name": "cultural_affinity",
+        "value": 0.6667,
+        "rawValue": 0.8521,
+        "inputs": ["rank 2 of 25 returned", "seed: Ilegal Mezcal, Aesop, Khruangbin"],
+        "source": "EVIDENCE_SOURCE_QLOO"
+      },
+      "demographicAlignment": {
+        "name": "demographic_alignment",
+        "value": 0.74,
+        "inputs": ["age 25_34 delta +0.11", "age 35_44 delta +0.06", "male delta +0.02", "female delta -0.01"],
+        "source": "EVIDENCE_SOURCE_KARUM"
+      },
+      "sharedTags": [
+        { "urn": "urn:tag:genre:place:restaurant:cocktail_bar", "label": "Cocktail Bars", "type": "urn:tag:genre", "score": 0.9 },
+        { "urn": "urn:tag:genre:place:restaurant:speakeasy", "label": "Speakeasies", "type": "urn:tag:genre", "score": 0.84 }
+      ],
+      "explainability": [
+        { "entityId": "5C2C4D4C-3E3F-4A3A-9F2E-2F0A6C7B1A01", "score": 0.301, "label": "Ilegal Mezcal" },
+        { "entityId": "7A1B0C2D-4E5F-4A6B-8C7D-9E0F1A2B3C02", "score": 0.184, "label": "Aesop" }
+      ],
+      "demographics": {
+        "ageBuckets": [
+          { "label": "25_34", "delta": 0.11 },
+          { "label": "35_44", "delta": 0.06 }
+        ],
+        "maleDelta": 0.02,
+        "femaleDelta": -0.01
+      },
+      "distanceMeters": 3120.8,
+      "outsideCity": false,
+      "rank": 2,
+      "evidenceIds": ["ev-0001", "ev-0002", "ev-0004"]
+    },
+    {
+      "entity": {
+        "id": "3B2C1D4E-5F6A-4B7C-8D9E-0F1A2B3C4D30",
+        "type": "urn:entity:place",
+        "name": "Midnight Cowboy",
+        "city": "Austin"
+      },
+      "affinity": {
+        "name": "cultural_affinity",
+        "value": 0.3333,
+        "rawValue": 0.8417,
+        "inputs": ["rank 3 of 25 returned", "seed: Ilegal Mezcal, Aesop, Khruangbin"],
+        "source": "EVIDENCE_SOURCE_QLOO"
+      },
+      "demographicAlignment": {
+        "name": "demographic_alignment",
+        "value": 0.69,
+        "inputs": ["age 25_34 delta +0.07", "age 35_44 delta +0.03", "male delta +0.01", "female delta +0.02"],
+        "source": "EVIDENCE_SOURCE_KARUM"
+      },
+      "sharedTags": [
+        { "urn": "urn:tag:genre:place:restaurant:cocktail_bar", "label": "Cocktail Bars", "type": "urn:tag:genre", "score": 0.87 },
+        { "urn": "urn:tag:genre:place:restaurant:speakeasy", "label": "Speakeasies", "type": "urn:tag:genre", "score": 0.81 }
+      ],
+      "explainability": [
+        { "entityId": "5C2C4D4C-3E3F-4A3A-9F2E-2F0A6C7B1A01", "score": 0.288, "label": "Ilegal Mezcal" },
+        { "entityId": "9D8C7B6A-5E4F-4D3C-2B1A-0F9E8D7C6B03", "score": 0.166, "label": "Khruangbin" }
+      ],
+      "demographics": {
+        "ageBuckets": [
+          { "label": "25_34", "delta": 0.07 },
+          { "label": "35_44", "delta": 0.03 }
+        ],
+        "maleDelta": 0.01,
+        "femaleDelta": 0.02
+      },
+      "distanceMeters": 2055.1,
+      "outsideCity": false,
+      "rank": 3,
+      "evidenceIds": ["ev-0001", "ev-0002"]
+    }
+  ],
+  "skipList": [
+    {
+      "entity": {
+        "id": "4C3D2E1F-6A5B-4C8D-9E0F-1A2B3C4D5E40",
+        "type": "urn:entity:place",
+        "name": "Perry's Steakhouse & Grille",
+        "city": "San Antonio"
+      },
+      "affinity": {
+        "name": "cultural_affinity",
+        "value": 0.04,
+        "rawValue": 0.7904,
+        "inputs": ["raw affinity below shortlist floor 0.828"],
+        "source": "EVIDENCE_SOURCE_QLOO"
+      },
+      "reason": "SKIP_REASON_CODE_OUTSIDE_CITY",
+      "reasonDetail": "resolved row is Perry's, San Antonio — outside Austin (name collision, trap 16)",
+      "competitorCount": 0
+    },
+    {
+      "entity": {
+        "id": "5D4E3F2A-7B6C-4D9E-0F1A-2B3C4D5E6F50",
+        "type": "urn:entity:place",
+        "name": "The Jackalope",
+        "city": "Austin"
+      },
+      "affinity": {
+        "name": "cultural_affinity",
+        "value": 0.08,
+        "rawValue": 0.8115,
+        "inputs": ["raw affinity 0.8115 below shortlist floor 0.828 (bottom decile)"],
+        "source": "EVIDENCE_SOURCE_QLOO"
+      },
+      "reason": "SKIP_REASON_CODE_LOW_AFFINITY",
+      "reasonDetail": "raw affinity 0.8115 below the returned shortlist floor 0.828 (bottom decile)",
+      "competitorCount": 0
+    }
+  ],
+  "warnings": [
+    "qloo: signal entity 68A7B9C2-5D4E-4F3A-9B8C-7D6E5F4A3B21 (Madre Mezcal) returned not_found; the run proceeds with the remaining seed",
+    "affinity: floor 0.828 is the returned set's low decile, not an absolute threshold"
+  ],
+  "errorCode": "ERROR_CODE_UNSPECIFIED",
+  "evidence": [
+    {
+      "id": "ev-0001",
+      "source": "EVIDENCE_SOURCE_QLOO",
+      "endpoint": "GET /v2/insights",
+      "parameters": "filter.type=urn:entity:place, filter.tags=urn:tag:genre:place:restaurant:bar, filter.location=POINT(-97.7431 30.2672), filter.radius=8000, take=25",
+      "resultCount": 25,
+      "latencyMs": 412
+    },
+    {
+      "id": "ev-0002",
+      "source": "EVIDENCE_SOURCE_QLOO",
+      "endpoint": "GET /v2/insights",
+      "parameters": "filter.results.entities=[5 shortlist ids], signal.interests.entities=[3 seed ids], take=5",
+      "resultCount": 5,
+      "latencyMs": 380
+    },
+    {
+      "id": "ev-0003",
+      "source": "EVIDENCE_SOURCE_QLOO",
+      "endpoint": "GET /v2/insights",
+      "parameters": "filter.results.entities=[5 skip candidates], take=5",
+      "resultCount": 5,
+      "latencyMs": 402
+    },
+    {
+      "id": "ev-0004",
+      "source": "EVIDENCE_SOURCE_QLOO",
+      "endpoint": "GET /v2/insights",
+      "parameters": "filter.results.entities=[5 shortlist ids], query.explainability=true, query.popularity=true",
+      "resultCount": 5,
+      "latencyMs": 355
+    }
+  ]
+}

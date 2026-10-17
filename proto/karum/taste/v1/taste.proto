@@ -1,0 +1,530 @@
+syntax = "proto3";
+
+// Package karum.taste.v1 is the taste contract: brand-seed resolution, tag
+// resolution, door scouting with the affinity and demographic terms, the
+// flagship heatmap, and the conquest-compare payload.
+//
+// service-taste implements this service; the Go gateway is the only caller.
+// Every Qloo-facing parameter in this contract was verified by the 16 Oct
+// spike or the 17 Oct extension (QLOO_APIS.md, spike/RECORDING.md); unverified
+// spellings do not appear here (PLAN.md §40 honesty rules).
+//
+// Field comments carry the provenance marker convention documented in
+// karum/common/v1/common.proto.
+package karum.taste.v1;
+
+import "karum/common/v1/common.proto";
+
+// TasteService is implemented by service-taste and called by the Go gateway
+// over gRPC. Heatmap is first-class for flagship and compare for the wholesale
+// displacement case; the client hides a widget when a capability reports
+// itself unavailable (PLAN.md §2).
+service TasteService {
+  // ResolveBrandSeed resolves the brand query and each fallback vibe query
+  // through `GET /search` and returns ranked candidates with a derived
+  // confidence. The default match sort is kept — `sort_by=distance` turns a
+  // name query into nearest venues (trap 7). A total miss is
+  // ERROR_CODE_UNRESOLVED, not an empty success (PLAN.md §8).
+  rpc ResolveBrandSeed(ResolveBrandSeedRequest) returns (ResolveBrandSeedResponse);
+
+  // ResolveTags maps category and lifestyle chips onto verified tag URNs via
+  // `GET /v2/tags`. A chip with no confident hit comes back unresolved
+  // (PLAN.md §9).
+  rpc ResolveTags(ResolveTagsRequest) returns (ResolveTagsResponse);
+
+  // ScoutDoors fans out the verified insights calls for a confirmed seed and
+  // returns recommended doors, the relative skip list, demographics, and the
+  // evidence bundle (PLAN.md §10, §11).
+  rpc ScoutDoors(ScoutDoorsRequest) returns (ScoutDoorsResponse);
+
+  // GetLocalityHeatmap returns heatmap cells for the seed at the preset
+  // radius and, when requested, locality polygons for the corridors
+  // (PLAN.md §12).
+  rpc GetLocalityHeatmap(GetLocalityHeatmapRequest) returns (GetLocalityHeatmapResponse);
+
+  // CompareAudiences returns the compare payload for one door against the
+  // emerging brand and an incumbent found on the menu. `matchEntities` is
+  // parsed and treated as empty when the payload has none (DI-22,
+  // PLAN.md §12).
+  rpc CompareAudiences(CompareAudiencesRequest) returns (CompareAudiencesResponse);
+}
+
+// SeedQuery is one query of the seed: the brand query, or one fallback vibe
+// query (PLAN.md §8).
+message SeedQuery {
+  // Input: the query text as typed or preset.
+  string text = 1;
+
+  // Qloo fact: the entity rows the query returned, best match first.
+  repeated karum.common.v1.EntityRef matches = 2;
+
+  // Model inference: whether the query produced at least one usable match; a
+  // partial seed — some queries hit, one misses — is allowed and lowers the
+  // seed confidence (PLAN.md §14).
+  bool resolved = 3;
+
+  // Model inference: a short note when the query missed or matched a
+  // different city.
+  string note = 4;
+}
+
+// BrandSeed is the confirmed seed a scout starts from: one resolved brand plus
+// any vibe chips, or a two-to-four-entity composite, never more than four
+// entities in total (PLAN.md §26, §29).
+message BrandSeed {
+  // Input: the brand name or preset text the operator entered.
+  string brand_text = 1;
+
+  // Qloo fact: the confirmed seed entity ids, one to four, each carrying its
+  // Qloo type and display name.
+  repeated karum.common.v1.EntityRef entities = 2;
+
+  // Qloo fact: the lifestyle tags attached to the seed.
+  repeated karum.common.v1.Tag tags = 3;
+
+  // Qloo fact: the per-query outcomes that built the seed, kept so the
+  // evidence panel can show a partial seed honestly.
+  repeated SeedQuery queries = 4;
+
+  // Model inference: derived confidence for the whole seed; reduced when the
+  // seed is partial.
+  double confidence = 5;
+
+  // Model inference: true when at least one query missed.
+  bool partial = 6;
+}
+
+// SeedCandidate is one ranked candidate the seed builder renders as a confirm
+// chip.
+message SeedCandidate {
+  // Qloo fact: the resolved entity row.
+  karum.common.v1.EntityRef entity = 1;
+
+  // Model inference: derived confidence from rank and name match; `/search`
+  // publishes no score (PLAN.md §8).
+  double confidence = 2;
+
+  // Model inference: true when the name is common or the hit is otherwise
+  // unsafe to auto-confirm; the seed builder asks the operator to pick
+  // (PLAN.md §8).
+  bool ambiguous = 3;
+
+  // Model inference: true when the row's city matches the preset city; the
+  // pick prefers this row (trap 16).
+  bool in_city = 4;
+
+  // Input: which query produced this row, e.g. "Sola" or "mezcal".
+  string matched_query = 5;
+}
+
+// ResolveBrandSeedRequest asks for ranked candidates for the brand query and
+// each fallback vibe query.
+message ResolveBrandSeedRequest {
+  // Input: trace and job ids for log propagation.
+  karum.common.v1.RequestMeta meta = 1;
+
+  // Input: the brand query text.
+  string brand_query = 2;
+
+  // Input: fallback vibe queries, resolved in order when the brand query
+  // misses or is thin.
+  repeated string fallback_queries = 3;
+
+  // Input: the geocoded city point, used to prefer the right city's row; the
+  // bare `lat,lon` form is formatted by the service (DI-21).
+  karum.common.v1.GeoPoint location = 4;
+
+  // Input: the geocoded city label the collision check compares against.
+  string city = 5;
+
+  // Input: how many candidates to return per query; the spike used take 5.
+  int32 take = 6;
+}
+
+// ResolveBrandSeedResponse returns the ranked candidates and a derived
+// confidence.
+message ResolveBrandSeedResponse {
+  // Qloo fact: the ranked candidates across the brand query and fallbacks.
+  repeated SeedCandidate candidates = 1;
+
+  // Model inference: the aggregate confidence for the seed as a whole.
+  double confidence = 2;
+
+  // Model inference: true when nothing resolved; pair it with
+  // ERROR_CODE_UNRESOLVED and name the miss in error_message.
+  bool unresolved = 3;
+
+  // Input: the failure classification; ERROR_CODE_UNSPECIFIED on success.
+  karum.common.v1.ErrorCode error_code = 4;
+
+  // Input: the operator-readable miss explanation.
+  string error_message = 5;
+
+  // Input: the call records for the evidence drawer.
+  repeated karum.common.v1.EvidenceCall evidence = 6;
+}
+
+// ResolvedTag is one chip mapped onto a verified tag URN.
+message ResolvedTag {
+  // Input: the chip text the caller sent.
+  string chip = 1;
+
+  // Qloo fact: the tag URN the chip maps to.
+  karum.common.v1.Tag tag = 2;
+
+  // Model inference: derived confidence; `/v2/tags` publishes no score
+  // (PLAN.md §9).
+  double confidence = 3;
+
+  // Input: true when the chip arrived as free text rather than a preset chip.
+  bool free_text = 4;
+}
+
+// UnresolvedTag is one chip the service refused to guess on; the UI shows the
+// miss instead (PLAN.md §9, §40).
+message UnresolvedTag {
+  // Input: the chip text the caller sent.
+  string chip = 1;
+
+  // Model inference: why the chip is unresolved, e.g. "no confident hit".
+  string reason = 2;
+}
+
+// ResolveTagsRequest maps chips onto tag URNs.
+message ResolveTagsRequest {
+  // Input: trace and job ids for log propagation.
+  karum.common.v1.RequestMeta meta = 1;
+
+  // Input: the venue-category and lifestyle chips to resolve.
+  repeated string chips = 2;
+}
+
+// ResolveTagsResponse splits chips into resolved and unresolved.
+message ResolveTagsResponse {
+  // Qloo fact: the chips that mapped onto verified URNs.
+  repeated ResolvedTag resolved = 1;
+
+  // Model inference: the chips left unresolved; rendered as misses.
+  repeated UnresolvedTag unresolved = 2;
+
+  // Input: the failure classification; ERROR_CODE_UNSPECIFIED on success.
+  karum.common.v1.ErrorCode error_code = 3;
+
+  // Input: the operator-readable explanation.
+  string error_message = 4;
+
+  // Input: the call records for the evidence drawer.
+  repeated karum.common.v1.EvidenceCall evidence = 5;
+}
+
+// ExplainabilityContribution is one seed input's contribution to a door's
+// affinity, straight from `feature.explainability=true` (PLAN.md §10).
+message ExplainabilityContribution {
+  // Qloo fact: the contributing seed entity id.
+  string entity_id = 1;
+
+  // Qloo fact: the contribution score Qloo reports for this input.
+  double score = 2;
+
+  // Qloo fact: the seed entity's display name when known, so the drawer needs
+  // no second lookup.
+  string label = 3;
+}
+
+// DemographicBucket is one age bucket of a venue's demographic profile; the
+// spike confirmed fine buckets only, deltas within ±0.5 (item 17).
+message DemographicBucket {
+  // Qloo fact: the bucket label, e.g. "25_34" through "55_and_older".
+  string label = 1;
+
+  // Qloo fact: the bucket's delta versus the population baseline.
+  double delta = 2;
+}
+
+// DemographicProfile is one entity's demographic alignment inputs.
+message DemographicProfile {
+  // Qloo fact: the age buckets with their deltas.
+  repeated DemographicBucket age_buckets = 1;
+
+  // Qloo fact: the male delta versus baseline.
+  double male_delta = 2;
+
+  // Qloo fact: the female delta versus baseline.
+  double female_delta = 3;
+}
+
+// DoorCandidate is one ranked door with its sub-scores, shared tags, and
+// explainability contributions.
+message DoorCandidate {
+  // Qloo fact: the venue row.
+  karum.common.v1.EntityRef entity = 1;
+
+  // Qloo fact: the cultural-affinity bundle — raw affinity plus the derived
+  // percentile `A_taste` kept beside it (PLAN.md §11).
+  karum.common.v1.SubScore affinity = 2;
+
+  // Model inference: the demographic-alignment bundle `D_demo`, mapped onto
+  // the brand's target cohort plus heatmap intensity (PLAN.md §11).
+  karum.common.v1.SubScore demographic_alignment = 3;
+
+  // Qloo fact: the taste tags this door shares with the seed.
+  repeated karum.common.v1.Tag shared_tags = 4;
+
+  // Qloo fact: the per-input explainability contributions.
+  repeated ExplainabilityContribution explainability = 5;
+
+  // Qloo fact: the door's demographic profile.
+  DemographicProfile demographics = 6;
+
+  // Model inference: straight-line distance from the preset point, computed
+  // after the call.
+  double distance_meters = 7;
+
+  // Model inference: true when the venue resolves outside the geocoded city;
+  // the card flags it (PLAN.md §14).
+  bool outside_city = 8;
+
+  // Model inference: the frozen server rank; the client renders this order
+  // and never re-sorts (PLAN.md §32).
+  int32 rank = 9;
+
+  // Input: the evidence ids this door's numbers cite.
+  repeated string evidence_ids = 10;
+}
+
+// SkipReasonCode classifies why a candidate sits on the skip list; reasons are
+// machine-readable and rendered as copy (PLAN.md §11, §32).
+enum SkipReasonCode {
+  // SKIP_REASON_CODE_UNSPECIFIED is unset; never sent on the wire.
+  SKIP_REASON_CODE_UNSPECIFIED = 0;
+
+  // SKIP_REASON_CODE_LOW_AFFINITY means the candidate scored below the
+  // returned shortlist's floor — a relative cut, never an absolute threshold
+  // (PLAN.md §11).
+  SKIP_REASON_CODE_LOW_AFFINITY = 1;
+
+  // SKIP_REASON_CODE_COMPETITOR_SATURATION means the menu audit found four or
+  // more direct niche competitors (PLAN.md §11, §21).
+  SKIP_REASON_CODE_COMPETITOR_SATURATION = 2;
+
+  // SKIP_REASON_CODE_CLOSED means Places reports the venue closed
+  // (PLAN.md §22).
+  SKIP_REASON_CODE_CLOSED = 3;
+
+  // SKIP_REASON_CODE_OUTSIDE_CITY means the venue resolved outside the
+  // geocoded city (PLAN.md §14).
+  SKIP_REASON_CODE_OUTSIDE_CITY = 4;
+
+  // SKIP_REASON_CODE_UNRESOLVED means the candidate name never resolved in
+  // Qloo and was recorded as a miss, never scored (PLAN.md §11, §17).
+  SKIP_REASON_CODE_UNRESOLVED = 5;
+}
+
+// SkipItem is one door on the skip list, with its reason and scores kept in
+// the evidence.
+message SkipItem {
+  // Qloo fact: the venue row the skip rule caught.
+  karum.common.v1.EntityRef entity = 1;
+
+  // Qloo fact: the affinity bundle that was compared against the shortlist
+  // floor, raw value included.
+  karum.common.v1.SubScore affinity = 2;
+
+  // Model inference: the machine-readable skip reason.
+  SkipReasonCode reason = 3;
+
+  // Model inference: the operator-readable reason line, naming the floor or
+  // the competitor count it was measured against.
+  string reason_detail = 4;
+
+  // Model inference: the direct niche competitors the audit counted, when the
+  // reason is competitor saturation.
+  int32 competitor_count = 5;
+}
+
+// ScoutDoorsRequest fans out the verified insights calls for a confirmed seed.
+// Place queries always carry WKT location plus an explicit metre radius: a
+// point without a radius returns zero rows, and 0 falls back to the ~15 km
+// default (item 5), so the radius is always the preset value.
+message ScoutDoorsRequest {
+  // Input: trace and job ids for log propagation.
+  karum.common.v1.RequestMeta meta = 1;
+
+  // Input: the confirmed seed; its entity ids are Qloo facts.
+  BrandSeed seed = 2;
+
+  // Input: lifestyle tags narrowing the signal.
+  repeated karum.common.v1.Tag tags = 3;
+
+  // Input: the city point; WKT formatting happens inside the service
+  // (DI-21).
+  karum.common.v1.GeoPoint location = 4;
+
+  // Input: the explicit radius in metres; presets use 8 km for doors and
+  // 10 km for the heatmap (PLAN.md §6).
+  int32 radius_meters = 5;
+
+  // Input: the door-shaping category tags applied as `filter.tags`; collab
+  // mode sends the non-competing tags on the same call (PLAN.md §10).
+  repeated karum.common.v1.Tag category_tags = 6;
+}
+
+// ScoutDoorsResponse returns the door board inputs, the skip list,
+// demographics, and the evidence bundle.
+message ScoutDoorsResponse {
+  // Qloo fact: the ranked doors, rank frozen server-side.
+  repeated DoorCandidate doors = 1;
+
+  // Qloo fact: the candidates below the relative floor, reasons attached.
+  repeated SkipItem skip_list = 2;
+
+  // Model inference: warnings surfaced for the drawer, including Qloo's
+  // `warnings[].not_found` signal entities (trap 4) and demographic mismatch
+  // notes (PLAN.md §12).
+  repeated string warnings = 3;
+
+  // Input: the failure classification; ERROR_CODE_UNSPECIFIED on success.
+  karum.common.v1.ErrorCode error_code = 4;
+
+  // Input: the operator-readable explanation; names the category when empty
+  // (PLAN.md §14).
+  string error_message = 5;
+
+  // Input: the call records for the evidence drawer.
+  repeated karum.common.v1.EvidenceCall evidence = 6;
+}
+
+// HeatmapPoint is one density cell of the flagship heatmap; the spike observed
+// geohash cells with affinity, rank, and popularity (item 3).
+message HeatmapPoint {
+  // Qloo fact: the cell's centre point.
+  karum.common.v1.GeoPoint location = 1;
+
+  // Qloo fact: the cell's geohash.
+  string geohash = 2;
+
+  // Qloo fact: the cell's affinity for the seed.
+  double affinity = 3;
+
+  // Qloo fact: the cell's affinity rank inside the response.
+  int32 affinity_rank = 4;
+
+  // Qloo fact: the cell's popularity.
+  double popularity = 5;
+}
+
+// LocalityCluster is one locality polygon from the
+// `output.heatmap.boundary=urn:entity:locality` response; the brief names
+// corridors from these (PLAN.md §12).
+message LocalityCluster {
+  // Qloo fact: the locality name.
+  string name = 1;
+
+  // Qloo fact: the polygon's centroid.
+  karum.common.v1.GeoPoint centroid = 2;
+
+  // Qloo fact: the polygon outline as an ordered ring of points.
+  repeated karum.common.v1.GeoPoint polygon = 3;
+
+  // Qloo fact: the locality's affinity for the seed.
+  double affinity = 4;
+}
+
+// GetLocalityHeatmapRequest asks for cells and, optionally, polygons.
+message GetLocalityHeatmapRequest {
+  // Input: trace and job ids for log propagation.
+  karum.common.v1.RequestMeta meta = 1;
+
+  // Input: the seed entities; their ids are Qloo facts.
+  repeated karum.common.v1.EntityRef entities = 2;
+
+  // Input: the city point; WKT formatting happens inside the service.
+  karum.common.v1.GeoPoint location = 3;
+
+  // Input: the explicit radius in metres; the preset uses 10 km.
+  int32 radius_meters = 4;
+
+  // Input: true to request locality polygons via
+  // `output.heatmap.boundary=urn:entity:locality` instead of cells alone.
+  bool include_localities = 5;
+}
+
+// GetLocalityHeatmapResponse returns the density layer and corridor inputs.
+message GetLocalityHeatmapResponse {
+  // Qloo fact: the density cells.
+  repeated HeatmapPoint cells = 1;
+
+  // Qloo fact: the locality polygons when requested.
+  repeated LocalityCluster localities = 2;
+
+  // Model inference: the top corridors named from the polygons, strongest
+  // first.
+  repeated string corridors = 3;
+
+  // Qloo fact: the strongest already-returned places inside those corridors,
+  // used as anchor neighbours.
+  repeated karum.common.v1.EntityRef anchors = 4;
+
+  // Input: false when the heatmap capability is unavailable for the seed; the
+  // client hides the layer rather than showing an empty map (PLAN.md §2).
+  bool available = 5;
+
+  // Input: why the capability is unavailable; empty when available.
+  string unavailable_reason = 6;
+
+  // Input: the failure classification; ERROR_CODE_UNSPECIFIED on success.
+  karum.common.v1.ErrorCode error_code = 7;
+
+  // Input: the operator-readable explanation.
+  string error_message = 8;
+
+  // Input: the call records for the evidence drawer.
+  repeated karum.common.v1.EvidenceCall evidence = 9;
+}
+
+// CompareAudiencesRequest compares one door against the emerging brand and an
+// incumbent the menu audit found.
+message CompareAudiencesRequest {
+  // Input: trace and job ids for log propagation.
+  karum.common.v1.RequestMeta meta = 1;
+
+  // Input: the emerging brand entity; the id is a Qloo fact.
+  karum.common.v1.EntityRef emerging_brand = 2;
+
+  // Input: the door entity; the id is a Qloo fact.
+  karum.common.v1.EntityRef venue = 3;
+
+  // Input: the incumbent name from the menu audit; it may not resolve in
+  // Qloo, in which case only the tag overlap is usable.
+  string incumbent_name = 4;
+}
+
+// CompareAudiencesResponse returns the compare payload; the chart degrades
+// when `matchEntities` is empty and cross-type overlap is zero (DI-22).
+message CompareAudiencesResponse {
+  // Qloo fact: the overlapping tag rows from `results.tags`.
+  repeated karum.common.v1.Tag overlap_tags = 1;
+
+  // Qloo fact: the matching entities from `results.matchEntities`; empty on
+  // the probed pairs.
+  repeated karum.common.v1.EntityRef match_entities = 2;
+
+  // Input: whether the payload carried a non-empty `matchEntities`.
+  bool match_entities_present = 3;
+
+  // Input: false when the compare capability cannot serve this pair; the
+  // client hides the chart instead of rendering it empty (PLAN.md §2).
+  bool available = 4;
+
+  // Input: why the capability is unavailable; empty when available.
+  string unavailable_reason = 5;
+
+  // Input: the failure classification; ERROR_CODE_UNSPECIFIED on success.
+  karum.common.v1.ErrorCode error_code = 6;
+
+  // Input: the operator-readable explanation.
+  string error_message = 7;
+
+  // Input: the call records for the evidence drawer.
+  repeated karum.common.v1.EvidenceCall evidence = 8;
+}
