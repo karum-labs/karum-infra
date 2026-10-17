@@ -98,13 +98,15 @@ In `infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `karum.a
 
 ### 6. Lock the three presets
 
-The judge buttons are fixed: Austin (Sola: mezcal brand + Aesop + Khruangbin; wholesale), Brooklyn (ceramics and matcha; flagship and collab), Mumbai Colaba (specialty cacao and coffee; wholesale). Colaba already resolved on 16 Oct — 10 of 10 venue names landed within 2 km of the block point. The 17 Oct extension confirmed the Austin door direction — a brand-typed seed returns ranked door rows at the downtown point with explainability and stable affinity (RECORDING.md extension) — and found one coverage miss: **Madre Mezcal does not resolve in Qloo** (brand-typed and any-type searches both miss; only same-name places in other cities). The locked Austin seed therefore swaps in Qloo-verified substitutes — Ilegal Mezcal, Aesop, and Khruangbin all resolve — and presets lock seed ids only after they resolve. This pass still resolves the Brooklyn reference entities and writes down the preset ids, the lat/lng, the radius, and the category tags the fixtures will replay. Door and collab queries use `filter.location` as WKT plus an explicit radius in metres (8 km unless a preset overrides; heatmap 10 km). A brand-type insights call, if any preset needs one, uses `signal.location` (DI-11). Spend is logged against the 9,856 requests remaining before anyone starts feature traffic.
+The judge buttons are fixed: Austin (Sola: mezcal brand + Aesop + Khruangbin; wholesale), Brooklyn (ceramics and matcha; flagship and collab), Mumbai Colaba (specialty cacao and coffee; wholesale). Colaba already resolved on 16 Oct — 10 of 10 venue names landed within 2 km of the block point. The 17 Oct extension confirmed the Austin door direction — a brand-typed seed returns ranked door rows at the downtown point with explainability and stable affinity (RECORDING.md extension) — and found one coverage miss: **Madre Mezcal does not resolve in Qloo** (brand-typed and any-type searches both miss; only same-name places in other cities). The locked Austin seed therefore swaps in Qloo-verified substitutes — Ilegal Mezcal, Aesop, and Khruangbin all resolve — and presets lock seed ids only after they resolve. This pass still resolves the Brooklyn reference entities and writes down the preset ids, the lat/lng, the radius, the category tags, and the skip-candidate ids the fixtures will replay. Door and collab queries use `filter.location` as WKT plus an explicit radius in metres (8 km unless a preset overrides; heatmap 10 km). A brand-type insights call, if any preset needs one, uses `signal.location` (DI-11). Spend is logged against the 9,856 requests remaining before anyone starts feature traffic.
 
 - [x] Colaba venue resolution measured 16 Oct — 10 of 10 within 2 km
 - [x] Location behaviour settled — place calls use WKT plus an explicit metre radius; brand-type insights use `signal.location` (DI-11, DI-21)
 - [x] Austin door query confirmed 17 Oct — a brand seed returns door rows at the downtown point; Madre Mezcal is a coverage miss and the seed swaps in Qloo-verified substitutes (Ilegal Mezcal, Aesop, Khruangbin)
 - [ ] Resolve the Brooklyn seed entities and confirm a point returns doors and heatmap cells
-- [ ] Write the four preset payloads (ids, points, radii, category tags) into the fixture seeds
+- [ ] Measure the western demo city's venue-resolution rate while resolving its venues (kill rule 2's 10-of-10-style check, [DECISIONS.md](DECISIONS.md) §4)
+- [ ] Confirm the Colaba door shape under its preset category tag — the 17 Oct Colaba calls were unfiltered and topped out with event venues (1–2 calls)
+- [ ] Write the four preset payloads (ids, points, radii, category tags, skip-candidate ids) into the fixture seeds
 - [ ] Update the quota ledger in [spike/RECORDING.md](spike/RECORDING.md) after this pass
 
 ## 3. service-taste
@@ -151,11 +153,11 @@ One typed method per endpoint the spike verified, and no method for an unverifie
 
 ### 11. Affinity score and the skip list
 
-From documented Qloo fields, compute `A_taste` and `D_demo` on a stable 0–1 scale and write the inputs beside each score. `A_taste` is the affinity's percentile inside the returned shortlist — raw affinity bands move with the seed and the city (observed 0.84–0.98 on 17 Oct, while per-entity values stay stable across calls), so a raw value is not comparable across campaigns; the raw affinity stays in the evidence. The gateway applies `O_shelf` and `P_saturation` later, once the menu audit exists. The skip list is relative: score the venues a naive plan would visit — and any ranked set that needs a negative judgment — in one `filter.results.entities` batch ([QLOO_APIS.md](QLOO_APIS.md) §3.14) and place candidates below the returned shortlist's floor (its minimum or bottom decile) on the skip list with a machine-readable reason. An absolute 0.45 floor never fires — ranked sets observed 0.83–0.98 on 17 Oct — so no absolute threshold ships. Return the top recommended doors and the skip items, and break ties deterministically so the same inputs always produce the same order. Unit-test the relative floor, an empty seed, a category that matches nothing, and ties.
+From documented Qloo fields, compute `A_taste` and `D_demo` on a stable 0–1 scale and write the inputs beside each score; the gateway computes `S_door = 0.50 · A_taste + 0.30 · O_shelf + 0.20 · D_demo` from the 0–1 sub-scores and displays `100 × S_door` (TECH.md's door score is the canonical definition; every process copy cites it). `A_taste` is the affinity's percentile inside the returned shortlist — raw affinity bands move with the seed and the city (observed 0.84–0.98 on 17 Oct, while per-entity values stay stable across calls), so a raw value is not comparable across campaigns; the raw affinity stays in the evidence. The gateway applies `O_shelf` and the `P_saturation` skip rule later, once the menu audit exists; when the audit is unavailable the shelf term is unknown and the composite renormalizes over affinity and demographics. The skip list is relative: score the skip candidates in one `filter.results.entities` batch ([QLOO_APIS.md](QLOO_APIS.md) §3.14) and place the ones below the returned shortlist's floor (its minimum or bottom decile) on the skip list with a machine-readable reason. Presets carry their verified candidate ids in the fixture seed; a free-entry run takes the venue names from `LlmOnlyBaseline`, resolves each through `/search`, records unresolved names as a miss on the run, and batch-scores the rest. An absolute 0.45 floor never fires — ranked sets observed 0.83–0.98 on 17 Oct — so no absolute threshold ships. Return the top recommended doors and the skip items, and break ties deterministically so the same inputs always produce the same order. Unit-test the relative floor, an empty seed, a category that matches nothing, and ties.
 
 - [ ] Compute `A_taste` and `D_demo` from documented fields only
 - [ ] Normalize both to a stable 0–1 scale and put the inputs in the evidence payload — `A_taste` as a percentile within the returned set, raw affinity retained
-- [ ] Batch-score the naive-plan candidates via `filter.results.entities` and place those below the shortlist floor on the skip list with a machine-readable reason
+- [ ] Batch-score the skip candidates (preset ids or resolved baseline names) via `filter.results.entities` and place those below the shortlist floor on the skip list with a machine-readable reason
 - [ ] Tie-break deterministically
 - [ ] Unit-test the relative floor, an empty seed, an empty category, and ties
 
@@ -171,12 +173,12 @@ From documented Qloo fields, compute `A_taste` and `D_demo` on a stable 0–1 sc
 
 ### 13. Cache and prewarm
 
-Cache Qloo responses in Redis under a canonical hash of the request parameters, with a 24h TTL. A single-flight lock makes concurrent refreshes of the same key share one upstream call. If Redis is down, fall back to an in-process cache and flip the degraded health bit. A prewarm RPC loads the four preset payloads (three buttons, plus Brooklyn collab). Eval requests set a bypass flag that is never written back into the demo cache.
+Cache Qloo responses in Redis under a canonical hash of the request parameters, with a 24h TTL. A single-flight lock makes concurrent refreshes of the same key share one upstream call. If Redis is down, fall back to an in-process cache and flip the degraded health bit. Prewarm runs each of the four presets (three buttons, plus Brooklyn collab) end-to-end once — taste, Places, AI, route — and stores the completed run (§25), so a preset click serves the stored campaign and its recorded trace instead of re-running the live pipeline (§37). Eval requests set a bypass flag that is never written back into the demo cache.
 
 - [ ] Redis cache keyed by a canonical parameter hash with a 24h TTL
 - [ ] Single-flight lock so a refresh cannot stampede Qloo
 - [ ] In-memory fallback when Redis is down, with a degraded health bit
-- [ ] Prewarm RPC for the four preset payloads
+- [ ] Prewarm the four presets end-to-end and store the completed runs
 - [ ] Eval bypass that is never served back as a cached demo response
 
 ### 14. Taste edge cases
@@ -203,7 +205,7 @@ Call Gemini 2.5 Flash through `google-genai` with `vertexai=True`, and one Pydan
 
 ### 16. Menu audit
 
-`AuditMenu` uses Google Search grounding to read the venue website, menu, or delivery listing. It reports whether the audit succeeded, which incumbents are stocked, a short menu summary, the `O_shelf` inputs, and the source URLs. Online-only or unverifiable venues keep their Qloo rank and set shelf opportunity to unknown. Grounding is capped to the working shortlist (the doors that can appear on the board, plus skip candidates the penalty might cite), not the full `take=25`. Grounded prose names a competitor only when that name is in the grounding sources or the Qloo payload.
+`AuditMenu` uses Google Search grounding to read the venue website, menu, or delivery listing. It reports whether the audit succeeded, which incumbents are stocked, a short menu summary, the `O_shelf` inputs, and the source URLs. Online-only or unverifiable venues keep their Qloo rank, set shelf opportunity to unknown, and the composite renormalizes over affinity and demographics (§11). Grounding is capped to the working shortlist (the doors that can appear on the board, plus skip candidates the skip rule might cite), not the full `take=25`. Grounded prose names a competitor only when that name is in the grounding sources or the Qloo payload.
 
 - [ ] Audit the live menu or shelf with Google Search grounding
 - [ ] Return incumbents, a menu summary, shelf inputs, and source URLs
@@ -213,13 +215,14 @@ Call Gemini 2.5 Flash through `google-genai` with `vertexai=True`, and one Pydan
 
 ### 17. Pitches, SKUs, and briefs
 
-`DraftDoorPitch` returns the shopkeeper script, and every number cites an evidence id. When the audit found an incumbent, it also returns the displacement battlecard, using the compare tags when they exist and the affinity plus menu finding when they do not. The recommended SKU is chosen from the brand's own SKU list by the door's taste tags. Flagship mode adds the site-brief paragraph for the top corridors. Collab mode adds the activation proposal. `LlmOnlyBaseline` is stored beside the Qloo result and labeled ungrounded. Length caps keep each text short enough that a non-technical judge can finish it.
+`DraftDoorPitch` returns the shopkeeper script, and every number cites an evidence id. When the audit found an incumbent, it also returns the displacement battlecard, using the compare tags when they exist and the affinity plus menu finding when they do not. The recommended SKU is chosen from the brand's own SKU list by the door's taste tags. Flagship mode adds the site-brief paragraph for the top corridors. Collab mode adds the activation proposal. `LlmOnlyBaseline` is stored beside the Qloo result and labeled ungrounded. Its venue names source the free-entry skip candidates (§11); unresolved names are recorded as misses, never scored. Length caps keep each text short enough that a non-technical judge can finish it.
 
 - [ ] Shopkeeper script that cites an evidence id for every number
 - [ ] Displacement battlecard when an incumbent is present
 - [ ] One recommended SKU from the brand's list, chosen with the door's taste tags
 - [ ] Site-brief paragraph in flagship mode, and an activation proposal in collab mode
 - [ ] LLM-only baseline stored beside the Qloo result and labeled ungrounded
+- [ ] Feed the baseline's venue names into the free-entry skip list, recording unresolved names as misses
 
 ### 18. Draft resilience
 
@@ -235,9 +238,10 @@ If Vertex errors, times out, or returns JSON that fails the schema, the gateway 
 
 ### 19. HTTP API and jobs
 
-`POST /api/v1/scout` creates a job from the confirmed seed, the city, the mode, and the SKU list, and returns a job id. `GET` returns the state and, once ready, the campaign payload. Draft `POST`s cover the run-sheet, the site brief, and a single-door pitch. `GET /events` is an SSE stream keyed by a cursor so a refresh replays from the last trace event.
+`POST /api/v1/scout` creates a job from the confirmed seed, the city, the mode, and the SKU list, and returns a job id. A request that names a preset serves the stored preset run (§13) and replays its recorded trace; only a free-entry request runs the live pipeline. `GET` returns the state and, once ready, the campaign payload. Draft `POST`s cover the run-sheet, the site brief, and a single-door pitch. `GET /events` is an SSE stream keyed by a cursor so a refresh replays from the last trace event.
 
 - [ ] `POST /api/v1/scout` creates a job from seed, city, mode, and SKUs
+- [ ] Serve preset requests from the stored runs, replaying the recorded trace; free entry runs the live pipeline
 - [ ] `GET` returns state and, when ready, the campaign payload
 - [ ] `POST` draft endpoints for the run-sheet, the site brief, and a single-door pitch
 - [ ] SSE `/events` with a cursor so a refresh can resume the trace
@@ -254,11 +258,11 @@ Geocode the city in the gateway before any taste RPC, and return candidate point
 
 ### 21. Orchestration and score assembly
 
-The runner calls seed resolution only when the request still has raw queries; presets and confirmed seeds go straight to scout. Flagship adds the heatmap call. After Places and the menu audit, the gateway computes `S_door`, applies `P_saturation` (affinity below the returned shortlist's floor — or four or more direct niche competitors), and freezes the ordered doors and the skip list. Compare runs only for doors whose audit found an incumbent. Independent taste RPCs run in parallel, and each completion writes a trace event. The exact Qloo and grounding payloads are stored on the run. A client abort cancels the downstream gRPC calls.
+The runner calls seed resolution only when the request still has raw queries; presets and confirmed seeds go straight to scout. Flagship adds the heatmap call. After Places and the menu audit, the gateway computes `S_door` from the 0–1 sub-scores (`100 × S_door` displayed), applies the `P_saturation` skip rule (affinity below the returned shortlist's floor — or four or more direct niche competitors), and freezes the ordered doors and the skip list. Compare runs only for doors whose audit found an incumbent. Independent taste RPCs run in parallel, and each completion writes a trace event. The exact Qloo and grounding payloads are stored on the run. A client abort cancels the downstream gRPC calls.
 
 - [ ] Scout from a confirmed seed, and resolve raw queries only when the request has them
 - [ ] Add the heatmap call in flagship mode, and compare only after an incumbent is found
-- [ ] Compute `S_door` from `A_taste`, `O_shelf`, `D_demo`, and `P_saturation`, and freeze the order
+- [ ] Compute `S_door` from the 0–1 sub-scores, apply the `P_saturation` skip rule, and freeze the order
 - [ ] Emit a trace event as each hop finishes, and persist the payloads on the run
 - [ ] Cancel downstream RPCs when the client aborts the job
 
@@ -302,7 +306,7 @@ Postgres tables for campaigns, runs, evidence snapshots, and drafts, applied wit
 
 ### 26. Gateway resilience
 
-Set a deadline on every taste and AI gRPC call and a circuit breaker per dependency. Per-IP and global rate limits return a JSON error the client can map to copy. Require `Idempotency-Key` on create so a double-submit returns the original job. Validate seed count (one to four entities), text length, SKU-list length, mode, and radius before any RPC. `GET /health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode as `live`, `fixture`, or `degraded`.
+Set a deadline on every taste and AI gRPC call and a circuit breaker per dependency. Per-IP and global rate limits return a JSON error the client can map to copy. Require `Idempotency-Key` on create so a double-submit returns the original job. Validate seed count (one to four seed entities — a resolved brand plus any vibe chips, or a two-to-four-entity composite of chips; the total never exceeds four, §29), text length, SKU-list length, mode, and radius before any RPC. `GET /health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode as `live`, `fixture`, or `degraded`.
 
 - [ ] Deadlines on every gRPC call and a circuit breaker per dependency
 - [ ] Per-IP and global rate limits with a clear JSON error
@@ -334,20 +338,21 @@ The path from the seed builder to the pitch is operable from the keyboard, with 
 
 ### 29. Seed builder, modes, and presets
 
-The brand field calls seed resolution through the gateway, debounced, with a minimum query length, and renders matches as confirm chips. Fallback vibe chips accept two to four reference entities. The SKU list is plain text on the seed. Mode pills are Wholesale, Flagship, and Collab, and they serialize into `POST /api/v1/scout`. Three preset buttons post the seeded ids and skip typing: Sola in Austin, ceramics and matcha in Brooklyn, cacao and coffee in Colaba. Switching Brooklyn from flagship to collab loads the second cached payload.
+The brand field calls seed resolution through the gateway, debounced, with a minimum query length, and renders matches as confirm chips. Fallback vibe chips build a composite seed of two to four reference entities; a resolved brand plus any added chips still totals four seed entities or fewer (§26). The SKU list is plain text on the seed. Mode pills are Wholesale, Flagship, and Collab, and they serialize into `POST /api/v1/scout`. Three preset buttons load the stored preset runs and skip typing: Sola in Austin, ceramics and matcha in Brooklyn, cacao and coffee in Colaba. Switching Brooklyn from flagship to collab loads the second stored payload.
 
 - [ ] Brand typeahead, debounced and cached, shown as confirm chips
-- [ ] Two to four fallback vibe chips, plus a SKU list
+- [ ] Fallback vibe chips (two-to-four-entity composites; four seed entities maximum), plus a SKU list
 - [ ] Mode pills for Wholesale, Flagship, and Collab
 - [ ] Inline validation before submit
-- [ ] Three preset buttons, with Brooklyn flagship and collab both cached
+- [ ] Three preset buttons loading the stored runs, with Brooklyn flagship and collab both stored
 
 ### 30. Live trace
 
-Subscribe to `GET /events` and render each trace event as a timeline row with stage name, elapsed time, and whether the step was a cache hit. The stages the judge should see are seed resolution, door ranking, Places, menu grounding, and the route. On refresh, resume from the stored cursor. Cancel calls the abort endpoint and stops the stream. If `/health` or the job state says fixture or degraded, show that banner above the timeline.
+Subscribe to `GET /events` and render each trace event as a timeline row with stage name, elapsed time, and whether the step was a cache hit. The stages the judge should see are seed resolution, door ranking, Places, menu grounding, and the route. A stored preset run replays its recorded events through the same timeline, cache-hit markers included. On refresh, resume from the stored cursor. Cancel calls the abort endpoint and stops the stream. If `/health` or the job state says fixture or degraded, show that banner above the timeline.
 
 - [ ] Render SSE events as a timeline
 - [ ] Show stage, elapsed time, and whether the step was cached
+- [ ] Replay the stored preset trace through the same timeline
 - [ ] Resume from the event cursor after refresh
 - [ ] Cancel aborts the job
 - [ ] Show a banner when the run is on fixtures or degraded
@@ -396,13 +401,13 @@ Put the job id in the URL and, on load, `GET` the job so a refresh restores an i
 
 ### 35. Judge-path copy
 
-The landing line states that brands lose the account by knocking on the wrong door, and the button labels match the three-minute script in [PRODUCT.md](PRODUCT.md) §6.2. The generic-LLM contrast renders only the live `LlmOnlyBaseline` text. The three presets are Austin, Brooklyn, and Colaba. The free-entry form still reaches a door list without using a seeded campaign. Live screens render scores the API returned; the illustrative percentages in the demo script are not hardcoded.
+The landing line states that brands lose the account by knocking on the wrong door, and the button labels match the three-minute script in [PRODUCT.md](PRODUCT.md) §6.2. The generic-LLM contrast renders only the live `LlmOnlyBaseline` text. The three presets are Austin, Brooklyn, and Colaba. The free-entry form runs the live pipeline and reaches a door list when the seed resolves — or shows the honest miss (§40) — without using a seeded campaign. Live screens render scores the API returned; the illustrative percentages in the demo script are not hardcoded.
 
 - [ ] Landing line: brands lose the account by knocking on the wrong door
 - [ ] Button labels that match the three-minute script
 - [ ] Show the generic-LLM contrast only from the live baseline text
 - [ ] Presets for Austin, Brooklyn, and Colaba
-- [ ] Free-entry path that still reaches a door list, with no hardcoded sample scores
+- [ ] Free-entry path that reaches a door list or shows the honest miss, with no hardcoded sample scores
 
 ### 36. Comprehension
 
@@ -416,13 +421,13 @@ Use one set of plain-English names for the three sub-scores in the Flutter cards
 
 ### 37. Prewarm and latency
 
-Call the taste prewarm RPC for all four preset payloads on deploy and again before the 24h TTL expires. A cached preset targets under a second. A live free-entry scout targets under eight seconds, and SSE events keep emitting on that path so the timeline does not look stuck. Set Cloud Run min instances above zero during the judging window. Record p50 and p95 for a preset and for free entry.
+Run the prewarm for all four presets on deploy: each runs end-to-end once and its completed run is stored (§13), so a preset click serves the stored campaign and its recorded trace — target under a second without re-running the live pipeline. A live free-entry scout targets under eight seconds, and SSE events keep emitting on that path so the timeline does not look stuck. Set Cloud Run min instances above zero during the judging window. Record p50 and p95 for a stored preset and for free entry.
 
-- [ ] Prewarm all four presets on deploy and again inside the cache TTL
-- [ ] Aim for a cached preset under a second and a live scout under eight seconds
+- [ ] Prewarm all four presets end-to-end on deploy, and refresh the stored runs before judging
+- [ ] Aim for a stored preset under a second and a live scout under eight seconds
 - [ ] Keep the trace moving on the slow path
 - [ ] Set Cloud Run min instances during the judging window
-- [ ] Record p50 and p95 for a preset and for free entry
+- [ ] Record p50 and p95 for a stored preset and for free entry
 
 ## 8. Proof and failure
 

@@ -151,7 +151,7 @@ To keep the architecture modular, scalable, and clean for multi-person parallel 
 - **Role:** Dedicated abstraction layer for all Qloo Taste Graph operations.
   - Resolves brand names, neighbor venues, and lifestyle tags into canonical Qloo URNs.
   - Executes cross-domain `Brand` $\rightarrow$ `Places` queries, `urn:heatmap` spatial grids, `urn:demographics` checks, and `/v2/analysis/compare` overlap calculations.
-  - Normalizes scores and caches responses in SQLite/Redis by parameter hash so repeated demo runs never exhaust the $10,000\text{ req/mo}$ hackathon quota.
+  - Normalizes scores and caches responses in Redis by parameter hash, with an in-process fallback, so prewarmed and repeated runs never exhaust the $10,000\text{ req/mo}$ hackathon quota.
 - **Key Libraries:** `httpx` (async REST calls to Qloo), `pydantic`, `grpcio`, `grpcio-tools`.
 
 #### 5. `service-ai` (Vertex AI & Live Web Grounding Microservice)
@@ -169,11 +169,11 @@ To keep the architecture modular, scalable, and clean for multi-person parallel 
 ```
 [ Flutter Client (`client`) ]
        │
-       │  1. POST /api/v1/scout (Brand Seed, Target City, Mode: DoorScout | Flagship | Collab)
+       │  1. POST /api/v1/scout (Brand Seed, Target City, Mode: Wholesale | Flagship | Collab)
        ▼
 [ Go + Gin Gateway (`server`) ]
        │
-       ├──► 2. gRPC: GetCulturalTargets() ──► [ `service-taste` (Python) ]
+       ├──► 2. gRPC: ResolveBrandSeed → ScoutDoors ──► [ `service-taste` (Python) ]
        │                                            ├── Resolves Brand / Seed Entities (`/search`, `/v2/tags`)
        │                                            ├── Queries `/v2/insights` (Places + Explainability + Tags)
        │                                            ├── Queries `/v2/insights` (`urn:heatmap` & `urn:demographics`)
@@ -182,7 +182,7 @@ To keep the architecture modular, scalable, and clean for multi-person parallel 
        ├──► 3. REST: Google Maps Places API (New)
        │       └── Verifies store is OPEN, fetches exact address, website URL, & coordinates
        │
-       ├──► 4. gRPC: AuditAndDraftPitches() ─► [ `service-ai` (Python) ]
+       ├──► 4. gRPC: AuditMenu → DraftDoorPitch ─► [ `service-ai` (Python) ]
        │                                            ├── Calls Gemini 2.5 Flash + Google Search Grounding
        │                                            ├── Inspects venue's live menu / stockists for competitors
        │                                            ├── Recommends specific Brand SKU per venue
@@ -198,6 +198,8 @@ To keep the architecture modular, scalable, and clean for multi-person parallel 
 ---
 
 ### 4.4 Shared gRPC Contracts (`infra/proto`)
+
+*Illustrative sketch, pre-pivot: the build follows [PLAN.md](PLAN.md) §1–3 and the real `karum.taste.v1` / `karum.agent.v1` packages; the names and fields below are historical.*
 
 #### `infra/proto/taste/v1/taste.proto`
 ```protobuf
@@ -377,14 +379,14 @@ All requests target `https://hackathon.api.qloo.com` with `X-Api-Key`:
 ---
 
 ### 5.2 The 3-Part Karum Door Score
-Rather than showing an opaque number, Karum computes a transparent composite score $S_{\text{door}} \in [0, 100]$ broken into three sub-bars on every card:
+Rather than showing an opaque number, Karum computes a transparent composite from three 0–1 sub-scores, shown as a 0–100 number and broken into three sub-bars on every card:
 
-$$S_{\text{door}} = 0.50 \cdot A_{\text{taste}} + 0.30 \cdot O_{\text{shelf}} + 0.20 \cdot D_{\text{demo}} - P_{\text{saturation}}$$
+$$S_{\text{door}} = 0.50 \cdot A_{\text{taste}} + 0.30 \cdot O_{\text{shelf}} + 0.20 \cdot D_{\text{demo}}$$ *(sub-scores 0–1; the card displays $100 \times S_{\text{door}}$)*
 
 1. **Cultural Affinity Fit ($A_{\text{taste}}$):** Qloo affinity score between the Brand Seed and the Venue entity, shown as a percentile inside the returned shortlist (raw affinity bands move with the seed and the city — 0.85–0.98 across the 17 Oct probes — so raw values are not comparable across campaigns), with `feature.explainability` signal weights attached.
-2. **Shelf / Menu Opportunity ($O_{\text{shelf}}$):** Derived from Vertex AI Search Grounding. High score if the venue carries complementary categories (e.g., craft cocktails, small-batch goods) without an exclusive lock from a direct craft twin; triggers Conquest Mode if they only stock a legacy mass-market incumbent.
-3. **Demographic & Locality Alignment ($D_{\text{demo}}$):** Alignment between the venue's `urn:demographics` age buckets and the brand's target cohort, plus neighborhood heatmap intensity.
-4. **Saturation / Mismatch Penalty ($P_{\text{saturation}}$):** Pushes a venue into the **"Doors to Skip"** column when its Qloo affinity falls below the returned shortlist's floor (computed per campaign — an absolute cutoff never fires, 17 Oct evidence) or when live menu verification shows the venue already stocks $4+$ direct niche competitors.
+2. **Shelf / Menu Opportunity ($O_{\text{shelf}}$):** Derived from Vertex AI Search Grounding. Full strength when the venue carries complementary categories (e.g., craft cocktails, small-batch goods) without an exclusive lock from a direct craft twin; each direct niche competitor found on the live menu takes a quarter off (1.0 → 0.25), and an incumbent found live produces the displacement battlecard. When grounding is unavailable the term is unknown, the composite renormalizes over cultural affinity and demographic alignment, and the card says the menu was not verified.
+3. **Demographic & Locality Alignment ($D_{\text{demo}}$):** Alignment between the venue's `urn:demographics` age buckets and the brand's target cohort, plus neighborhood heatmap intensity, mapped onto 0–1.
+4. **Skip rule ($P_{\text{saturation}}$):** A gate applied after scoring, not a term in the composite. It pushes a venue into the **"Doors to Skip"** column when its Qloo affinity falls below the returned shortlist's floor (computed per campaign — an absolute cutoff never fires, 17 Oct evidence) or when live menu verification shows the venue already stocks $4+$ direct niche competitors. Skipped venues keep their sub-scores and reason code in the evidence.
 
 ---
 
@@ -429,8 +431,8 @@ $$S_{\text{door}} = 0.50 \cdot A_{\text{taste}} + 0.30 \cdot O_{\text{shelf}} + 
 - **1:40 – 2:15 (Counterfactual & Sales Action):**
   - Toggle **"Compare with Plain LLM"** to show the generic tourist list side-by-side against Karum's culturally grounded route.
   - Click **"Generate Pitch & Run-Sheet"**: preview the tailored email/script citing Qloo's shared audience insights and the optimized 6-stop Google Maps sales route.
-- **2:15 – 2:50 (Mode Switch: Flagship & Collab Scout):**
-  - Toggle to **Flagship & Pop-Up Scout**. The Qloo `urn:heatmap` lights up East 6th / Cesar Chavez as the #1 micro-corridor for a weekend pop-up, alongside 3 non-competing apparel/vinyl shops (`Brand Collabs` mode) to co-host the tasting.
+- **2:15 – 2:50 (Mode Switch: Brooklyn Flagship & Collab):**
+  - Switch to the **Brooklyn preset** and toggle **Flagship & Pop-Up Scout**. The Qloo `urn:heatmap` lights up the top Brooklyn micro-corridor for a weekend pop-up (names re-rendered from the locked preset), and the **Brand Collabs** toggle surfaces the non-competing boutiques to co-host the tasting.
 - **2:50 – 3:00 (Close):**
   - *"From first stockist to first flagship store, Karum turns Qloo's cultural graph into revenue."*
 
@@ -443,9 +445,9 @@ $$S_{\text{door}} = 0.50 \cdot A_{\text{taste}} + 0.30 \cdot O_{\text{shelf}} + 
 | Phase | Dates | Owner / Repo | Key Deliverables |
 | :--- | :--- | :--- | :--- |
 | **Phase 1: Contracts & Infra** | Oct 17 – Oct 18 | Both (`infra`) | Finalize `taste.proto` and `agent.proto`; write `Makefile` for Go & Python stub generation; set up `docker-compose.yml`. |
-| **Phase 2: Qloo Microservice** | Oct 18 – Oct 21 | Backend / Qloo (`service-taste`) | Implement `/search`, `/v2/tags`, `/v2/insights` (Places, Tags, Heatmap, Demographics), `feature.explainability=true`, and SQLite parameter-hash caching. |
+| **Phase 2: Qloo Microservice** | Oct 18 – Oct 21 | Backend / Qloo (`service-taste`) | Implement `/search`, `/v2/tags`, `/v2/insights` (Places, Tags, Heatmap, Demographics), `feature.explainability=true`, and Redis parameter-hash caching with the in-process fallback. |
 | **Phase 3: Vertex AI & Grounding** | Oct 18 – Oct 21 | AI / Agent (`service-ai`) | Implement `google-genai` client (`vertexai=True`, `gemini-2.5-flash`) with `GoogleSearch` tool; build structured Pydantic output parsers for menu verification, SKU selection, and pitch drafting. |
 | **Phase 4: Go Gateway & Maps** | Oct 21 – Oct 23 | Backend (`server`) | Build Gin REST API, wire gRPC clients to `service-taste` and `service-ai`, integrate Google Places API (New) and Google Routes API waypoint optimization. |
 | **Phase 5: Flutter Web UI** | Oct 21 – Oct 26 | Frontend (`client`) | Build brand seed selector, streaming trace log, interactive map (route polylines + heatmap), door cards with 3 sub-score bars, evidence drawer, "Doors to Skip", and LLM comparison toggle. |
-| **Phase 6: Pre-Warm & Cloud Run** | Oct 26 – Oct 28 | Both (`infra` / all) | Pre-warm 3 demo cities (Austin, Brooklyn, Mumbai Colaba) into cache; deploy `server`, `service-taste`, `service-ai`, and `client` to Google Cloud Run; verify MIT licenses on all 5 GitHub repos. |
-| **Phase 7: Polish & Submit** | Oct 28 – Oct 29 | Both | Final end-to-end latency check ($<8\text{s}$ live, $<1\text{s}$ cached presets), write Devpost submission mapped to the 4 judging criteria, submit 24 hours ahead of deadline. |
+| **Phase 6: Pre-Warm & Cloud Run** | Oct 26 – Oct 28 | Both (`infra` / all) | Prewarm the four preset runs (Austin, Brooklyn flagship + collab, Mumbai Colaba) end-to-end and store them; deploy `server`, `service-taste`, `service-ai`, and `client` to Google Cloud Run; verify MIT licenses on all 5 GitHub repos. |
+| **Phase 7: Polish & Submit** | Oct 28 – Oct 29 | Both | Final end-to-end latency check ($<8\text{s}$ live, $<1\text{s}$ stored presets), write Devpost submission mapped to the 4 judging criteria, submit 24 hours ahead of deadline. |

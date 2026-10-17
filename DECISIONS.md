@@ -1,6 +1,8 @@
-# Karum decision record — 14 Oct 2026 · updated 16 Oct 2026 (Qloo spike)
+# Karum decision record — 14 Oct 2026 · updated 17 Oct 2026 (brand pivot)
 
 One page that locks the shape of the five-repo build. Sources: [PRODUCT.md](PRODUCT.md) (the product and its must-builds) and [TECH.md](TECH.md) (the five-repo split). Anything not recorded here is out of scope until this page changes.
+
+> **17 Oct 2026 — brand pivot.** The product became the brand-operated expansion agent ([PLAN.md](PLAN.md); [PRODUCT.md](PRODUCT.md) §2). The leasing-era rows below — neighbour confirmation, `ResolveEntities` / `GetBlockProfile` / `ScoreCandidates`, the vacancy / do-not-lease framing, and the Shelfwise fallback — are superseded where they disagree: [PLAN.md](PLAN.md) wins, and Qloo facts live in [QLOO_APIS.md](QLOO_APIS.md). Still current: the two-person split (§5), the spike outcomes and quota (§6), and the stack adaptations (§2).
 
 ## 1. Service map
 

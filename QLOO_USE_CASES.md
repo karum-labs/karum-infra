@@ -107,7 +107,7 @@ Summary first, details after.
 
 ### 2.5 Saturation / cannibalisation check — Insights with `filter.type=urn:entity:place`
 
-- **What it does:** "is a coffee shop already within walking distance?" — the check that stops Karum recommending what the block already has. It feeds both the cannibalisation penalty in scoring and the "do not lease: third coffee concept" card.
+- **What it does:** "is a coffee shop already within walking distance?" — the check that stops Karum recommending what the block already has. It feeds the saturation signal behind the skip rule in scoring ([PLAN.md](PLAN.md) §11) and the **Doors to Skip** card.
 - **The call:** `GET /v2/insights?filter.type=urn:entity:place&filter.tags=<category tag>&filter.location=POINT(<lon> <lat>)&filter.location.radius=<metres>&sort_by=distance&take=50` — Insights takes WKT only (longitude-first); always send an explicit radius (a WKT point without one returns 0 results). Documented refinements for later: `filter.price_level`, `filter.price_range.from/.to`, `filter.hotel_class`, ratings (`filter.rating`, TripAdvisor, business_rating), `filter.external.exists=resy,michelin,tablet` plus the Resy triple (count/rating/party_size), `filter.hours`, `filter.references_brand`, and `filter.exclude.tags` (+ operator) for the inverse "what to avoid" queries.
 - **Where it lives:** [PLAN.md](PLAN.md) epics 14 and 15; [PRODUCT.md](PRODUCT.md) call sequence #4.
 - **Why it matters:** it is the product's negative space ("do not lease") and the tie-breaker between two otherwise plausible candidates.
@@ -123,7 +123,7 @@ Summary first, details after.
 
 ### 2.7 Scoring inputs — documented Qloo dials that feed the three-part score
 
-- **What it does:** the score has three parts (catchment fit, co-tenancy complement, cannibalisation penalty). These documented parameters shape all three:
+- **What it does:** the score has three parts (cultural affinity, shelf opportunity, demographic alignment — [PLAN.md](PLAN.md) §11). These documented parameters shape all three:
   - **Popularity band** — `filter.popularity.min/max` (0–1): the "safe vs emerging" split.
   - **Price / rent proxy** — `filter.price_level.min/max` (1–4); hotel-style variant `filter.price_range.from/.to` (name conflict DI-5).
   - **Trends bias** — `bias.trends` (`off` … `very_high`, default `medium`): how much current momentum weighs.

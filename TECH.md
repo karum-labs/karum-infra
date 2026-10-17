@@ -25,7 +25,7 @@ Python (uv-managed) gRPC service. Stubs come from `karum-infra/proto/` via buf. 
 - **Door scouting.** `ScoutDoors` ranks places for the confirmed seed inside an explicit metre radius. Each door carries affinity, shared taste tags, `feature.explainability` contributions, and demographic alignment. Doors under the affinity floor are returned on the skip list with a machine-readable reason. The evidence payload lists every Qloo call.
 - **Flagship heatmap.** `GetLocalityHeatmap` returns heatmap cells, and locality polygons when the caller asks for the `urn:entity:locality` boundary, so the map can name the top corridors and their anchor neighbours.
 - **Conquest overlap.** `CompareAudiences` calls `/v2/analysis/compare` for a door against the emerging brand and an incumbent found on the menu. The chart uses the `tags` overlap. `matchEntities` is parsed and treated as empty when the payload has none.
-- **Caching.** Redis, keyed by a canonical hash of the request, so preset replays do not burn the 10,000 request monthly quota. Fixture files are redacted; raw Qloo JSON never lands in a repo.
+- **Caching.** Redis, keyed by a canonical hash of the request, with an in-process fallback, so repeated taste calls do not burn the 10,000 request monthly quota. Fixture files are redacted; raw Qloo JSON never lands in a repo.
 
 ### service-ai
 
@@ -40,7 +40,7 @@ Python (uv-managed) gRPC service using `google-genai` on Vertex AI (`vertexai=Tr
 
 Go 1.22+ Gin gateway. It is the only public HTTP surface.
 
-- `POST /api/v1/scout` creates a job from the confirmed seed, the city, the mode, and the SKU list, and returns a job id. `GET` returns state and the campaign payload. `GET /events` is an SSE stream with a cursor.
+- `POST /api/v1/scout` creates a job from the confirmed seed, the city, the mode, and the SKU list, and returns a job id; a request that names a preset serves the stored prewarmed run and replays its recorded trace, and only free entry runs the live pipeline. `GET` returns state and the campaign payload. `GET /events` is an SSE stream with a cursor.
 - Geocodes the city once and reuses that lat/lng for the map, the scout radius, the heatmap, and Places. The three judge presets send coordinates and already-resolved seed ids.
 - Calls taste, then Google Places API (New) for address, hours, website, and open status on the working set, then service-ai, then Google Routes with `optimizeWaypointOrder` across the qualified doors.
 - Assembles the door score (below) after both microservices have reported. Persists the run and freezes the evidence snapshot so a later cache refresh cannot rewrite it.
@@ -64,24 +64,24 @@ The mode pills are `Wholesale Doors`, `Flagship & Pop-Up`, and `Brand Collabs`.
 
 Conquest and SKU assortment are wholesale outputs, not extra pills. When the menu audit finds an incumbent, that door's card carries a displacement battlecard backed by `CompareAudiences`. The SKU badge is the brand SKU whose palette matches the door's taste tags.
 
-Judge presets, each pre-warmed:
+Judge presets, each pre-warmed end-to-end and stored:
 
 - Austin — Sola yuzu mezcal (Ilegal Mezcal, Aesop, Khruangbin — Madre Mezcal is absent from Qloo coverage; 17 Oct extension) — wholesale
-- Brooklyn — minimalist ceramics and matcha — flagship, plus a cached collab run so the mode toggle is instant
+- Brooklyn — minimalist ceramics and matcha — flagship, plus a stored collab run so the mode toggle is instant
 - Mumbai, Colaba — specialty cacao and coffee — wholesale
 
 ## The door score
 
-`service-taste` returns cultural affinity and demographic alignment. `service-ai` returns shelf opportunity and the competitor count from the menu audit. The gateway computes the composite, on a 0–100 scale, and writes the formula and the inputs into the evidence payload:
+`service-taste` returns cultural affinity and demographic alignment. `service-ai` returns shelf opportunity and the competitor count from the menu audit. The gateway computes the composite from 0–1 sub-scores, displays it as a 0–100 number, and writes the formula and the inputs into the evidence payload:
 
-`S_door = 0.50 · A_taste + 0.30 · O_shelf + 0.20 · D_demo − P_saturation`
+`S_door = 0.50 · A_taste + 0.30 · O_shelf + 0.20 · D_demo` (sub-scores 0–1; the card shows `100 · S_door`)
 
 - **A_taste** — Qloo affinity between the seed and the venue, displayed as a percentile inside the returned shortlist (raw affinity bands move with the seed and the city — Austin: brand seed 0.85 vs place 0.97; Colaba: both ~0.94–0.97 on 17 Oct), with explainability contributions attached and the raw value kept in the evidence.
-- **O_shelf** — high when grounding finds a complementary menu and no exclusive lock from a direct peer; lower when the shelf is already crowded with niche competitors.
-- **D_demo** — alignment between the venue's `urn:demographics` age buckets and the brand's target cohort, plus heatmap intensity for the block.
-- **P_saturation** — applied when affinity falls below the returned shortlist's floor (its minimum or bottom decile — the absolute 0.45 threshold was retired 17 Oct; ranked sets observed 0.83–0.98), or when the audit finds four or more direct niche competitors. Those doors are returned on the skip list with the reason code.
+- **O_shelf** — starts at 1.0 when grounding finds a complementary menu and no exclusive lock from a direct peer; each direct niche competitor found on the live menu takes a quarter off (1.0, 0.75, 0.50, 0.25), and four or more skip the door instead of scoring it.
+- **D_demo** — alignment between the venue's `urn:demographics` age buckets and the brand's target cohort, mapped onto 0–1, plus heatmap intensity for the block.
+- **P_saturation** — the skip rule, applied after scoring and never a term in the composite: a door whose affinity falls below the returned shortlist's floor (its minimum or bottom decile — the absolute 0.45 threshold was retired 17 Oct; ranked sets observed 0.83–0.98), or whose audit finds four or more direct niche competitors, is returned on the skip list with its reason code and keeps its sub-scores in the evidence.
 
-Ties break deterministically. The client renders server rank and does not re-sort. When grounding is unavailable, `O_shelf` is unknown, the penalty uses affinity alone, and the card says the menu was not verified.
+Ties break deterministically. The client renders server rank and does not re-sort. When grounding is unavailable, `O_shelf` is unknown, the composite renormalizes over `A_taste` and `D_demo`, and the card says the menu was not verified.
 
 ## Qloo calls the spike settled
 
@@ -129,4 +129,4 @@ All requests use `https://hackathon.api.qloo.com` and the `X-Api-Key` header. A 
 [ karum-client — Flutter web ]
 ```
 
-Each process boots in `live`, `fixture`, or `degraded` mode (`*_MODE` in [.env.example](.env.example)). Fixture mode replays the redacted recordings and makes no outbound calls, so the stack runs with no keys present. Cached presets are the judge path: under a second once pre-warmed. A live free-entry scout targets under eight seconds, and the trace keeps emitting on that path.
+Each process boots in `live`, `fixture`, or `degraded` mode (`*_MODE` in [.env.example](.env.example)). Fixture mode replays the redacted recordings and makes no outbound calls, so the stack runs with no keys present. Stored preset runs are the judge path: the prewarm runs each preset end-to-end once and stores the completed run, so a preset click serves the stored campaign and its recorded trace — under a second, no live pipeline. A live free-entry scout targets under eight seconds, and the trace keeps emitting on that path.
