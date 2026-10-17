@@ -57,7 +57,7 @@ In `infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `karum.a
 
 ### 2. Taste RPCs
 
-`ResolveBrandSeed` returns ranked brand, place, or artist candidates and a derived confidence. `ResolveTags` maps a category or lifestyle chip to tag URNs. `ScoutDoors` takes confirmed seed ids, tags, the city point, an explicit metre radius, and a category tag, and returns recommended doors, the skip list, demographics, and the evidence bundle. `GetLocalityHeatmap` returns cells and, when requested, locality polygons. `CompareAudiences` returns the compare payload for one door, the emerging brand, and an incumbent. Heatmap and compare are first-class for flagship and conquest; the client hides a widget when that RPC reports itself unavailable.
+`ResolveBrandSeed` returns ranked brand, place, or artist candidates and a derived confidence. `ResolveTags` maps a category or lifestyle chip to tag URNs. `ScoutDoors` takes confirmed seed ids, tags, the city point, an explicit metre radius, and a category tag, and returns recommended doors, the skip list, demographics, and the evidence bundle. `GetLocalityHeatmap` returns cells and, when requested, locality polygons. `CompareAudiences` returns the compare payload for one door, the emerging brand, and an incumbent. Heatmap is first-class for flagship and compare for the wholesale displacement case; the client hides a widget when that RPC reports itself unavailable.
 
 - [ ] `ResolveBrandSeed` with ranked candidates and a confidence
 - [ ] `ResolveTags` for venue-category and lifestyle chips
@@ -76,11 +76,11 @@ In `infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `karum.a
 
 ### 4. Stubs and fixtures
 
-`buf generate` emits Go stubs for the gateway and Python stubs for taste and AI. CI runs that generate step inside Docker so laptop and CI stubs match. The fixture pack holds redacted recordings for the three judge campaigns — Austin wholesale, Brooklyn flagship, Brooklyn collab, and Mumbai wholesale. Redacted means the fields Karum consumes, never raw Qloo JSON ([QLOO_APIS.md](QLOO_APIS.md) §1). Fixture mode serves those recordings and makes no outbound calls. A contract test round-trips one campaign through both generated stubs.
+`buf generate` emits Go stubs for the gateway and Python stubs for taste and AI. CI runs that generate step inside Docker so laptop and CI stubs match. The fixture pack holds redacted recordings for the judge campaigns — Austin wholesale, Brooklyn flagship and collab, and Mumbai wholesale. Redacted means the fields Karum consumes, never raw Qloo JSON ([QLOO_APIS.md](QLOO_APIS.md) §1). Fixture mode serves those recordings and makes no outbound calls. A contract test round-trips one campaign through both generated stubs.
 
 - [ ] Generate Go and Python stubs from `infra/proto` in CI
 - [ ] Generate inside Docker so local and CI stubs match
-- [ ] Ship a redacted fixture pack for the three judge campaigns, including the Brooklyn collab run
+- [ ] Ship a redacted fixture pack for the four presets (three cities; Brooklyn carries flagship and collab)
 - [ ] Add a fixture mode that serves those recordings with no network
 - [ ] Add a contract test that round-trips a campaign through both stubs
 
@@ -98,12 +98,13 @@ In `infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `karum.a
 
 ### 6. Lock the three presets
 
-The judge buttons are fixed: Austin (Sola: mezcal brand + Aesop + Khruangbin; wholesale), Brooklyn (ceramics and matcha; flagship and collab), Mumbai Colaba (specialty cacao and coffee; wholesale). Colaba already resolved on 16 Oct — 10 of 10 venue names landed within 2 km of the block point. The 17 Oct extension confirmed the Austin door direction — a brand-typed seed returns ranked door rows at the downtown point with explainability and stable affinity (RECORDING.md extension) — and found one coverage miss: **Madre Mezcal does not resolve in Qloo** (brand-typed and any-type searches both miss; only same-name places in other cities). The locked Austin seed therefore swaps in Qloo-verified substitutes — Ilegal Mezcal, Aesop, and Khruangbin all resolve — and presets lock seed ids only after they resolve. This pass still resolves the Brooklyn reference entities and writes down the preset ids, the lat/lng, the radius, the category tags, and the skip-candidate ids the fixtures will replay. Door and collab queries use `filter.location` as WKT plus an explicit radius in metres (8 km unless a preset overrides; heatmap 10 km). A brand-type insights call, if any preset needs one, uses `signal.location` (DI-11). Spend is logged against the 9,856 requests remaining before anyone starts feature traffic.
+The judge buttons are fixed: Austin (Sola: mezcal brand + Aesop + Khruangbin; wholesale), Brooklyn (ceramics and matcha; flagship and collab), Mumbai Colaba (specialty cacao and coffee; wholesale). Colaba already resolved on 16 Oct — 10 of 10 venue names landed within 2 km of the block point. The 17 Oct extension confirmed the Austin door direction — a brand-typed seed returns ranked door rows at the downtown point with explainability and stable affinity (RECORDING.md extension) — and found one coverage miss: **Madre Mezcal does not resolve in Qloo** (brand-typed and any-type searches both miss; only same-name places in other cities). The locked Austin seed therefore swaps in Qloo-verified substitutes — Ilegal Mezcal, Aesop, and Khruangbin all resolve — and presets lock seed ids only after they resolve. Entity-level misses swap like the Austin seed; if the city fails the 70% resolution check or the point returns no heatmap cells, the flagship toggle moves to the best verified alternative in the same pass, with the backup city's heatmap probed during it (1 call). This pass still resolves the Brooklyn reference entities and writes down the preset ids, the lat/lng, the radius, the category tags, and the skip-candidate ids the fixtures will replay. Door and collab queries use `filter.location` as WKT plus an explicit radius in metres (8 km unless a preset overrides; heatmap 10 km). A brand-type insights call, if any preset needs one, uses `signal.location` (DI-11). Spend is logged against the 9,856 requests remaining before anyone starts feature traffic.
 
 - [x] Colaba venue resolution measured 16 Oct — 10 of 10 within 2 km
 - [x] Location behaviour settled — place calls use WKT plus an explicit metre radius; brand-type insights use `signal.location` (DI-11, DI-21)
 - [x] Austin door query confirmed 17 Oct — a brand seed returns door rows at the downtown point; Madre Mezcal is a coverage miss and the seed swaps in Qloo-verified substitutes (Ilegal Mezcal, Aesop, Khruangbin)
 - [ ] Resolve the Brooklyn seed entities and confirm a point returns doors and heatmap cells
+- [ ] Decide the flagship fallback in this pass — entity misses swap like Madre → Ilegal; a city-level failure (under 70% resolution, or no heatmap cells at the point) moves the toggle to the best verified alternative, with a 1-call backup heatmap probe
 - [ ] Measure the western demo city's venue-resolution rate while resolving its venues (kill rule 2's 10-of-10-style check, [DECISIONS.md](DECISIONS.md) §4)
 - [ ] Confirm the Colaba door shape under its preset category tag — the 17 Oct Colaba calls were unfiltered and topped out with event venues (1–2 calls)
 - [ ] Write the four preset payloads (ids, points, radii, category tags, skip-candidate ids) into the fixture seeds
@@ -173,12 +174,12 @@ From documented Qloo fields, compute `A_taste` and `D_demo` on a stable 0–1 sc
 
 ### 13. Cache and prewarm
 
-Cache Qloo responses in Redis under a canonical hash of the request parameters, with a 24h TTL. A single-flight lock makes concurrent refreshes of the same key share one upstream call. If Redis is down, fall back to an in-process cache and flip the degraded health bit. Prewarm runs each of the four presets (three buttons, plus Brooklyn collab) end-to-end once — taste, Places, AI, route — and stores the completed run (§25), so a preset click serves the stored campaign and its recorded trace instead of re-running the live pipeline (§37). Eval requests set a bypass flag that is never written back into the demo cache.
+Cache Qloo responses in Redis under a canonical hash of the request parameters, with a 24h TTL. A single-flight lock makes concurrent refreshes of the same key share one upstream call. If Redis is down, fall back to an in-process cache and flip the degraded health bit. Prewarm runs each of the four presets (three buttons, plus Brooklyn collab) end-to-end once — taste, Places, AI (menu audit, drafts, and the `LlmOnlyBaseline` text), and route — and stores the completed run with its drafts, baseline text, and trace events (§25), so a preset click serves the newest ready stored run and its recorded trace instead of re-running the live pipeline (§37). Eval requests set a bypass flag that is never written back into the demo cache.
 
 - [ ] Redis cache keyed by a canonical parameter hash with a 24h TTL
 - [ ] Single-flight lock so a refresh cannot stampede Qloo
 - [ ] In-memory fallback when Redis is down, with a degraded health bit
-- [ ] Prewarm the four presets end-to-end and store the completed runs
+- [ ] Prewarm the four presets end-to-end, `LlmOnlyBaseline` included, and store the completed runs with their traces
 - [ ] Eval bypass that is never served back as a cached demo response
 
 ### 14. Taste edge cases
@@ -238,10 +239,10 @@ If Vertex errors, times out, or returns JSON that fails the schema, the gateway 
 
 ### 19. HTTP API and jobs
 
-`POST /api/v1/scout` creates a job from the confirmed seed, the city, the mode, and the SKU list, and returns a job id. A request that names a preset serves the stored preset run (§13) and replays its recorded trace; only a free-entry request runs the live pipeline. `GET` returns the state and, once ready, the campaign payload. Draft `POST`s cover the run-sheet, the site brief, and a single-door pitch. `GET /events` is an SSE stream keyed by a cursor so a refresh replays from the last trace event.
+`POST /api/v1/scout` creates a job from the confirmed seed, the city, the mode, and the SKU list, and returns a job id. A request that names a preset serves the newest ready stored run (§13) and replays its recorded trace; if no stored run exists yet, the preset falls back to the live pipeline in live mode and to the fixture recording in fixture mode (§4). A free-entry request always runs the live pipeline. `GET` returns the state and, once ready, the campaign payload. Draft `POST`s cover the run-sheet, the site brief, and a single-door pitch. `GET /events` is an SSE stream keyed by a cursor so a refresh replays from the last trace event.
 
 - [ ] `POST /api/v1/scout` creates a job from seed, city, mode, and SKUs
-- [ ] Serve preset requests from the stored runs, replaying the recorded trace; free entry runs the live pipeline
+- [ ] Serve presets from the newest ready stored run, replaying the recorded trace; fall back to live or fixture when none exists, and keep free entry live
 - [ ] `GET` returns state and, when ready, the campaign payload
 - [ ] `POST` draft endpoints for the run-sheet, the site brief, and a single-door pitch
 - [ ] SSE `/events` with a cursor so a refresh can resume the trace
@@ -296,12 +297,13 @@ The gateway renders the PDF. Wholesale and collab produce a field run-sheet: ord
 
 ### 25. Job persistence
 
-Postgres tables for campaigns, runs, evidence snapshots, and drafts, applied with forward-only migrations. The HTTP API gets a campaign by id so a refresh can restore it. A re-run inserts a new run row and leaves the previous snapshot untouched. A seed script loads the four presets so fixture and live modes share the same ids. There is no account table.
+Postgres tables for campaigns, runs, evidence snapshots, drafts, and each run's trace events, applied with forward-only migrations. A run's stored payload carries the campaign plus the `LlmOnlyBaseline` text and the recorded trace a stored preset replays (§19, §30). The HTTP API gets a campaign by id so a refresh can restore it. A re-run inserts a new run row and leaves the previous snapshot untouched; the preset path always serves the newest ready run. A seed script loads the four presets so fixture and live modes share the same ids. There is no account table.
 
-- [ ] Postgres schema for campaigns, runs, evidence snapshots, and drafts
+- [ ] Postgres schema for campaigns, runs, evidence snapshots, drafts, and trace events
 - [ ] Forward-only migrations
 - [ ] Get a campaign by id
 - [ ] Re-run creates a new run and leaves the previous snapshot untouched
+- [ ] Store the baseline text and the recorded trace on the run so a stored preset serves without live calls
 - [ ] Seed the four presets
 
 ### 26. Gateway resilience
@@ -421,7 +423,7 @@ Use one set of plain-English names for the three sub-scores in the Flutter cards
 
 ### 37. Prewarm and latency
 
-Run the prewarm for all four presets on deploy: each runs end-to-end once and its completed run is stored (§13), so a preset click serves the stored campaign and its recorded trace — target under a second without re-running the live pipeline. A live free-entry scout targets under eight seconds, and SSE events keep emitting on that path so the timeline does not look stuck. Set Cloud Run min instances above zero during the judging window. Record p50 and p95 for a stored preset and for free entry.
+Run the prewarm for all four presets after each deploy: the Make `prewarm` target posts an authenticated prewarm request to the deployed gateway, each preset runs end-to-end once — `LlmOnlyBaseline` included — and its completed run with its recorded trace is stored (§13), so a preset click serves the newest ready stored run — target under a second without re-running the live pipeline. A live free-entry scout targets under eight seconds, and SSE events keep emitting on that path so the timeline does not look stuck. Set Cloud Run min instances above zero during the judging window. Record p50 and p95 for a stored preset and for free entry.
 
 - [ ] Prewarm all four presets end-to-end on deploy, and refresh the stored runs before judging
 - [ ] Aim for a stored preset under a second and a live scout under eight seconds

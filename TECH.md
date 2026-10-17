@@ -40,10 +40,10 @@ Python (uv-managed) gRPC service using `google-genai` on Vertex AI (`vertexai=Tr
 
 Go 1.22+ Gin gateway. It is the only public HTTP surface.
 
-- `POST /api/v1/scout` creates a job from the confirmed seed, the city, the mode, and the SKU list, and returns a job id; a request that names a preset serves the stored prewarmed run and replays its recorded trace, and only free entry runs the live pipeline. `GET` returns state and the campaign payload. `GET /events` is an SSE stream with a cursor.
+- `POST /api/v1/scout` creates a job from the confirmed seed, the city, the mode, and the SKU list, and returns a job id; a request that names a preset serves the newest ready stored run and replays its recorded trace, and only free entry runs the live pipeline. `GET` returns state and the campaign payload. `GET /events` is an SSE stream with a cursor.
 - Geocodes the city once and reuses that lat/lng for the map, the scout radius, the heatmap, and Places. The three judge presets send coordinates and already-resolved seed ids.
 - Calls taste, then Google Places API (New) for address, hours, website, and open status on the working set, then service-ai, then Google Routes with `optimizeWaypointOrder` across the qualified doors.
-- Assembles the door score (below) after both microservices have reported. Persists the run and freezes the evidence snapshot so a later cache refresh cannot rewrite it.
+- Assembles the door score (below) after both microservices have reported. Persists the run, its trace-event stream, and the frozen evidence snapshot, so a stored preset can replay its recorded trace and a later cache refresh cannot rewrite the snapshot.
 - Renders the PDF run-sheet (wholesale and collab) and the site-selection brief (flagship).
 
 ### client
@@ -129,4 +129,4 @@ All requests use `https://hackathon.api.qloo.com` and the `X-Api-Key` header. A 
 [ karum-client — Flutter web ]
 ```
 
-Each process boots in `live`, `fixture`, or `degraded` mode (`*_MODE` in [.env.example](.env.example)). Fixture mode replays the redacted recordings and makes no outbound calls, so the stack runs with no keys present. Stored preset runs are the judge path: the prewarm runs each preset end-to-end once and stores the completed run, so a preset click serves the stored campaign and its recorded trace — under a second, no live pipeline. A live free-entry scout targets under eight seconds, and the trace keeps emitting on that path.
+Each process boots in `live`, `fixture`, or `degraded` mode (`*_MODE` in [.env.example](.env.example)). Fixture mode replays the redacted recordings and makes no outbound calls, so the stack runs with no keys present. Stored preset runs are the judge path: the prewarm runs each preset end-to-end once — `LlmOnlyBaseline` included — and stores the completed run, so a preset click serves the newest ready stored run and its recorded trace — under a second, no live pipeline. A live free-entry scout targets under eight seconds, and the trace keeps emitting on that path.
