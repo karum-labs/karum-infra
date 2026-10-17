@@ -467,12 +467,12 @@ An `unresolved` or `empty` result is rendered as a miss in the API and in the UI
 
 ### 41. Containers and Cloud Run
 
-Dockerfiles for the gateway, taste, and AI already run in Compose. Publish the Flutter web build on the public demo host. Infra holds the Cloud Run service manifests and the env wiring, and provisions a managed Postgres for the demo — the Compose container does not follow to Cloud Run, while Redis stays optional behind the in-process fallback. Secrets live in a secret manager; a preview revision can boot in fixture mode with no Qloo key. CORS allows only the client origin. The Qloo key is injected into taste, never into the browser.
+Dockerfiles for the gateway, taste, and AI already run in Compose. Publish the Flutter web build on the public demo host. Infra holds the Cloud Run service manifests and the env wiring, and provisions a managed Postgres for the demo (Neon, free tier — scale-to-zero is expected, and the wake adds only a few hundred milliseconds); the Compose container does not follow to Cloud Run, while Redis stays optional behind the in-process fallback. Secrets live in a secret manager; a preview revision can boot in fixture mode with no Qloo key. CORS allows only the client origin. The Qloo key is injected into taste, never into the browser.
 
 - [x] Dockerfiles for gateway, taste, and AI
 - [ ] Publish the Flutter web build on the public demo host
 - [ ] Add Cloud Run manifests and env wiring in infra
-- [ ] Provision a managed Postgres for the demo, with Redis optional behind the in-process fallback
+- [ ] Provision the Neon free-tier Postgres for the demo, with Redis optional behind the in-process fallback
 - [ ] Store secrets in a secret manager, and allow preview to run on fixtures
 - [ ] Restrict CORS to the client origin and keep the Qloo key server-side
 
