@@ -94,7 +94,7 @@ flutter run -d chrome --dart-define=GATEWAY_URL=http://localhost:8080
 
 | Tool | Pin |
 | --- | --- |
-| Go | `1.26.0` |
+| Go | `1.27.2` |
 | Python | `3.13` |
 | uv | `0.13.1` |
 | Flutter | `3.47.6` |

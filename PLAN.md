@@ -2,7 +2,7 @@
 
 This is the build checklist for the whole system. The product is the brand-operated expansion agent in [PRODUCT.md](PRODUCT.md). The shape is the five-repo split in [TECH.md](TECH.md): Flutter client, Go gateway, `service-taste`, `service-ai`, and this infra repo for protos, Compose, and Cloud Run.
 
-Today is 18 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Feature freeze is 27 Oct, the public no-login build is up on 28 Oct, and the submission goes in on 29 Oct. Cloud Run and the pre-warmed cache stay up through 23 Nov; judging runs 2–16 Nov.
+Today is 18 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Feature freeze is 27 Oct, the public build is up on 28 Oct with the hackathon banner signing judges into the preseeded account, and the submission goes in on 29 Oct. Cloud Run and the pre-warmed cache stay up through 23 Nov; judging runs 2–16 Nov.
 
 On 17 Oct the product became the brand agent: a brand seed and a city go in, and doors, flagship corridors, collab partners, skip reasons, menu audits, and a field route come out. This checklist is that build. Platform work finished before the pivot stays ticked. The domain protos and the stub toolchain landed 18 Oct (sections 1–4); scoring, drafts, and the product screens are still unbuilt, and they follow the sections below. [DECISIONS.md](DECISIONS.md) records the earlier leasing shape; where it disagrees with this file, this file wins. Qloo parameter facts stay in [QLOO_APIS.md](QLOO_APIS.md) and [spike/RECORDING.md](spike/RECORDING.md) — that catalogue still cites the old epic numbers, so new work cites section numbers and DI ids.
 
@@ -41,7 +41,7 @@ Service ownership:
 - **server:** city geocode, job orchestration, score assembly, Places, Routes, PDF, Postgres, rate limits, SSE
 - **client:** judge-ready Flutter web UI, plus the same screens on desktop
 
-After the domain protos land, client work (sections 29–36) runs in parallel with taste and AI against fixture mode. If the calendar tightens, cut in this order and leave the three-minute path alone: the compare chart, run history beyond the live job, the sixty-second coach, then the observability dashboard. The path that stays is the Austin wholesale preset, a door card with citations, the evidence drawer, the skip list, the LLM toggle, the pitch and the route, then the Brooklyn flagship heatmap and its collab toggle.
+After the domain protos land, client work (sections 27–38) runs in parallel with taste and AI against fixture mode. Design tokens, mockups, and the preseeded judge account come before the screens. If the calendar tightens, cut in this order and leave the three-minute path alone: the compare chart, run history beyond the live job, the sixty-second coach, then the observability dashboard. The path that stays is the Austin wholesale preset, a door card with citations, the evidence drawer, the skip list, the LLM toggle, the pitch and the route, then the Brooklyn flagship heatmap and its collab toggle.
 
 ## 1. Contracts and local platform
 
@@ -174,7 +174,7 @@ From documented Qloo fields, compute `A_taste` and `D_demo` on a stable 0–1 sc
 
 ### 13. Cache and prewarm
 
-Cache Qloo responses in Redis under a canonical hash of the request parameters, with a 24h TTL. A single-flight lock makes concurrent refreshes of the same key share one upstream call. If Redis is down, fall back to an in-process cache and flip the degraded health bit. Prewarm runs each of the four presets (three buttons, plus Brooklyn collab) end-to-end once — taste, Places, AI (menu audit, drafts, and the `LlmOnlyBaseline` text), and route — and stores the completed run with its drafts, baseline text, and trace events (§25), so a preset click serves the newest ready stored run and its recorded trace instead of re-running the live pipeline (§37). Eval requests set a bypass flag that is never written back into the demo cache.
+Cache Qloo responses in Redis under a canonical hash of the request parameters, with a 24h TTL. A single-flight lock makes concurrent refreshes of the same key share one upstream call. If Redis is down, fall back to an in-process cache and flip the degraded health bit. Prewarm runs each of the four presets (three buttons, plus Brooklyn collab) end-to-end once — taste, Places, AI (menu audit, drafts, and the `LlmOnlyBaseline` text), and route — and stores the completed run with its drafts, baseline text, and trace events (§25), so a preset click serves the newest ready stored run and its recorded trace instead of re-running the live pipeline (§39). Eval requests set a bypass flag that is never written back into the demo cache.
 
 - [ ] Redis cache keyed by a canonical parameter hash with a 24h TTL
 - [ ] Single-flight lock so a refresh cannot stampede Qloo
@@ -297,7 +297,7 @@ The gateway renders the PDF. Wholesale and collab produce a field run-sheet: ord
 
 ### 25. Job persistence
 
-Postgres tables for campaigns, runs, evidence snapshots, drafts, and each run's trace events, applied with forward-only migrations. A run's stored payload carries the campaign plus the `LlmOnlyBaseline` text and the recorded trace a stored preset replays (§19, §30). The HTTP API gets a campaign by id so a refresh can restore it. A re-run inserts a new run row and leaves the previous snapshot untouched; the preset path always serves the newest ready run. A seed script loads the four presets so fixture and live modes share the same ids. There is no account table.
+Postgres tables for campaigns, runs, evidence snapshots, drafts, and each run's trace events, applied with forward-only migrations. A run's stored payload carries the campaign plus the `LlmOnlyBaseline` text and the recorded trace a stored preset replays (§19, §32). The HTTP API gets a campaign by id so a refresh can restore it. A re-run inserts a new run row and leaves the previous snapshot untouched; the preset path always serves the newest ready run. A seed script loads the four presets so fixture and live modes share the same ids. The judge account is added in §28; this schema stays campaigns, runs, evidence, and drafts.
 
 - [ ] Postgres schema for campaigns, runs, evidence snapshots, drafts, and trace events
 - [ ] Forward-only migrations
@@ -308,7 +308,7 @@ Postgres tables for campaigns, runs, evidence snapshots, drafts, and each run's 
 
 ### 26. Gateway resilience
 
-Set a deadline on every taste and AI gRPC call and a circuit breaker per dependency. Per-IP and global rate limits return a JSON error the client can map to copy. Require `Idempotency-Key` on create so a double-submit returns the original job. Validate seed count (one to four seed entities — a resolved brand plus any vibe chips, or a two-to-four-entity composite of chips; the total never exceeds four, §29), text length, SKU-list length, mode, and radius before any RPC. `GET /health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode as `live`, `fixture`, or `degraded`.
+Set a deadline on every taste and AI gRPC call and a circuit breaker per dependency. Per-IP and global rate limits return a JSON error the client can map to copy. Require `Idempotency-Key` on create so a double-submit returns the original job. Validate seed count (one to four seed entities — a resolved brand plus any vibe chips, or a two-to-four-entity composite of chips; the total never exceeds four, §31), text length, SKU-list length, mode, and radius before any RPC. `GET /health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode as `live`, `fixture`, or `degraded`.
 
 - [ ] Deadlines on every gRPC call and a circuit breaker per dependency
 - [ ] Per-IP and global rate limits with a clear JSON error
@@ -318,17 +318,37 @@ Set a deadline on every taste and AI gRPC call and a circuit breaker per depende
 
 ## 6. Flutter client
 
-### 27. App shell
+### 27. Design tokens and mockups
 
-Flutter web is the judge target, with the same screens on desktop. The shared theme defines type scale, cards, chips, banners, and drawers, and every screen implements loading, empty, and error states against the gateway job states. Preset and free-entry scouts run with no account. The gateway base URL is a compile-time define so local Compose and the production host are a switch.
+Before any screen is built, lock the visual system the Flutter theme will consume and the frames the judge path will follow. Tokens cover color, type scale, spacing, radius, and elevation, and they are the values the app-shell theme reads. Mockups cover the login screen with the hackathon banner, the seed builder, the live trace, the map (route, heatmap, and skip pins), the door board with the evidence drawer, and the pitch. Frame both a laptop width and a narrow window. The tokens are checked into the client; the mockups are the reference for the screens in §29–§36.
+
+- [ ] Define color, type, spacing, radius, and elevation tokens
+- [ ] Mock the login screen with the hackathon banner, the seed builder, and the trace
+- [ ] Mock the map, the door board, the evidence drawer, and the pitch
+- [ ] Frame a laptop width and a narrow window
+- [ ] Check the tokens into the client for the app-shell theme to consume
+
+### 28. Preseeded judge account
+
+Create one judge account and attach the four preset campaigns to it. `HACKATHON_MODE=true` (see `.env.example`) makes the login screen show a banner that signs the judge into that account, so judging starts inside the product with the presets already there. `HACKATHON_MODE=false` hides the banner. The account row, its session, and the link from the account to the seeded campaigns live in Postgres. The gateway exposes the flag, and the client renders the banner. Account credentials stay in the secret manager.
+
+- [ ] Add the judge account and attach the four preset campaigns
+- [ ] Expose `HACKATHON_MODE` from the gateway to the client
+- [ ] Show the login banner only when the flag is true, and sign the judge into the preseeded account
+- [ ] Hide the banner when the flag is false
+- [ ] Keep the account credentials in the secret manager
+
+### 29. App shell
+
+Flutter web is the judge target, with the same screens on desktop. The shared theme defines type scale, cards, chips, banners, and drawers, and every screen implements loading, empty, and error states against the gateway job states. With `HACKATHON_MODE` on, the judge is already inside the preseeded account from §28 before a scout starts. The gateway base URL is a compile-time define so local Compose and the production host are a switch.
 
 - [x] Ship Flutter web as the judge target, with the same screens on desktop
 - [ ] Add theme, type scale, cards, chips, banners, and drawers — theme, type scale, cards, chips, and the mode banner exist; drawers still to add
 - [x] Add loading, empty, and error states on every screen
-- [ ] Let a preset and a free-entry scout run with no account
+- [ ] Run a preset and a free-entry scout from the preseeded judge session
 - [x] Configure the gateway base URL for local and production — `--dart-define=GATEWAY_URL`
 
-### 28. Accessibility and layout
+### 30. Accessibility and layout
 
 The path from the seed builder to the pitch is operable from the keyboard, with focus order, labels, and contrast set for a short audit. The trace honours the reduced-motion media query. Layout breakpoints cover a laptop width and a narrow window. A list renders the same recommended doors and skip doors when the map is not the view being used.
 
@@ -338,7 +358,7 @@ The path from the seed builder to the pitch is operable from the keyboard, with 
 - [ ] Lay out for a laptop width and a narrow window
 - [ ] Provide a non-map list of the same doors
 
-### 29. Seed builder, modes, and presets
+### 31. Seed builder, modes, and presets
 
 The brand field calls seed resolution through the gateway, debounced, with a minimum query length, and renders matches as confirm chips. Fallback vibe chips build a composite seed of two to four reference entities; a resolved brand plus any added chips still totals four seed entities or fewer (§26). The SKU list is plain text on the seed. Mode pills are Wholesale, Flagship, and Collab, and they serialize into `POST /api/v1/scout`. Three preset buttons load the stored preset runs and skip typing: Sola in Austin, ceramics and matcha in Brooklyn, cacao and coffee in Colaba. Switching Brooklyn from flagship to collab loads the second stored payload.
 
@@ -348,7 +368,7 @@ The brand field calls seed resolution through the gateway, debounced, with a min
 - [ ] Inline validation before submit
 - [ ] Three preset buttons loading the stored runs, with Brooklyn flagship and collab both stored
 
-### 30. Live trace
+### 32. Live trace
 
 Subscribe to `GET /events` and render each trace event as a timeline row with stage name, elapsed time, and whether the step was a cache hit. The stages the judge should see are seed resolution, door ranking, Places, menu grounding, and the route. A stored preset run replays its recorded events through the same timeline, cache-hit markers included. On refresh, resume from the stored cursor. Cancel calls the abort endpoint and stops the stream. If `/health` or the job state says fixture or degraded, show that banner above the timeline.
 
@@ -359,7 +379,7 @@ Subscribe to `GET /events` and render each trace event as a timeline row with st
 - [ ] Cancel aborts the job
 - [ ] Show a banner when the run is on fixtures or degraded
 
-### 31. Map
+### 33. Map
 
 Draw numbered pins for the qualified doors and red pins for the skip list, with a legend. Draw the scout radius from the lat/lng and the radius the campaign used. Render the heatmap, and locality polygons when the payload has them, in flagship mode. Render the field-route polyline when Routes legs are present. Use OSM or CARTO tiles and keep the attribution visible, including Google attribution for Places and Routes data.
 
@@ -369,7 +389,7 @@ Draw numbered pins for the qualified doors and red pins for the skip list, with 
 - [ ] Field-route polyline when legs are present
 - [ ] OSM or CARTO tiles with visible attribution
 
-### 32. Door board, evidence, and the baseline
+### 34. Door board, evidence, and the baseline
 
 Render the top recommended doors as cards with three labeled sub-score bars — cultural affinity, shelf opportunity, demographic alignment — the shared tags, and the SKU badge. Call out the first stop inside that list; do not re-sort on the client. The skip tab reads the reason codes, including low affinity and competitor count. Menu findings render as clickable grounding URLs. The evidence drawer lists each Qloo call's endpoint, parameters, and result count, plus the explainability weights, and styles Qloo facts differently from model inferences. The LLM-only toggle requests `LlmOnlyBaseline` for the same inputs and labels it ungrounded. Any card field the insights payload lacks hydrates via `GET /entities` ([QLOO_APIS.md](QLOO_APIS.md) §3.12).
 
@@ -380,7 +400,7 @@ Render the top recommended doors as cards with three labeled sub-score bars — 
 - [ ] LLM-only toggle labeled ungrounded, and server rank preserved
 - [ ] Hydrate missing card fields via `GET /entities`
 
-### 33. Pitch and run-sheet actions
+### 35. Pitch and run-sheet actions
 
 The pitch action opens the script and, when present, the battlecard or the activation proposal. The run-sheet action downloads the server-rendered PDF; flagship downloads the site brief instead. Copy-to-clipboard is available on the script. If a later draft request fails, the actions that already succeeded stay enabled.
 
@@ -389,7 +409,7 @@ The pitch action opens the script and, when present, the battlecard or the activ
 - [ ] Copy the script
 - [ ] Keep completed actions available when a later draft fails
 
-### 34. Client edge cases
+### 36. Client edge cases
 
 Put the job id in the URL and, on load, `GET` the job so a refresh restores an in-flight scout. Double-submit sends the same `Idempotency-Key` and renders the one job the gateway returns. Map HTTP 429, 409, and validation errors to specific copy. An `empty` result explains the miss and routes the operator back to the seed. If the SSE stream drops, poll `GET` until the state is terminal.
 
@@ -401,9 +421,9 @@ Put the job id in the URL and, on load, `GET` the job so a refresh restores an i
 
 ## 7. Demo quality
 
-### 35. Judge-path copy
+### 37. Judge-path copy
 
-The landing line states that brands lose the account by knocking on the wrong door, and the button labels match the three-minute script in [PRODUCT.md](PRODUCT.md) §6.2. The generic-LLM contrast renders only the live `LlmOnlyBaseline` text. The three presets are Austin, Brooklyn, and Colaba. The free-entry form runs the live pipeline and reaches a door list when the seed resolves — or shows the honest miss (§40) — without using a seeded campaign. Live screens render scores the API returned; the illustrative percentages in the demo script are not hardcoded.
+The landing line states that brands lose the account by knocking on the wrong door, and the button labels match the three-minute script in [PRODUCT.md](PRODUCT.md) §6.2. The generic-LLM contrast renders only the live `LlmOnlyBaseline` text. The three presets are Austin, Brooklyn, and Colaba. The free-entry form runs the live pipeline and reaches a door list when the seed resolves — or shows the honest miss (§42) — without using a seeded campaign. Live screens render scores the API returned; the illustrative percentages in the demo script are not hardcoded.
 
 - [ ] Landing line: brands lose the account by knocking on the wrong door
 - [ ] Button labels that match the three-minute script
@@ -411,7 +431,7 @@ The landing line states that brands lose the account by knocking on the wrong do
 - [ ] Presets for Austin, Brooklyn, and Colaba
 - [ ] Free-entry path that reaches a door list or shows the honest miss, with no hardcoded sample scores
 
-### 36. Comprehension
+### 38. Comprehension
 
 Use one set of plain-English names for the three sub-scores in the Flutter cards, the run-sheet, and the pitch, matching the fields the gateway returns: cultural affinity, shelf opportunity, and demographic alignment. A dismissible sixty-second coach runs on the first preset only. The formula tooltip reads the same expression the gateway writes into the evidence payload. Radius uses metres end to end, and the UI may show a kilometre label for the city-scale ring. Three non-technical read-throughs produce a punch list of lines to rewrite.
 
@@ -421,7 +441,7 @@ Use one set of plain-English names for the three sub-scores in the Flutter cards
 - [ ] Show radius in one consistent unit system
 - [ ] Run three non-technical read-throughs and fix any line they cannot explain
 
-### 37. Prewarm and latency
+### 39. Prewarm and latency
 
 Run the prewarm for all four presets after each deploy: the Make `prewarm` target posts an authenticated prewarm request to the deployed gateway, each preset runs end-to-end once — `LlmOnlyBaseline` included — and its completed run with its recorded trace is stored (§13), so a preset click serves the newest ready stored run — target under a second without re-running the live pipeline. A live free-entry scout targets under eight seconds, and SSE events keep emitting on that path so the timeline does not look stuck. Set Cloud Run min instances above zero during the judging window. Record p50 and p95 for a stored preset and for free entry.
 
@@ -433,7 +453,7 @@ Run the prewarm for all four presets after each deploy: the Make `prewarm` targe
 
 ## 8. Proof and failure
 
-### 38. Automated tests
+### 40. Automated tests
 
 `service-taste` owns the affinity unit tests and the Qloo fixture replay tests. `service-ai` owns the Pydantic schema tests and the fallback tests that run with Vertex stubbed out. The gateway tests dial in-process fakes of taste and AI and assert job state, score assembly, and error mapping. Flutter widget tests cover the seed builder, the trace, the door board, and the error copy. A Compose smoke script posts the Austin preset and asserts a door list, a skip list, and a route.
 
@@ -443,7 +463,7 @@ Run the prewarm for all four presets after each deploy: the Make `prewarm` targe
 - [ ] Add Flutter tests for the seed builder, the trace, the board, and errors
 - [ ] Add a Compose smoke script for the Austin preset
 
-### 39. Failure drills
+### 41. Failure drills
 
 Run the Austin preset with taste down, AI down, Redis down, and Postgres down, and with Qloo returning 429 and 500 through fixture mode. Also run invalid model JSON and a venue name that looks like an instruction, plus cancel mid-flight and a browser refresh. For each case, write the expected job state and the expected Flutter copy into a one-page runbook.
 
@@ -453,7 +473,7 @@ Run the Austin preset with taste down, AI down, Redis down, and Postgres down, a
 - [ ] Drill cancel mid-flight and refresh
 - [ ] Write the expected UI for each drill into a one-page runbook
 
-### 40. Honesty rules
+### 42. Honesty rules
 
 An `unresolved` or `empty` result is rendered as a miss in the API and in the UI, with no filled-in guess. Undocumented Qloo parameters stay out of taste client code, fixtures, and prompts — every parameter used resolves to a [QLOO_APIS.md](QLOO_APIS.md) §6 or §7 row. Illustrative numbers in the product brief stay out of live screens and drafts. Degraded mode is visible as the job state and in `GET /health`. When a run reaches `ready`, its evidence snapshot is frozen.
 
@@ -465,7 +485,7 @@ An `unresolved` or `empty` result is rendered as a miss in the API and in the UI
 
 ## 9. Ship and submit
 
-### 41. Containers and Cloud Run
+### 43. Containers and Cloud Run
 
 Dockerfiles for the gateway, taste, and AI already run in Compose. Publish the Flutter web build on the public demo host. Infra holds the Cloud Run service manifests and the env wiring, and provisions a managed Postgres for the demo (Neon, free tier — scale-to-zero is expected, and the wake adds only a few hundred milliseconds); the Compose container does not follow to Cloud Run, while Redis stays optional behind the in-process fallback. Secrets live in a secret manager; a preview revision can boot in fixture mode with no Qloo key. CORS allows only the client origin. The Qloo key is injected into taste, never into the browser.
 
@@ -476,7 +496,7 @@ Dockerfiles for the gateway, taste, and AI already run in Compose. Publish the F
 - [ ] Store secrets in a secret manager, and allow preview to run on fixtures
 - [ ] Restrict CORS to the client origin and keep the Qloo key server-side
 
-### 42. Security pass
+### 44. Security pass
 
 The gateway enforces the same length limits as the seed builder and does not fetch a URL supplied by the client. Grounding URLs are citations returned by the model, not fetch targets. Delete removes a campaign along with its runs and drafts. CI runs dependency and container scans on gateway, taste, and AI. A short rotation note covers the Qloo key and the GCP service account used by Cloud Run.
 
@@ -486,7 +506,7 @@ The gateway enforces the same length limits as the seed builder and does not fet
 - [ ] Run dependency and container scans in CI
 - [ ] Write a rotation note for the Qloo key and the GCP service account
 
-### 43. Observability
+### 45. Observability
 
 Generate a trace id on `POST /api/v1/scout` and propagate it from Flutter through the gateway into taste and AI log lines. Record latency and error rate per outbound dependency: Qloo, Vertex, Places, Routes, Redis, and Postgres. Keep a dashboard or a saved log query scoped to the judging window. Alert when the Qloo error rate spikes. Point an uptime check at `GET /health`.
 
@@ -496,7 +516,7 @@ Generate a trace id on `POST /api/v1/scout` and propagate it from Flutter throug
 - [ ] Alert on a Qloo error spike
 - [ ] Point an uptime check at `/health`
 
-### 44. Docs and Devpost
+### 46. Docs and Devpost
 
 The public README covers the five-repo layout, the Compose run path, the honesty rules, and the MIT licence line, rewritten for the brand agent. Devpost text maps the build onto the four judging criteria and includes the three presets, the skip list, and the LLM contrast. Screenshots show a door card, a skip card, the evidence drawer, the baseline toggle, and the flagship heatmap. Team size, originality, and key terms were checked against the rules on 16 Oct 2026. Submit at least 24 hours before 30 Oct 2026, 11:45pm EDT.
 
@@ -508,13 +528,13 @@ The public README covers the five-repo layout, the Compose run path, the honesty
 - [ ] Keep the demo free and reachable through 16 Nov 2026, with every submission material in English
 - [ ] Submit at least 24 hours before 30 Oct 2026, 11:45pm EDT
 
-### 45. Judging week
+### 47. Judging week
 
-Re-run seed resolution against the live hackathon key for all three presets and confirm the seeded entity ids still hit. Re-run prewarm and the Compose smoke script pointed at production. Click the three-minute script on a clean browser profile, then Brooklyn collab and one free-entry city. Keep the previous Cloud Run revision available so a bad deploy can roll back without a rebuild. Leave the demo live and no-login through 16 Nov 2026.
+Re-run seed resolution against the live hackathon key for all three presets and confirm the seeded entity ids still hit. Re-run prewarm and the Compose smoke script pointed at production. Click the three-minute script on a clean browser profile, then Brooklyn collab and one free-entry city. Keep the previous Cloud Run revision available so a bad deploy can roll back without a rebuild. Leave the demo live through 16 Nov 2026, with the hackathon banner signing judges into the preseeded account.
 
 - [ ] Re-verify all three presets still resolve
 - [ ] Re-run prewarm and the smoke script against production
 - [ ] Click the three-minute script on a clean browser profile
 - [ ] Check the Brooklyn collab toggle and one free-entry city
 - [ ] Keep a rollback to the previous Cloud Run revision
-- [ ] Leave the demo live and no-login through 16 Nov 2026
+- [ ] Leave the demo live through 16 Nov 2026, with the hackathon banner on the preseeded account

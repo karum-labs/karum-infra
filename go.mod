@@ -1,6 +1,6 @@
 module github.com/karum-labs/karum-infra
 
-go 1.26.0
+go 1.27.2
 
 require (
 	google.golang.org/grpc v1.84.0
