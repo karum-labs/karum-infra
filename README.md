@@ -35,7 +35,7 @@ Karum reads the cultural taste of a city via **Qloo**, scores candidate doors on
 - **`QLOO_APIS.md`** — every Qloo endpoint Karum may call with exact parameters, mapped to PLAN epics, plus the spike checklist for the open questions.
 - **`QLOO_USE_CASES.md`** — the plain-language map of where Karum uses Qloo today (each call, its epic, its watch-outs) plus suggested additional use cases, grouped by build cost and spike gates.
 - **`spike/`** — the epic-9 probe runner (`run_spike.py`, stdlib-only) and recording sheet that work the QLOO_APIS.md §5 checklist against the hackathon host; raw responses stay local in `spike/out/`.
-- **`docker-compose.yml`** — the full local stack (gateway, taste, AI, Redis, Postgres) with healthchecks and a deterministic startup order.
+- **`docker-compose.yml`** — the local stack (gateway, taste, AI, Redis) with healthchecks and a deterministic startup order. Postgres is the `POSTGRES_DSN` URI, not a container.
 - **`.env.example`** — every environment variable and which process reads it.
 - **`versions.env`** — the single source of truth for Go, Python, Flutter, and buf versions.
 - **`Makefile`** — `up`, `down`, `test`, `prewarm`, `eval`, plus proto tooling: `lint-proto`, `breaking`, `generate`, `check-proto-docs`, `contract-test`.
@@ -43,10 +43,9 @@ Karum reads the cultural taste of a city via **Qloo**, scores candidate doors on
 
 ## Run path
 
-Requires **Docker** with the Compose plugin. All services boot in **fixture mode** with no credentials, so the whole stack starts with no `.env` file.
+Requires **Docker** with the Compose plugin. Copy `.env.example` to `.env` and set `POSTGRES_DSN` before starting; Compose refuses to boot without that URI.
 
 ```bash
-# Optional: create a .env to override defaults (e.g. to go live).
 cp .env.example .env
 
 # Build and start the full stack.
@@ -67,7 +66,6 @@ make down
 | service-taste | — | In-stack only (gRPC `8081`) |
 | service-ai | — | In-stack only (gRPC `8082`) |
 | redis | — | In-stack only (`6379`) |
-| postgres | — | In-stack only (`5432`) |
 
 Confirm the gateway is healthy:
 

@@ -1,8 +1,9 @@
 # Karum local stack.
 #
-# Brings up the Go gateway, the two microservices, Redis, and Postgres with
+# Brings up the Go gateway, the two microservices, and Redis with
 # healthchecks and a deterministic startup order, so gRPC clients never dial a
-# process that is still booting.
+# process that is still booting. Postgres is not in this stack: the gateway
+# reads POSTGRES_DSN and talks to that database directly.
 #
 # Every service builds from its sibling repo directory (../<repo>), so this
 # file expects the five repos to sit next to each other:
@@ -15,7 +16,7 @@
 #     karum-service-ai/
 #
 # Usage (from this repo's root):
-#   cp .env.example .env   # optional; defaults boot in fixture mode
+#   cp .env.example .env   # required: set POSTGRES_DSN before `up`
 #   docker compose up --build
 #
 # See the README for host ports, where logs go, and how Flutter web points at
@@ -38,24 +39,6 @@ services:
       timeout: 3s
       retries: 5
       start_period: 5s
-
-  # --- Postgres: vacancies, runs, evidence snapshots, drafts. -------------
-  postgres:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-karum}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-karum}
-      POSTGRES_DB: ${POSTGRES_DB:-karum}
-    # Named volume so data survives `docker compose down` (without -v).
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-karum} -d ${POSTGRES_DB:-karum}"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-      start_period: 10s
 
   # --- service-taste: Qloo integration, caching, taste scoring. ----------
   service-taste:
@@ -131,15 +114,13 @@ services:
       TASTE_ADDR: service-taste:8081
       AI_ADDR: service-ai:8082
       REDIS_ADDR: redis:6379
-      POSTGRES_DSN: postgres://${POSTGRES_USER:-karum}:${POSTGRES_PASSWORD:-karum}@postgres:5432/${POSTGRES_DB:-karum}?sslmode=disable
+      POSTGRES_DSN: ${POSTGRES_DSN:?set POSTGRES_DSN in .env}
     depends_on:
       service-taste:
         condition: service_healthy
       service-ai:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      postgres:
         condition: service_healthy
     healthcheck:
       # The runtime image is distroless (no shell/curl), so the binary probes
@@ -149,6 +130,3 @@ services:
       timeout: 4s
       retries: 5
       start_period: 8s
-
-volumes:
-  postgres-data:
