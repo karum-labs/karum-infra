@@ -104,8 +104,13 @@ check-fixtures:
 	$(PYTHON) fixtures/tools/redact.py --verify
 
 ## test-fixtures: unit-test the redaction projections.
+# Invoke a script (fixtures/tools/run_tests.py) instead of `python -c "..."`:
+# make's Windows shell (cmd.exe) mangles `python -c "..."` with a leading
+# `.venv` segment, treating `.venv` as a separate command. A script path --
+# the same shape `make check-fixtures` already uses for `redact.py` -- works.
+# The venv python is still required for the pinned protobuf (see versions.env).
 test-fixtures:
-	$(PYTHON) -m unittest discover -s fixtures/tools -p "test_*.py"
+	$(PYTHON) fixtures/tools/run_tests.py
 
 ## spike ARGS="key": run the Qloo spike runner (see spike/README.md).
 spike:

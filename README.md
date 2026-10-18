@@ -1,8 +1,8 @@
 # karum-infra
 
-Shared **protos, local Docker Compose, toolchain pins, and Cloud Run manifests** for [Karum](#readme) — a tenant-mix leasing agent that tells retail landlords what an empty storefront should become.
+Shared **protos, local Docker Compose, toolchain pins, and Cloud Run manifests** for [Karum](#readme) — the brand-operated expansion agent: a brand seed and a city go in, and doors, flagship corridors, collab partners, skip reasons, menu audits, and a field route come out.
 
-Karum reads the cultural taste of a surrounding block via **Qloo**, scores candidate tenants on **catchment fit** and **co-tenancy complement**, then drafts the leasing memo and outreach with **Vertex AI**. A wrong tenant is a multi-year mistake.
+Karum reads the cultural taste of a city via **Qloo**, scores candidate doors on **affinity, shelf opportunity, and demographic alignment**, then drafts the shopkeeper pitch, battlecard, and field route with **Vertex AI**. A wrong door is a lost account.
 
 ## The five-repo layout
 
@@ -16,7 +16,7 @@ Karum reads the cultural taste of a surrounding block via **Qloo**, scores candi
 
 ```text
 [ Flutter Client ]
-        │  POST /api/v1/analyses
+        │  POST /api/v1/scout
         ▼
 [ Go Gateway (karum-server) ]
         ├── gRPC ──► [ service-taste ] ──► Qloo API
