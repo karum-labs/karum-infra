@@ -51,6 +51,7 @@ services:
       TASTE_QLOO_BASE_URL: ${TASTE_QLOO_BASE_URL:-https://hackathon.api.qloo.com}
       TASTE_REDIS_ADDR: redis:6379
       TASTE_LOG_LEVEL: ${TASTE_LOG_LEVEL:-INFO}
+      TASTE_GRPC_PORT: "9091"
     depends_on:
       redis:
         condition: service_healthy
@@ -83,6 +84,7 @@ services:
       AI_GCP_LOCATION: ${AI_GCP_LOCATION:-us-central1}
       AI_GEMINI_MODEL: ${AI_GEMINI_MODEL:-gemini-2.5-flash}
       AI_LOG_LEVEL: ${AI_LOG_LEVEL:-INFO}
+      GRPC_PORT: "9092"
     healthcheck:
       test:
         [
@@ -112,6 +114,8 @@ services:
       # Point the gateway at the compose service names, not localhost.
       TASTE_ADDR: service-taste:8081
       AI_ADDR: service-ai:8082
+      TASTE_GRPC_ADDR: service-taste:9091
+      AI_GRPC_ADDR: service-ai:9092
       REDIS_ADDR: redis:6379
       POSTGRES_DSN: ${POSTGRES_DSN:?set POSTGRES_DSN in .env}
       GOOGLE_PLACES_API_KEY: ${GOOGLE_PLACES_API_KEY:?set GOOGLE_PLACES_API_KEY in .env}

@@ -6,7 +6,7 @@ Today is 18 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Feature 
 
 On 17 Oct the product became the brand agent: a brand seed and a city go in, and doors, flagship corridors, collab partners, skip reasons, menu audits, and a field route come out. This checklist is that build. Platform work finished before the pivot stays ticked. The domain protos and the stub toolchain landed 18 Oct (sections 1–4); service-taste now resolves seeds, tags, doors, scores, heatmaps, and compare, while the gateway, the AI service's transport, and the product screens remain unbuilt, and they follow the sections below. [DECISIONS.md](DECISIONS.md) records the earlier leasing shape; where it disagrees with this file, this file wins. Qloo parameter facts stay in [QLOO_APIS.md](QLOO_APIS.md) and [spike/RECORDING.md](spike/RECORDING.md) — that catalogue still cites the old epic numbers, so new work cites section numbers and DI ids.
 
-**Status — 18 Oct 2026 (audited).** The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done for all five: MIT licences, READMEs, gitignores, CI, gitleaks, toolchain pins in `versions.env`, `GET /health` on the three backends, and Dockerfiles. Compose is gateway, taste, AI, and Redis; Postgres is the required `POSTGRES_DSN` URI, not a container. **Verified complete:** infra sections 1–3 and 6, plus the stub and fixture tooling in §4 — protos frozen with provenance markers (`doccheck`: 209 fields), `make contract-test` passes through both stub sets, and the 80-file fixture pack verifies (`redact.py --verify`); taste sections 7–12 — 336 tests pass, with one local cache test failing only because `redis` is not installed in this venv. **Partially complete:** taste §13 has the cache, single-flight, fallback, and eval bypass but no prewarm path; taste §14 has dedupe, the outside-city flag, the unresolved stop, and partial-seed confidence, but no seed-entity filter on the door board; service-ai §15–§18 now carry a real request timeout, Google Search grounding, a shortlist cap, shelf-unknown fallback results, sourced-incumbent filtering, citation filtering, brand-list SKU enforcement, and delimited names (34 tests pass), and the new `karum-server/internal/orchestrator` runner keeps the taste ranking on Vertex failure, stores the baseline beside the Qloo payload, feeds baseline names into a free-entry skip list, and regenerates one door through the draft RPC only; its transports are in-process fakes until §19 lands. **Not built:** `karum-server` now has a tested runner but no HTTP scout surface — only `/health`; the runner uses fake transports, the geocoder still returns not-implemented, and there are no gRPC clients, SQL driver, Places, Routes, PDF, SSE, or scout routes. `POSTGRES_DSN` is required at startup. `karum-client` is still the health-screen scaffold — no design system for this product, seed builder, trace, map, door board, or pitch. Sections 19–26 and the product-screen work in §27–§36 are unchecked (only the `GATEWAY_URL` define is done); §37–§47 stay open except the READMEs, licences, Dockerfiles, and the rules check. Nothing has been pushed.
+**Status — 19 Oct 2026.** The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done for all five: MIT licences, READMEs, gitignores, CI, gitleaks, toolchain pins in `versions.env`, `GET /health` on the three backends, and Dockerfiles. Compose is gateway, taste, AI, and Redis; Postgres is the required `POSTGRES_DSN` URI, not a container. **Verified complete:** infra sections 1–3 and 6, plus the stub and fixture tooling in §4 except the AI fixture replay; taste sections 7–12; service-ai §15–§18; gateway §19–§26 — scout jobs, geocoding, score assembly, Places, Routes, PDFs, Postgres snapshots, and the resilience controls. Taste and AI serve those RPCs over gRPC beside their HTTP health ports. **Still open on purpose:** §4 AI fixture replay, §5 `make test`, §13 prewarm, §14 the seed-entity filter, and the product work from §27 onward except the `GATEWAY_URL` define, the Dockerfiles, and the README and rules notes already ticked. `karum-client` is still the health-screen scaffold. Nothing has been pushed.
 
 | Window | Sections | Outcome |
 | --- | --- | --- |
@@ -91,7 +91,7 @@ In `infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `karum.a
 - [x] Compose gateway, taste, AI, and Redis — the database is the required `POSTGRES_DSN` URI
 - [x] Add healthchecks and a deterministic startup order
 - [x] Add `.env.example` listing every variable and which process reads it
-- [ ] Add one command that runs the Austin preset on fixtures and prints the campaign JSON — `make test` is still a TODO; the gateway has no scout route to call
+- [ ] Add one command that runs the Austin preset on fixtures and prints the campaign JSON — `make test` is still a TODO; `POST /api/v1/scout` exists, the one-command fixture run does not
 - [x] Document ports, logs, and how Flutter web points at the gateway
 
 ## 2. Sample campaigns
@@ -241,96 +241,96 @@ If Vertex errors, times out, or returns JSON that fails the schema, the gateway 
 
 `POST /api/v1/scout` creates a job from the confirmed seed, the city, the mode, and the SKU list, and returns a job id. A request that names a preset serves the newest ready stored run (§13) and replays its recorded trace; if no stored run exists yet, the preset falls back to the live pipeline in live mode and to the fixture recording in fixture mode (§4). A free-entry request always runs the live pipeline. `GET` returns the state and, once ready, the campaign payload. Draft `POST`s cover the run-sheet, the site brief, and a single-door pitch. `GET /events` is an SSE stream keyed by a cursor so a refresh replays from the last trace event.
 
-- [ ] `POST /api/v1/scout` creates a job from seed, city, mode, and SKUs
-- [ ] Serve presets from the newest ready stored run, replaying the recorded trace; fall back to live or fixture when none exists, and keep free entry live
-- [ ] `GET` returns state and, when ready, the campaign payload
-- [ ] `POST` draft endpoints for the run-sheet, the site brief, and a single-door pitch
-- [ ] SSE `/events` with a cursor so a refresh can resume the trace
+- [x] `POST /api/v1/scout` creates a job from seed, city, mode, and SKUs
+- [x] Serve presets from the newest ready stored run, replaying the recorded trace; fall back to live or fixture when none exists, and keep free entry live
+- [x] `GET` returns state and, when ready, the campaign payload
+- [x] `POST` draft endpoints for the run-sheet, the site brief, and a single-door pitch
+- [x] SSE `/events` with a cursor so a refresh can resume the trace
 
-Evidence: `internal/httpapi/router.go` registers only `/health` and the `/api/v1/` index; `orchestrator.Run` is a stub that returns not-implemented.
+Evidence: `POST /api/v1/scout` returns a job id; a second preset post replays the newest ready run and its trace; `rerun` inserts another run; free entry uses the live runner. `GET /api/v1/scout/:id` returns the campaign once ready. Draft posts render the run-sheet and the flagship site brief, and regenerate one door. `GET /api/v1/scout/:id/events?cursor=` replays trace events after that cursor.
 
 ### 20. City geocode
 
 Geocode the city in the gateway before any taste RPC, and return candidate points when the query is ambiguous instead of picking one. Reject an empty query and unusable coordinates with `validation`. Cache geocode results and follow the provider's attribution rules. Persist a single lat/lng on the campaign and reuse it for the map, the scout radius, the heatmap, and Places. The four presets skip the geocoder and post their stored points.
 
-- [ ] Geocode the city before any taste call
-- [ ] Return candidates when the query is ambiguous
-- [ ] Reject an empty query and unusable points with a specific error
-- [ ] Cache geocodes and follow the provider's attribution rules
-- [ ] Store one lat/lng and reuse it; presets post stored points
+- [x] Geocode the city before any taste call
+- [x] Return candidates when the query is ambiguous
+- [x] Reject an empty query and unusable points with a specific error
+- [x] Cache geocodes and follow the provider's attribution rules
+- [x] Store one lat/lng and reuse it; presets post stored points
 
-Evidence: `internal/geocode/geocode.go` defines the interface but ships a `NoopGeocoder` that always returns `ErrNotImplemented`; there is no provider, cache, or point persistence.
+Evidence: `GoogleGeocoder` runs in `buildRequest` before `Runner.Run`. An ambiguous query is HTTP 422 with the candidate points and no job. Empty queries and out-of-range coordinates are validation errors. Results cache for 24h, in memory or Redis, and carry `Map data © Google`. Presets copy their stored point and do not call the geocoder. The same point is what scout, the heatmap, Places, and the route reuse.
 
 ### 21. Orchestration and score assembly
 
 The runner calls seed resolution only when the request still has raw queries; presets and confirmed seeds go straight to scout. Flagship adds the heatmap call. After Places and the menu audit, the gateway computes `S_door` from the 0–1 sub-scores (`100 × S_door` displayed), applies the `P_saturation` skip rule (affinity below the returned shortlist's floor — or four or more direct niche competitors), and freezes the ordered doors and the skip list. Compare runs only for doors whose audit found an incumbent. Independent taste RPCs run in parallel, and each completion writes a trace event. The exact Qloo and grounding payloads are stored on the run. A client abort cancels the downstream gRPC calls.
 
-- [ ] Scout from a confirmed seed, and resolve raw queries only when the request has them
-- [ ] Add the heatmap call in flagship mode, and compare only after an incumbent is found
-- [ ] Compute `S_door` from the 0–1 sub-scores, apply the `P_saturation` skip rule, and freeze the order
-- [ ] Emit a trace event as each hop finishes, and persist the payloads on the run
-- [ ] Cancel downstream RPCs when the client aborts the job
+- [x] Scout from a confirmed seed, and resolve raw queries only when the request has them
+- [x] Add the heatmap call in flagship mode, and compare only after an incumbent is found
+- [x] Compute `S_door` from the 0–1 sub-scores, apply the `P_saturation` skip rule, and freeze the order
+- [x] Emit a trace event as each hop finishes, and persist the payloads on the run
+- [x] Cancel downstream RPCs when the client aborts the job
 
-Evidence: the orchestrator has no runner; the gateway has no gRPC client to either service.
+Evidence: a confirmed seed never calls `ResolveBrandSeed`; a raw query does, and only then. Flagship adds `GetLocalityHeatmap`; wholesale does not. Compare runs only for a door whose audit named an incumbent. `score.Assemble` computes `S_door = 0.50·A_taste + 0.30·O_shelf + 0.20·D_demo`, skips a door at four or more competitors or strictly below the shortlist floor, and freezes rank. Each hop appends a trace event, and the Qloo and grounding payloads are stored on the run. `POST .../abort` cancels the context the gRPC client passes downstream.
 
 ### 22. Places enrichment
 
 When a Places key is set, enrich the working set with address, opening hours, website, and open status. The website is the hint the menu audit searches from. Venues Places reports as closed are skipped with that reason. Missing key or a Places error leaves the Qloo door in the payload with enrichment marked unknown, and the job still reaches `ready`.
 
-- [ ] Enrich the working set with address, hours, website, and open status
-- [ ] Pass the website through to the menu audit
-- [ ] Skip a venue Places reports as closed, with that reason
-- [ ] Keep the door and mark enrichment unknown when the key is missing or Places errors
+- [x] Enrich the working set with address, hours, website, and open status
+- [x] Pass the website through to the menu audit
+- [x] Skip a venue Places reports as closed, with that reason
+- [x] Keep the door and mark enrichment unknown when the key is missing or Places errors
 
-Evidence: no Places client exists in `karum-server`.
+Evidence: `places.Client` calls Places API (New) `places:searchText` and keeps address, hours, website, and business status. The audit target receives that website. `CLOSED_PERMANENTLY` moves the door to the skip list with reason `closed`. A missing key or a Places error leaves the door on the board with enrichment unknown, and the run still finishes.
 
 ### 23. Field route
 
 When a Routes key is set, order the qualified wholesale or collab doors with `optimizeWaypointOrder` and return legs the Flutter map draws as a polyline. Skip the call in flagship mode, when the key is missing, or when fewer than two doors qualified. A Routes error is isolated: the job still reaches `ready` with the door list. Include the Google attribution fields the response is required to carry.
 
-- [ ] Order qualified wholesale and collab doors with waypoint optimization
-- [ ] Return legs the map can draw
-- [ ] Skip routing in flagship mode, when the key is missing, or when fewer than two doors qualify
-- [ ] Keep the campaign ready when routing fails
-- [ ] Attribute Google data as required
+- [x] Order qualified wholesale and collab doors with waypoint optimization
+- [x] Return legs the map can draw
+- [x] Skip routing in flagship mode, when the key is missing, or when fewer than two doors qualify
+- [x] Keep the campaign ready when routing fails
+- [x] Attribute Google data as required
 
-Evidence: no Routes client exists in `karum-server`.
+Evidence: `routes.Client` calls `computeRoutes` with `optimizeWaypointOrder` and returns legs plus a polyline. Flagship, a missing key, and fewer than two geocoded stops skip the call. A Routes error sets `route.failed` and leaves the door list and a ready or degraded run. The payload carries `Map data © Google`.
 
 ### 24. Run-sheet PDF
 
 The gateway renders the PDF. Wholesale and collab produce a field run-sheet: ordered stops, the three sub-scores, the SKU, the pitch, and the citations. Flagship produces a site-selection brief: the top corridors, the anchor neighbours, and the demographic line. Qloo facts and model inferences are visually distinct, using the split marked in the proto comments. A PDF failure leaves the on-screen campaign usable.
 
-- [ ] Render a field run-sheet for wholesale and collab
-- [ ] Render a site-selection brief for flagship
-- [ ] Keep Qloo facts and model inferences distinct in the PDF
-- [ ] Leave the on-screen campaign usable when PDF rendering fails
+- [x] Render a field run-sheet for wholesale and collab
+- [x] Render a site-selection brief for flagship
+- [x] Keep Qloo facts and model inferences distinct in the PDF
+- [x] Leave the on-screen campaign usable when PDF rendering fails
 
-Evidence: no PDF renderer or dependency exists in `karum-server`.
+Evidence: `pdf.RunSheet` and `pdf.SiteBrief` draw with core Helvetica. Roman type is a Qloo fact and italic type is a model inference. `POST .../drafts/run-sheet` and `.../site-brief` return the PDF. A renderer error is HTTP 502 and `GET` still returns the campaign.
 
 ### 25. Job persistence
 
 Postgres tables for campaigns, runs, evidence snapshots, drafts, and each run's trace events, applied with forward-only migrations. A run's stored payload carries the campaign plus the `LlmOnlyBaseline` text and the recorded trace a stored preset replays (§19, §32). The HTTP API gets a campaign by id so a refresh can restore it. A re-run inserts a new run row and leaves the previous snapshot untouched; the preset path always serves the newest ready run. A seed script loads the four presets so fixture and live modes share the same ids. The judge account is added in §28; this schema stays campaigns, runs, evidence, and drafts.
 
-- [ ] Postgres schema for campaigns, runs, evidence snapshots, drafts, and trace events
-- [ ] Forward-only migrations
-- [ ] Get a campaign by id
-- [ ] Re-run creates a new run and leaves the previous snapshot untouched
-- [ ] Store the baseline text and the recorded trace on the run so a stored preset serves without live calls
-- [ ] Seed the four presets
+- [x] Postgres schema for campaigns, runs, evidence snapshots, drafts, and trace events
+- [x] Forward-only migrations
+- [x] Get a campaign by id
+- [x] Re-run creates a new run and leaves the previous snapshot untouched
+- [x] Store the baseline text and the recorded trace on the run so a stored preset serves without live calls
+- [x] Seed the four presets
 
-Evidence: `POSTGRES_DSN` is read into config and never used; the repo has no SQL, migrations, or database driver.
+Evidence: `internal/persist/migrations/0001_init.sql` creates campaigns, runs, evidence snapshots, drafts, trace events, and idempotency keys. `persist.Open` applies that file once through `schema_migrations` and seeds the four preset campaigns. `GET /api/v1/campaigns/:id` returns the newest run. A re-run inserts a new run id and leaves the previous row. The run payload stores the baseline text and the trace, and the preset path serves that stored run without another scout. If Postgres is unreachable the process stays up and `/health` reports postgres down.
 
 ### 26. Gateway resilience
 
 Set a deadline on every taste and AI gRPC call and a circuit breaker per dependency. Per-IP and global rate limits return a JSON error the client can map to copy. Require `Idempotency-Key` on create so a double-submit returns the original job. Validate seed count (one to four seed entities — a resolved brand plus any vibe chips, or a two-to-four-entity composite of chips; the total never exceeds four, §31), text length, SKU-list length, mode, and radius before any RPC. `GET /health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode as `live`, `fixture`, or `degraded`.
 
-- [ ] Deadlines on every gRPC call and a circuit breaker per dependency
-- [ ] Per-IP and global rate limits with a clear JSON error
-- [ ] `Idempotency-Key` on create
-- [ ] Validation limits for seed count, text length, SKU list, mode, and radius
-- [ ] `/health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode
+- [x] Deadlines on every gRPC call and a circuit breaker per dependency
+- [x] Per-IP and global rate limits with a clear JSON error
+- [x] `Idempotency-Key` on create
+- [x] Validation limits for seed count, text length, SKU list, mode, and radius
+- [x] `/health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode
 
-Evidence: no gRPC dialing, middleware, rate limiter, or idempotency store; `GET /health` reports only this process, its mode, version, and uptime.
+Evidence: taste and AI calls go through `grpcclient` with the runner's per-call deadline and a circuit breaker per dependency. A per-IP limit and a global limit return HTTP 429 `rate_limited`. `Idempotency-Key` is required; the same key and body replay the original job, and a different body is HTTP 409. Seed count is 1–4, text is at most 200 characters, the SKU list is at most 24, mode is wholesale, flagship, or collab, and radius is 500–50000. `GET /health` keeps process status `ok` and adds `dependencies` for gateway, taste, AI, Redis, Postgres, and Qloo mode.
 
 ## 6. Flutter client
 
