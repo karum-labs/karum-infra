@@ -1,0 +1,101 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261017-140134-resolve-place-maggie-mae-s.json",
+    "recorded": "2026-10-17 14:01:34",
+    "label": "resolve-place-maggie-mae-s",
+    "status": 200,
+    "request": "/search?query=Maggie%20Mae%27s&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "572A6EDD-A341-4C1D-8316-6DB97A55BE78",
+      "name": "Maggie Mae's",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.2670833,
+        "lon": -97.7397361
+      },
+      "geocode": {
+        "city": "Austin",
+        "name": "Downtown",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "323 E 6th St Austin, TX 78701"
+    },
+    {
+      "entity_id": "31F6339D-D743-462D-B903-075E572AA1FF",
+      "name": "Maggie Mae's",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 38.8342139,
+        "lon": -97.62445
+      },
+      "geocode": {
+        "city": "Salina",
+        "country": "United States",
+        "admin1_region": "Kansas"
+      },
+      "disambiguation": "409 S Broadway Blvd Salina, KS 67401"
+    },
+    {
+      "entity_id": "A73316B9-E500-4027-8560-3C352FD3A549",
+      "name": "Maggie Mae's on the Bluffs",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 27.9173726,
+        "lon": -82.819812
+      },
+      "geocode": {
+        "city": "Belleair Bluffs",
+        "country": "United States",
+        "admin1_region": "Florida"
+      },
+      "disambiguation": "2961 W Bay Dr Belleair Bluffs, FL 33770"
+    },
+    {
+      "entity_id": "2ED0A66F-A80C-4E05-BD0B-459626EFE244",
+      "name": "Maggie Mae's Bar",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.743956999999995,
+        "lon": -73.922855
+      },
+      "geocode": {
+        "city": "New York",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "4115 Queens Blvd Sunnyside, NY 11104"
+    },
+    {
+      "entity_id": "940A9909-693F-4926-99DD-D4C18A936557",
+      "name": "Maggie Mae's Waterfront",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 27.952336199999998,
+        "lon": -82.8294387
+      },
+      "geocode": {
+        "city": "Clearwater",
+        "country": "United States",
+        "admin1_region": "Florida"
+      },
+      "disambiguation": "1261 Gulf Blvd #104 Clearwater Beach, FL 33767"
+    }
+  ]
+}

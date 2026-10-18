@@ -1,0 +1,120 @@
+{
+  "preset_id": "mumbai-colaba-wholesale",
+  "label": "Cacao and coffee in Colaba",
+  "mode": "wholesale",
+  "brand": "specialty cacao and coffee — brand-typed search misses; the seed is resolved Mumbai outlets",
+  "city": "Mumbai, MH, IN",
+  "point": {
+    "lat": 18.93,
+    "lon": 72.83
+  },
+  "radii_m": {
+    "doors": 8000
+  },
+  "category_tags": {
+    "doors": "urn:tag:genre:place:restaurant:cafe"
+  },
+  "seed_entities": [
+    {
+      "entity_id": "0DE2E903-CCB5-4523-BAF0-3EC15514248C",
+      "name": "Mary Lodge by Subko",
+      "kind": "place",
+      "note": "Subko's Mary Lodge outpost — resolves (rank 1)"
+    },
+    {
+      "entity_id": "6CEDF620-266F-4B72-B14E-875532C321B1",
+      "name": "Blue Tokai Coffee Roasters | Bandra",
+      "kind": "place",
+      "note": "incumbent specialty roaster — resolves (rank 1)"
+    },
+    {
+      "entity_id": "617683A6-DCF8-4104-8A1A-7484D1F9601C",
+      "name": "Blue Tokai Coffee Roasters | Versova",
+      "kind": "place",
+      "note": "second incumbent outpost — resolves (rank 4)"
+    }
+  ],
+  "excluded_seed_candidates": [
+    {
+      "entity_id": "BC400638-8F5F-4F9C-9634-4833CA61E26F",
+      "name": "Subko Mini At Kitab Khana",
+      "reason": "resolves in /search but is not_found to insights (warnings preserved in the door recordings); excluded from the seed"
+    }
+  ],
+  "skip_candidates": [
+    {
+      "entity_id": "68A744F0-1CE7-4C73-9A60-80C7A5713F72",
+      "name": "Leopold Cafe",
+      "affinity": 0.9171,
+      "verdict": "skip",
+      "note": "below the cafe-tag floor (0.9295)"
+    },
+    {
+      "entity_id": "AE5CB53B-F858-4FFC-8D87-2DDD803A9B2F",
+      "name": "Cafe Mondegar",
+      "affinity": 0.8909,
+      "verdict": "skip",
+      "note": "below the cafe-tag floor"
+    },
+    {
+      "entity_id": "41966C27-754D-4135-931F-64CF4F2418CA",
+      "name": "US CLUB",
+      "affinity": 0.8558,
+      "verdict": "skip",
+      "note": "below the cafe-tag floor"
+    },
+    {
+      "entity_id": "75C0A119-48D6-4E7A-B719-47269354E130",
+      "name": "High Street Phoenix",
+      "affinity": 0.8395,
+      "verdict": "skip",
+      "note": "below the cafe-tag floor"
+    },
+    {
+      "entity_id": "F13D82F2-95EF-49CF-8EEF-7B838CA53668",
+      "name": "Royal Halls NSCI",
+      "affinity": 0.8326,
+      "verdict": "skip",
+      "note": "below the cafe-tag floor; the unfiltered 17 Oct board topped out with event venues like this one"
+    }
+  ],
+  "skip_pool": {
+    "scored_n": 5,
+    "floor": 0.9295,
+    "note": "Candidates batch-scored against the seed; all five land below the cafe-tag board floor. The batch ran with the four-candidate seed (Kitab Khana included, not_found), so affinities carry the three-entity signal."
+  },
+  "door_board": {
+    "tag": "urn:tag:genre:place:restaurant:cafe",
+    "rows": 25,
+    "min": 0.9295,
+    "max": 0.9681,
+    "top": [
+      "Suzette",
+      "Blue Tokai Coffee Roasters | Nariman Point",
+      "Zen Cafe"
+    ]
+  },
+  "recordings": [
+    "qloo/mumbai-colaba-wholesale/search-subko.json",
+    "qloo/mumbai-colaba-wholesale/search-blue-tokai-coffee.json",
+    "qloo/mumbai-colaba-wholesale/search-leopold-cafe.json",
+    "qloo/mumbai-colaba-wholesale/insights-doors-baseline.json",
+    "qloo/mumbai-colaba-wholesale/insights-doors-take50.json",
+    "qloo/mumbai-colaba-wholesale/insights-doors-control-place-signal.json",
+    "qloo/mumbai-colaba-wholesale/insights-doors-plus-tags.json",
+    "qloo/mumbai-colaba-wholesale/insights-doors-untagged.json",
+    "qloo/mumbai-colaba-wholesale/insights-doors-cafe-tag.json",
+    "qloo/mumbai-colaba-wholesale/insights-skip-batch-probe.json",
+    "qloo/mumbai-colaba-wholesale/compare-leopold-probe.json",
+    "qloo/mumbai-colaba-wholesale/demographics-seed.json",
+    "qloo/tags/cafe-genre.json"
+  ],
+  "notes": [
+    "Specialty brands miss: Subko, Blue Tokai, Third Wave, Dandelion, Kocoatrait, and Paul and Mike return no brand-typed match; Subko and Blue Tokai names resolve as places (qloo/misses/).",
+    "Venue resolution (kill rule 2): 10 of 10 Colaba venues landed within 2 km on 16 Oct — the 70% gate passes.",
+    "The tagged board keeps the door shape and even surfaces the incumbent's own Nariman Point outlet at rank 2; the untagged board drifts to dining and anchors.",
+    "Seed outposts sit north of the Colaba point; the point fixes the expansion market, the seed supplies the taste.",
+    "A_taste displays within-set percentiles; the raw affinities above stay evidence-only."
+  ],
+  "verified": "2026-10-18"
+}

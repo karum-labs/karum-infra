@@ -1,0 +1,108 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050922-resolve-place-matchabar.json",
+    "recorded": "2026-10-18 05:09:22",
+    "label": "resolve-place-matchabar",
+    "status": 200,
+    "request": "/search?query=MatchaBar&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "A4C7B439-7CDE-4786-992D-8348AB89B5B1",
+      "name": "MatchaBar",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7400555,
+        "lon": -74.0015509
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Chelsea",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "256 W 15th St New York, NY 10011"
+    },
+    {
+      "entity_id": "87204B9B-0BAD-4D9F-B639-4C27AA4BAA6E",
+      "name": "MatchaBar",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 34.0893578,
+        "lon": -118.2769955
+      },
+      "geocode": {
+        "city": "Los Angeles",
+        "name": "Silver Lake",
+        "metro": "Los Angeles",
+        "country": "United States",
+        "admin1_region": "California"
+      },
+      "disambiguation": "3534 W Sunset Blvd Los Angeles, CA 90026"
+    },
+    {
+      "entity_id": "ADA1B8F0-802D-4E9E-BAD0-1DE0F9998907",
+      "name": "Matcha Bar",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 52.355242999999994,
+        "lon": 4.891137
+      },
+      "geocode": {
+        "city": "Amsterdam",
+        "name": "Zuid",
+        "metro": "Amsterdam",
+        "country": "Netherlands",
+        "admin1_region": "North Holland"
+      },
+      "disambiguation": "Albert Cuypstraat 89 1072 CP Amsterdam Netherlands"
+    },
+    {
+      "entity_id": "7DE9C13A-0D09-4457-9F80-AB8F5D3017EE",
+      "name": "MatchaBar",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7237559,
+        "lon": -73.9969362
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "SoHo",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "70 Prince St New York, NY 10012"
+    },
+    {
+      "entity_id": "73702217-5D96-4993-8755-225F6D190FDB",
+      "name": "MATCHA BAR",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 13.7567218,
+        "lon": 100.5328105
+      },
+      "geocode": {
+        "city": "Thung Phaya Thai",
+        "name": "Thung Phaya Thai",
+        "metro": "Bangkok",
+        "country": "Thailand",
+        "admin1_region": "Bangkok"
+      },
+      "disambiguation": "15 Soi Phahonyothin 3 แขวงพญาไท, Khet Phaya Thai Bangkok 10400 Thailand"
+    }
+  ]
+}

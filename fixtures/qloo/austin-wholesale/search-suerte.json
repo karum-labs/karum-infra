@@ -1,0 +1,102 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050758-resolve-place-suerte.json",
+    "recorded": "2026-10-18 05:07:58",
+    "label": "resolve-place-suerte",
+    "status": 200,
+    "request": "/search?query=Suerte&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "4F046D7D-01FA-41F8-BBAF-91ED857D498B",
+      "name": "Suerte",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.2622778,
+        "lon": -97.7232758
+      },
+      "geocode": {
+        "city": "Austin",
+        "name": "East Cesar Chavez",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "1800 E 6th St Austin, TX 78702"
+    },
+    {
+      "entity_id": "7F5663B9-4672-4172-BD24-9D60B81E09A5",
+      "name": "Suerte Bar & Grill",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 26.2017384,
+        "lon": -98.23801689999999
+      },
+      "geocode": {
+        "city": "McAllen",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "301 S 17th St McAllen, TX 78501"
+    },
+    {
+      "entity_id": "7E9945C7-4C6E-4101-916B-82E5DABE65DC",
+      "name": "Suerte",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 37.4435295,
+        "lon": 24.943406099999997
+      },
+      "geocode": {
+        "city": "Municipality of Syros and Ermoupoli",
+        "name": "Vrontado",
+        "country": "Greece",
+        "admin1_region": "Aegean"
+      },
+      "disambiguation": "Coast Petrou Ralli 52 Ermoupoli 841 00 Greece"
+    },
+    {
+      "entity_id": "6A2327EA-7AC6-4A64-B367-CFCDA63B800A",
+      "name": "Suerte Bar & Grill Uptown",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 26.2397895,
+        "lon": -98.2175857
+      },
+      "geocode": {
+        "city": "McAllen",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "400 W Nolana Ave ste n1 McAllen, TX 78504"
+    },
+    {
+      "entity_id": "86DF6931-8445-45EF-B862-F4CD4AF96215",
+      "name": "Suerte o Muerte moto café",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 18.9334068,
+        "lon": -99.22097439999999
+      },
+      "geocode": {
+        "city": "Cuernavaca",
+        "name": "Lomas de la Selva",
+        "country": "Mexico",
+        "admin1_region": "Morelos"
+      },
+      "disambiguation": "Av Teopanzolco 500 Vista Hermosa 62290 Cuernavaca, Mor. Mexico"
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050930-resolve-place-lilia.json",
+    "recorded": "2026-10-18 05:09:30",
+    "label": "resolve-place-lilia",
+    "status": 200,
+    "request": "/search?query=Lilia&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "55E6BA87-F930-4AF0-AD01-D2A3AF0CF782",
+      "name": "Lilia",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7175365,
+        "lon": -73.9524225
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Williamsburg",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "567 Union Ave Brooklyn, NY 11211"
+    },
+    {
+      "entity_id": "3D1AE83B-473B-48BF-A76B-C43040DDC4B8",
+      "name": "Lilia",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": -22.9091795,
+        "lon": -43.1840067
+      },
+      "geocode": {
+        "city": "Rio de Janeiro",
+        "name": "Centro",
+        "country": "Brazil",
+        "admin1_region": "Rio de Janeiro"
+      },
+      "disambiguation": "R. do Senado, 45 - Centro Rio de Janeiro - RJ 20231-005 Brazil"
+    },
+    {
+      "entity_id": "A4366216-7D5A-4F8D-B785-0FE75E2B2A93",
+      "name": "Lilianfels Blue Mountains Resort & Spa",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": -33.72935,
+        "lon": 150.309653
+      },
+      "geocode": {
+        "city": "Blue Mountains City Council",
+        "name": "Katoomba",
+        "metro": "Sydney",
+        "country": "Australia",
+        "admin1_region": "New South Wales"
+      },
+      "disambiguation": "5/19 Lilianfels Ave Katoomba NSW 2780 Australia"
+    },
+    {
+      "entity_id": "A7F6236E-08C4-473D-AEDC-95AECC1BB40C",
+      "name": "Lili & Oli",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 45.4818286,
+        "lon": -73.5771614
+      },
+      "geocode": {
+        "city": "Montreal",
+        "name": "Le Sud-Ouest",
+        "metro": "Montreal",
+        "country": "Canada",
+        "admin1_region": "Quebec"
+      },
+      "disambiguation": "2713 Notre-Dame St W Montreal, Quebec H3J 1N9 Canada"
+    },
+    {
+      "entity_id": "77BF48C1-671F-42B4-9718-44FDCA0873A6",
+      "name": "Liliana Paduano Accademia di Formazione Professionale",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.8510169,
+        "lon": 14.2756814
+      },
+      "geocode": {
+        "city": "Naples",
+        "name": "Municipalità 4",
+        "metro": "Naples",
+        "country": "Italy",
+        "admin1_region": "Campania"
+      },
+      "disambiguation": "Corso Arnaldo Lucci, 156 80142 Napoli NA Italy"
+    }
+  ]
+}

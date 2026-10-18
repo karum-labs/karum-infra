@@ -1,0 +1,104 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050926-resolve-place-fresh-kills-bar.json",
+    "recorded": "2026-10-18 05:09:26",
+    "label": "resolve-place-fresh-kills-bar",
+    "status": 200,
+    "request": "/search?query=Fresh%20Kills%20Bar&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "46B3218C-4B68-4CA4-B871-9C2CB59DBEF6",
+      "name": "Fresh Kills Bar",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.714721999999995,
+        "lon": -73.9615566
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Williamsburg",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "161 Grand St Brooklyn, NY 11249"
+    },
+    {
+      "entity_id": "53491005-CA1E-4DF6-98B0-DBA635CC9222",
+      "name": "Fresh Kills Barbershop",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.6299305,
+        "lon": -74.10928299999999
+      },
+      "geocode": {
+        "city": "New York",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "600 Forest Ave Staten Island, NY 10310"
+    },
+    {
+      "entity_id": "387FF3CB-AC81-4060-A027-FA0D60F62EAE",
+      "name": "The Whole Enchilada Fresh Mexican Grill & Bar",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 28.5657097,
+        "lon": -81.58707
+      },
+      "geocode": {
+        "city": "Winter Garden",
+        "metro": "Orlando",
+        "country": "United States",
+        "admin1_region": "Florida"
+      },
+      "disambiguation": "129 W Plant St Winter Garden, FL 34787"
+    },
+    {
+      "entity_id": "FDC4BC0C-276C-476F-B767-1B9005C3ADAD",
+      "name": "J's Fresh Bar & Kitchen",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": -1.2601639999999998,
+        "lon": 36.7819632
+      },
+      "geocode": {
+        "city": "Nairobi",
+        "name": "Muthangari sublocation",
+        "country": "Kenya",
+        "admin1_region": "Nairobi"
+      },
+      "disambiguation": "Muthangari Dr Nairobi Kenya"
+    },
+    {
+      "entity_id": "196C33D4-5996-404D-B817-B1DEAD6397C4",
+      "name": "2 Spaghi - Fresh Pasta Bar",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 47.4980924,
+        "lon": 19.059843
+      },
+      "geocode": {
+        "city": "Budapest",
+        "name": "7th district",
+        "country": "Hungary",
+        "admin1_region": "Central Hungary"
+      },
+      "disambiguation": "Passage Budapest Gozsdu Udvar 16-building 5 1072 Hungary"
+    }
+  ]
+}

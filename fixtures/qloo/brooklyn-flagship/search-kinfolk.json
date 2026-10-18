@@ -1,0 +1,23 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050921-resolve-brand-kinfolk.json",
+    "recorded": "2026-10-18 05:09:21",
+    "label": "resolve-brand-kinfolk",
+    "status": 200,
+    "request": "/search?query=Kinfolk&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "0044C2D6-C96D-4571-8EFE-E81E8CF722D4",
+      "name": "Kinfolk",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    }
+  ]
+}

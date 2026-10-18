@@ -1,0 +1,106 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050920-resolve-place-devocion.json",
+    "recorded": "2026-10-18 05:09:20",
+    "label": "resolve-place-devocion",
+    "status": 200,
+    "request": "/search?query=Devocion&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "AF59EF83-C53B-45AB-A980-D5EEECB3A8F0",
+      "name": "Devoción",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.714774,
+        "lon": -73.9622189
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Williamsburg",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "148 Grand St Brooklyn, NY 11249"
+    },
+    {
+      "entity_id": "CDC7DCB6-CCF9-4DF3-8455-869D97D6C46D",
+      "name": "Devoción",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.739111,
+        "lon": -73.989113
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Flatiron District",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "25 E 20th St New York, NY 10003"
+    },
+    {
+      "entity_id": "21B4EAE3-B11B-4AB2-863A-6EC6420102B0",
+      "name": "Devoción",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.688546099999996,
+        "lon": -73.9834934
+      },
+      "geocode": {
+        "city": "New York",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "276 Livingston St Brooklyn, NY 11201"
+    },
+    {
+      "entity_id": "1F9C070E-9D5B-4E10-91B2-F25792DEAD29",
+      "name": "Devoción",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7016804,
+        "lon": -73.986543
+      },
+      "geocode": {
+        "city": "New York",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "105 York St Brooklyn, NY 11201"
+    },
+    {
+      "entity_id": "761DC0AD-ED32-490B-8BA9-E29B0C46FEA9",
+      "name": "Devoción",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.758131999999996,
+        "lon": -73.9713838
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Midtown East",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "600 Lexington Ave New York, NY 10022"
+    }
+  ]
+}

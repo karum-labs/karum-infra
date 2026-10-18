@@ -1,0 +1,105 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050840-resolve-place-choplet-ceramic-studio.json",
+    "recorded": "2026-10-18 05:08:40",
+    "label": "resolve-place-choplet-ceramic-studio",
+    "status": 200,
+    "request": "/search?query=Choplet%20Ceramic%20Studio&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "2B5888A0-8A41-4F23-9E1E-0F52DA29244A",
+      "name": "Choplet Ceramic Studio & Gallery",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7134776,
+        "lon": -73.9592514
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Williamsburg",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "238 Grand St Brooklyn, NY 11211"
+    },
+    {
+      "entity_id": "65870B72-3DA3-4827-929B-00C83671BDD2",
+      "name": "Céramic Café Studio Montréal",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 45.5226123,
+        "lon": -73.58048819999999
+      },
+      "geocode": {
+        "city": "Montreal",
+        "name": "Le Plateau-Mont-Royal",
+        "metro": "Montreal",
+        "country": "Canada",
+        "admin1_region": "Quebec"
+      },
+      "disambiguation": "4338 R. Saint-Denis Montréal, QC H2J 2K8 Canada"
+    },
+    {
+      "entity_id": "8C2255D4-8351-4C05-A8A7-20DC65519230",
+      "name": "Céramic Café Studio Laval",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 45.5587144,
+        "lon": -73.7439413
+      },
+      "geocode": {
+        "city": "Laval",
+        "name": "Chomedey",
+        "metro": "Montreal",
+        "country": "Canada",
+        "admin1_region": "Quebec"
+      },
+      "disambiguation": "3000 Blvd. Saint-Martin O Laval, QC H7T 0P6 Canada"
+    },
+    {
+      "entity_id": "60659686-D137-441F-B08E-8761C9015E0F",
+      "name": "3M Car Care Studio - Car Detailing, Ceramic Coating and PPF, OMR/ ECR",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 12.9375124,
+        "lon": 80.2347856
+      },
+      "geocode": {
+        "city": "Chennai",
+        "name": "Thuraipakkam",
+        "country": "India",
+        "admin1_region": "Tamil Nadu"
+      },
+      "disambiguation": "3/452E, Rajiv Gandhi Salai opposite AKDR Golf Village, OMR Thoraipakkam, Chennai, Tamil Nadu 600097 India"
+    },
+    {
+      "entity_id": "C745E6A9-E725-4EDF-A9C7-512F0F1584E5",
+      "name": "Ceramic Open Studio at Fuller Craft Museum",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 42.102559899999996,
+        "lon": -71.0454125
+      },
+      "geocode": {
+        "city": "Brockton",
+        "country": "United States",
+        "admin1_region": "Massachusetts"
+      },
+      "disambiguation": "455 Oak St Brockton, MA 02301"
+    }
+  ]
+}

@@ -1,0 +1,180 @@
+{
+  "preset_id": "brooklyn-flagship",
+  "label": "Ceramics and matcha in Brooklyn",
+  "mode": "flagship",
+  "brand": "composite seed — Muji (design brand) plus ceramics-studio and matcha vibes",
+  "city": "Brooklyn, NY, US",
+  "point": {
+    "lat": 40.7172,
+    "lon": -73.9566
+  },
+  "radii_m": {
+    "doors": 8000,
+    "heatmap": 10000
+  },
+  "category_tags": {
+    "doors": "urn:tag:genre:place:restaurant:cafe"
+  },
+  "seed_entities": [
+    {
+      "entity_id": "E12201A5-CC50-40AF-97AE-C54A2CA303F7",
+      "name": "Muji",
+      "kind": "brand",
+      "note": "brand anchor — resolves"
+    },
+    {
+      "entity_id": "2B5888A0-8A41-4F23-9E1E-0F52DA29244A",
+      "name": "Choplet Ceramic Studio & Gallery",
+      "kind": "place",
+      "note": "ceramics vibe — Williamsburg studio and gallery"
+    },
+    {
+      "entity_id": "6E449EFE-6006-4023-8EEC-0F1F720BDC94",
+      "name": "BKLYN CLAY",
+      "kind": "place",
+      "note": "ceramics vibe — studio network"
+    },
+    {
+      "entity_id": "98F7EBDF-987C-4741-B6F8-5C7511DC0021",
+      "name": "Kettl Tea",
+      "kind": "place",
+      "note": "matcha vibe — tea house"
+    }
+  ],
+  "alternates": [
+    {
+      "entity_id": "0044C2D6-C96D-4571-8EFE-E81E8CF722D4",
+      "name": "Kinfolk",
+      "note": "design-media vibe — the fifth signal in the 18 Oct recordings; trimmed to keep the four-entity seed cap (PLAN.md §26)"
+    },
+    {
+      "entity_id": "334199C3-D599-492F-B8E9-76911A42F0C1",
+      "name": "Marimekko",
+      "note": "brand swap-in — resolves"
+    },
+    {
+      "entity_id": "A4C7B439-7CDE-4786-992D-8348AB89B5B1",
+      "name": "MatchaBar",
+      "note": "matcha place swap-in — resolves (the Manhattan row is rank 1 of 5)"
+    }
+  ],
+  "heatmap": {
+    "cells": 5523,
+    "boundary_variants": [
+      "default",
+      "urn:geohash"
+    ],
+    "localities": 83,
+    "note": "Both boundary variants returned 5,523 cells; localities returned 83 polygon rows and name the corridors."
+  },
+  "skip_candidates": [
+    {
+      "entity_id": "55E6BA87-F930-4AF0-AD01-D2A3AF0CF782",
+      "name": "Lilia",
+      "affinity": 0.9192,
+      "verdict": "skip",
+      "note": "closest miss — 0.0026 below the ranked floor"
+    },
+    {
+      "entity_id": "9B68AA9D-BDA3-479D-95AF-C057CA0F2BEA",
+      "name": "Bakeri",
+      "affinity": 0.8237,
+      "verdict": "skip",
+      "note": "below the returned floor"
+    },
+    {
+      "entity_id": "1F7B4F4E-2443-4CEE-9B23-E3E54142A8AE",
+      "name": "SEY Coffee",
+      "affinity": 0.8223,
+      "verdict": "skip",
+      "note": "below the returned floor"
+    },
+    {
+      "entity_id": "9A47479B-EBCC-4406-9174-220EBC59B691",
+      "name": "Maison Premiere",
+      "affinity": 0.821,
+      "verdict": "skip",
+      "note": "below the returned floor"
+    },
+    {
+      "entity_id": "46B3218C-4B68-4CA4-B871-9C2CB59DBEF6",
+      "name": "Fresh Kills Bar",
+      "affinity": 0.8071,
+      "verdict": "skip",
+      "note": "below the returned floor"
+    },
+    {
+      "entity_id": "AF59EF83-C53B-45AB-A980-D5EEECB3A8F0",
+      "name": "Devoción",
+      "affinity": 0.7989,
+      "verdict": "skip",
+      "note": "below the returned floor"
+    },
+    {
+      "entity_id": "94ED4726-A194-4DD1-8C8E-04741512A1E4",
+      "name": "Cafe Mogador",
+      "affinity": 0.7966,
+      "verdict": "skip",
+      "note": "below the returned floor"
+    },
+    {
+      "entity_id": "1EB1DDC1-0907-46FC-8D07-DB1BBCD020CA",
+      "name": "Butler",
+      "affinity": 0.7865,
+      "verdict": "skip",
+      "note": "below the returned floor; the New York row was resolve rank 4 of 5"
+    }
+  ],
+  "skip_pool": {
+    "ranked_n": 50,
+    "ranked_min": 0.9218,
+    "ranked_max": 0.9471,
+    "note": "The eight candidates are the names a naive Brooklyn walk would pitch; they were resolved for the kill-rule check and batch-scored for the skip list. All eight land below the floor."
+  },
+  "door_board": {
+    "tag": "urn:tag:genre:place:restaurant:cafe",
+    "rows": 25,
+    "min": 0.9097,
+    "max": 0.9308,
+    "top": [
+      "Stonefruit Espresso + Kitchen",
+      "Cafe Alula",
+      "Hanamizuki Cafe"
+    ]
+  },
+  "recordings": [
+    "qloo/brooklyn-flagship/search-muji.json",
+    "qloo/brooklyn-flagship/search-kinfolk.json",
+    "qloo/brooklyn-flagship/search-marimekko.json",
+    "qloo/brooklyn-flagship/search-matchabar.json",
+    "qloo/brooklyn-flagship/search-kettl-tea.json",
+    "qloo/brooklyn-flagship/search-choplet-ceramic-studio.json",
+    "qloo/brooklyn-flagship/search-bklyn-clay.json",
+    "qloo/brooklyn-flagship/search-devocion.json",
+    "qloo/brooklyn-flagship/search-sey-coffee.json",
+    "qloo/brooklyn-flagship/search-bakeri.json",
+    "qloo/brooklyn-flagship/search-butler.json",
+    "qloo/brooklyn-flagship/search-maison-premiere.json",
+    "qloo/brooklyn-flagship/search-fresh-kills-bar.json",
+    "qloo/brooklyn-flagship/search-cafe-mogador.json",
+    "qloo/brooklyn-flagship/search-lilia.json",
+    "qloo/brooklyn-flagship/insights-doors-cafe-tag.json",
+    "qloo/brooklyn-flagship/insights-heatmap-cells.json",
+    "qloo/brooklyn-flagship/insights-heatmap-cells-geohash.json",
+    "qloo/brooklyn-flagship/insights-heatmap-localities.json",
+    "qloo/brooklyn-flagship/insights-skip-ranked.json",
+    "qloo/brooklyn-flagship/insights-skip-batch-probe.json",
+    "qloo/brooklyn-flagship/demographics-seed.json",
+    "qloo/brooklyn-flagship/demographics-door-batch-probe.json",
+    "qloo/tags/cafe-genre.json"
+  ],
+  "notes": [
+    "The recorded 18 Oct calls were seeded with five entities (the four above plus Kinfolk); the locked preset trims to four for the seed cap. Provenance is preserved — each envelope's source.request shows the five ids.",
+    "Kinto, Hasami Porcelain, Ippodo Tea, Kettl (as a brand), and Matchaful all miss on brand search; Muji, Kinfolk, and Marimekko resolve (qloo/misses/).",
+    "Toby's Estate Coffee and The West fail venue resolution; The West is drowned by Westin hotels.",
+    "The place:ceramics genre tag returns 0 rows; galleries carry the collab grade (brooklyn-collab).",
+    "filter.results.entities is ignored by demographics — per-door profiles need per-door calls (recorded as a trap).",
+    "A_taste displays within-set percentiles; the raw affinities above stay evidence-only."
+  ],
+  "verified": "2026-10-18"
+}

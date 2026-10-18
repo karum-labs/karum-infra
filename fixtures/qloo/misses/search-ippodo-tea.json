@@ -1,0 +1,64 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050843-resolve-brand-ippodo-tea.json",
+    "recorded": "2026-10-18 05:08:43",
+    "label": "resolve-brand-ippodo-tea",
+    "status": 200,
+    "request": "/search?query=Ippodo%20Tea&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "466CB37E-4A07-464B-8D35-F43F30683B48",
+      "name": "Skinny Bunny Tea",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "87BD42D7-236B-4668-807E-CFC5E56EB747",
+      "name": "Happy Dad Hard Seltzer & Tea",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "A596D78A-A3CF-4809-AF4E-526A72800287",
+      "name": "Thin Tea",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "24C05ABA-5D77-43A5-B5CC-6814A27190D2",
+      "name": "Arizona Iced Tea",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "23AC5A4E-9665-4FCF-8377-746DC27BCA47",
+      "name": "The Coffee Bean & Tea Leaf",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    }
+  ],
+  "note": "Falls back to unrelated tea brands."
+}

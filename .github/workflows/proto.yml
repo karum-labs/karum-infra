@@ -7,6 +7,7 @@ on:
       - "proto/**"
       - "tools/**"
       - "contract/**"
+      - "fixtures/**"
       - "go.mod"
       - "go.sum"
       - ".github/workflows/proto.yml"
@@ -16,6 +17,7 @@ on:
       - "proto/**"
       - "tools/**"
       - "contract/**"
+      - "fixtures/**"
       - "go.mod"
       - "go.sum"
       - ".github/workflows/proto.yml"
@@ -118,3 +120,25 @@ jobs:
 
       - name: Go tests (doccheck and round-trip runners)
         run: go test ./...
+
+  fixtures:
+    name: Fixture Pack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # The pack is committed; regeneration needs the local recordings, which
+      # CI does not have, so it verifies hashes, preset schemas, and the
+      # projection unit tests instead.
+      - name: Unit-test the redaction projections
+        run: make test-fixtures
+
+      - name: Verify pack hashes and preset schemas
+        run: make check-fixtures

@@ -1,0 +1,64 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261017-140126-resolve-brand-madre-mezcal.json",
+    "recorded": "2026-10-17 14:01:26",
+    "label": "resolve-brand-madre-mezcal",
+    "status": 200,
+    "request": "/search?query=Madre%20Mezcal&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "458023C4-39D1-4D21-93C0-F1359FC00FAD",
+      "name": "Hija De Tu Madre",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "629CA775-0434-43A9-ACA2-1AB1A97013D1",
+      "name": "Clase Azul Tequila & Mezcal",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "617D3A14-7AE5-476E-89B8-B0E100B506C2",
+      "name": "Mezcal El Silencio",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "41C4BB40-E667-416F-9541-63FD7E7FFFF5",
+      "name": "Ilegal Mezcal",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "0B5F894C-DDA4-4E7E-93F5-D0C9633F2912",
+      "name": "Yola Mezcal",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    }
+  ],
+  "note": "Brand-typed search falls back to unrelated mezcal brands."
+}

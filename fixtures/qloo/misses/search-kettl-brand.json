@@ -1,0 +1,54 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050845-resolve-brand-kettl.json",
+    "recorded": "2026-10-18 05:08:45",
+    "label": "resolve-brand-kettl",
+    "status": 200,
+    "request": "/search?query=Kettl&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "ED15195F-5B62-46A0-AE35-BB8ABD7F44F3",
+      "name": "Kettlebell Kings",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "E1DA4DC2-D8CB-4C95-B1C0-5263683FC6C6",
+      "name": "Kettle & Fire",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "5284ED89-13CF-48CF-8599-657AE55992AB",
+      "name": "Kettle Brand",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "9A6E5D29-2F73-44C4-BE39-C1320948ECCE",
+      "name": "Kettle Chips",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    }
+  ],
+  "note": "Falls back to kettle retailers."
+}

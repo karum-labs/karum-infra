@@ -1,0 +1,106 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050922-resolve-place-maison-premiere.json",
+    "recorded": "2026-10-18 05:09:22",
+    "label": "resolve-place-maison-premiere",
+    "status": 200,
+    "request": "/search?query=Maison%20Premiere&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "9A47479B-EBCC-4406-9174-220EBC59B691",
+      "name": "Maison Premiere",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7142687,
+        "lon": -73.96166459999999
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Williamsburg",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "298 Bedford Ave Brooklyn, NY 11249"
+    },
+    {
+      "entity_id": "0EA7BD0E-D4E1-484F-AED6-34467C70D76A",
+      "name": "maison PREMIERE",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 35.6438913,
+        "lon": 139.7045238
+      },
+      "geocode": {
+        "city": "Meguro",
+        "name": "Naka Meguro 1",
+        "metro": "Tokyo",
+        "country": "Japan",
+        "admin1_region": "Tokyo"
+      },
+      "disambiguation": "1 Chome-1-29 Nakameguro Meguro City, Tokyo 153-0061 Japan"
+    },
+    {
+      "entity_id": "87A0C1CC-A15C-4B81-9C2D-E18B73A8C87B",
+      "name": "Maison Premiére beauty",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 43.4020163,
+        "lon": 13.534237
+      },
+      "geocode": {
+        "city": "Recanati",
+        "name": "Porta d'Osimo",
+        "country": "Italy",
+        "admin1_region": "Marche"
+      },
+      "disambiguation": "Sentiero per il Monte Cardosa, 2 62019 Recanati MC Italy"
+    },
+    {
+      "entity_id": "A31D04F1-87A6-4DBC-A2C1-B34B6DE199B1",
+      "name": "Maison du Tourisme de Crans-Montana",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 46.3126288,
+        "lon": 7.4807539
+      },
+      "geocode": {
+        "city": "Crans-Montana",
+        "name": "Montana",
+        "country": "Switzerland",
+        "admin1_region": "Wallis"
+      },
+      "disambiguation": "Rte des Arolles 4 3963 Crans-Montana Switzerland"
+    },
+    {
+      "entity_id": "DAA169F3-F291-446F-BDDA-D9CC31F2ED60",
+      "name": "La Maison Rose",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 48.887981499999995,
+        "lon": 2.3396448999999997
+      },
+      "geocode": {
+        "city": "Paris",
+        "name": "Quartier des Grandes-Carrières",
+        "metro": "Paris",
+        "country": "France",
+        "admin1_region": "Ile-de-France"
+      },
+      "disambiguation": "2 Rue de l'Abreuvoir 75018 Paris France"
+    }
+  ]
+}

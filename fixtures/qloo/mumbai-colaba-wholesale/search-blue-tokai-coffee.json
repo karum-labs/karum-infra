@@ -1,0 +1,102 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-051214-resolve-place-blue-tokai-coffee.json",
+    "recorded": "2026-10-18 05:12:14",
+    "label": "resolve-place-blue-tokai-coffee",
+    "status": 200,
+    "request": "/search?query=Blue%20Tokai%20Coffee&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "6CEDF620-266F-4B72-B14E-875532C321B1",
+      "name": "Blue Tokai Coffee Roasters | Bandra",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 19.0603995,
+        "lon": 72.8243282
+      },
+      "geocode": {
+        "city": "Mumbai",
+        "name": "H/W Ward",
+        "country": "India",
+        "admin1_region": "Maharashtra"
+      },
+      "disambiguation": "Shop No 1, No 33, Mayflower Building Perry Road New Kantwadi Rd, Bandra West Mumbai, Maharashtra 400050 India"
+    },
+    {
+      "entity_id": "83F60D9B-EC59-439E-84A4-FB7E62EB5913",
+      "name": "Blue Tokai Coffee Roasters | Noida",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 28.590508999999997,
+        "lon": 77.3190785
+      },
+      "geocode": {
+        "city": "Noida",
+        "country": "India",
+        "admin1_region": "Uttar Pradesh"
+      },
+      "disambiguation": "No B/126, The Shop B-126, Udhyog Marg, B Block, Sector 5 Noida, Uttar Pradesh 201301 India"
+    },
+    {
+      "entity_id": "AB43EE31-BDB8-4EBD-BB39-724F6C15208C",
+      "name": "Blue Tokai Coffee Roasters | Hauz Khas",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 28.553048399999998,
+        "lon": 77.20782369999999
+      },
+      "geocode": {
+        "city": "National Capital Region",
+        "name": "Hauz Khas",
+        "country": "India",
+        "admin1_region": "Delhi"
+      },
+      "disambiguation": "15A opposite Old Dr Dangs Clinic, Block A, Hauz Khas New Delhi, Delhi 110016 India"
+    },
+    {
+      "entity_id": "617683A6-DCF8-4104-8A1A-7484D1F9601C",
+      "name": "Blue Tokai Coffee Roasters | Versova",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 19.1328358,
+        "lon": 72.8123492
+      },
+      "geocode": {
+        "city": "Mumbai",
+        "name": "K/W Ward",
+        "country": "India",
+        "admin1_region": "Maharashtra"
+      },
+      "disambiguation": "Shop No 6 JP Rd, opposite Palm Beach Apartment, Aram Nagar Part 1, Machlimar, Versova, Andheri West Mumbai, Maharashtra 400061 India"
+    },
+    {
+      "entity_id": "C054CCC0-1BB7-4527-A254-54FE541F463D",
+      "name": "Blue Tokai Coffee Roasters | Deer Park",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 28.559611699999998,
+        "lon": 77.1969458
+      },
+      "geocode": {
+        "city": "National Capital Region",
+        "name": "Safdarjung Enclave",
+        "country": "India",
+        "admin1_region": "Delhi"
+      },
+      "disambiguation": "Commercial Complex B6 opposite Deer Park, next to the Piano Man and Mother Dairy, Safdarjung Enclave New Delhi, Delhi 110029, India"
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050924-resolve-place-the-west.json",
+    "recorded": "2026-10-18 05:09:24",
+    "label": "resolve-place-the-west",
+    "status": 200,
+    "request": "/search?query=The%20West&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "956C47FF-325B-47DA-86EA-EBF5DFE70492",
+      "name": "The Westin Jakarta",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": -6.223750099999999,
+        "lon": 106.83386069999999
+      },
+      "geocode": {
+        "city": "Karet Kuningan",
+        "name": "RW 05",
+        "country": "Indonesia",
+        "admin1_region": "Special capital Region of Jakarta"
+      },
+      "disambiguation": "Jl. H. R. Rasuna Said Blok C No.22A RT.2/RW.5, Kuningan, Karet Kuningan Setiabudi South Jakarta City, Jakarta 12940, Indonesia"
+    },
+    {
+      "entity_id": "CB3D1F9D-91C0-43BC-B3EC-549E72003E81",
+      "name": "The Westin Resort Nusa Dua, Bali",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": -8.7958612,
+        "lon": 115.22993059999999
+      },
+      "geocode": {
+        "city": "Benoa",
+        "country": "Indonesia",
+        "admin1_region": "Bali"
+      },
+      "disambiguation": "Kawasan Pariwisata Nusa Dua, BTDC Lot N-3 Jl. Kw. Nusa Dua Resort Benoa South Kuta, Badung Regency, Bali 80361, Indonesia"
+    },
+    {
+      "entity_id": "F42A4891-FB4C-4860-A84B-7F2AA91256BC",
+      "name": "The Westin Dubai Mina Seyahi Beach Resort & Marina",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 25.0929096,
+        "lon": 55.1487464
+      },
+      "geocode": {
+        "city": "Dubai",
+        "name": "Dubai Media City",
+        "country": "United Arab Emirates",
+        "admin1_region": "Dubai"
+      },
+      "disambiguation": "Marsa Dubai - Dubai Marina - Dubai United Arab Emirates"
+    },
+    {
+      "entity_id": "C2E47086-C102-4BE5-87ED-56BE4E8B3BE4",
+      "name": "The Westin Bonaventure Hotel & Suites, Los Angeles",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 34.052777299999995,
+        "lon": -118.255596
+      },
+      "geocode": {
+        "city": "Los Angeles",
+        "name": "Downtown",
+        "metro": "Los Angeles",
+        "country": "United States",
+        "admin1_region": "California"
+      },
+      "disambiguation": "404 S Figueroa St Los Angeles, CA 90071"
+    },
+    {
+      "entity_id": "D0357305-6FEB-49AB-B56E-C2B7C8663E22",
+      "name": "The Westin Lima Hotel & Convention Center",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": -12.0917021,
+        "lon": -77.0247784
+      },
+      "geocode": {
+        "city": "San Isidro",
+        "name": "Centro financiero de San Isidro",
+        "country": "Peru",
+        "admin1_region": "Lima"
+      },
+      "disambiguation": "Av. las Begonias 450 San Isidro 00027 Peru"
+    }
+  ],
+  "note": "Generic name drowned by Westin hotels."
+}

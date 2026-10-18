@@ -1,0 +1,104 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050923-resolve-place-bakeri.json",
+    "recorded": "2026-10-18 05:09:23",
+    "label": "resolve-place-bakeri",
+    "status": 200,
+    "request": "/search?query=Bakeri&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "9B68AA9D-BDA3-479D-95AF-C057CA0F2BEA",
+      "name": "Bakeri",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7200227,
+        "lon": -73.9601227
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Williamsburg",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "150 Wythe Ave Brooklyn, NY 11211"
+    },
+    {
+      "entity_id": "FA01F496-F3B8-46D1-9771-645442247F84",
+      "name": "Bakeri",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7343778,
+        "lon": -73.9575167
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Greenpoint",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "105 Freeman St Brooklyn, NY 11222"
+    },
+    {
+      "entity_id": "E2FCE1ED-6B6F-4E14-AB7A-F0D23021B8BD",
+      "name": "Bakè - Ristorante",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.2737165,
+        "lon": 18.4246078
+      },
+      "geocode": {
+        "city": "Melendugno",
+        "country": "Italy",
+        "admin1_region": "Apulia"
+      },
+      "disambiguation": "Via dei Pini, 18 73026 Torre dell'Orso LE Italy"
+    },
+    {
+      "entity_id": "99B74E21-918B-46C2-8F68-C7ED94E5D875",
+      "name": "Bakeries Roscher OHG Café",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 50.579864199999996,
+        "lon": 13.0149291
+      },
+      "geocode": {
+        "city": "Annaberg-Buchholz",
+        "name": "Annaberg",
+        "country": "Germany",
+        "admin1_region": "Saxony"
+      },
+      "disambiguation": "Parkstraße 33 09456 Annaberg-Buchholz Germany"
+    },
+    {
+      "entity_id": "BBCD0B00-DCF5-453B-BE08-20304F9FCD77",
+      "name": "Bakeries Two Flags",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": -33.129667999999995,
+        "lon": -64.35132
+      },
+      "geocode": {
+        "city": "Río Cuarto",
+        "name": "Macrocentro",
+        "country": "Argentina",
+        "admin1_region": "Córdoba"
+      },
+      "disambiguation": "Av. Italia 1321 X5800BAC Río Cuarto Córdoba Argentina"
+    }
+  ]
+}

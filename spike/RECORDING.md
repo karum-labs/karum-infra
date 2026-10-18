@@ -46,6 +46,10 @@ redact before promoting anything into the fixture pack. The key never leaves
 - **Calls spent total (quota ledger):** 144 (123 + 21) — `X-Month-RateLimit-Remaining: 9856` after the last extension call
 - **Items settled:** all 22 items now carry verdicts — 21 settled (1–6, 8–22; 12–14, 18–20, 22 and 15's tag-scoped half closed in the deferred-tier run); item 7 stays partial by design (429 deliberately unprobed — zero 429s across 144 calls)
 - **Blockers found:** none — one seed coverage miss (Madre Mezcal) recorded in the 17 Oct extension section
+- **Calls spent, preset lock pass (18 Oct):** 55 (key probe 1 · Austin venue resolves 5 · Brooklyn seed and alternate resolves 12 · Brooklyn venue resolves 10 · tag catalogues 3 · Brooklyn doors 1 · Brooklyn heatmap 2 · Brooklyn localities 1 · collab 2 · Brooklyn skip pools 2 · Colaba seed and brand resolves 8 · Colaba doors 2 · Colaba skip batch 1 · Austin compare 1 · demographics 4)
+- **Calls spent total (quota ledger):** 199 (144 + 55) — `X-Month-RateLimit-Remaining: 9801` after the last call
+- **Presets locked (18 Oct):** the four payloads ship in `fixtures/presets/` with the redacted recordings and the sha256 manifest — the fixture pack is done; the Brooklyn kill-rule check measured 8/10 (80% ≥ 70%)
+- **Blockers found, preset lock pass:** none — the pass's misses are exported as honesty fixtures under `fixtures/qloo/misses/`
 
 ## Traps carried into client code (16 Oct)
 
@@ -99,3 +103,102 @@ Two hard product risks went unprobed on 16 Oct: the **brand → place direction*
 **What follows from E1–E4:** `filter.location` WKT plus an explicit metre radius stands; the category tag is mandatory for door-shaped output; `A_taste` display uses within-set percentiles (raw affinity stays in the evidence); skip candidates are batch-scored and cut against a relative floor. [PLAN.md](../PLAN.md) §11, TECH's door score, and [PRODUCT.md](../PRODUCT.md) §5.2 carry these updates.
 
 **News for the walkthroughs:** the four new traps (14–17) above; the new runner commands (`brand-doors`, `skip-pool`) are in [spike/README.md](README.md).
+
+## Preset lock pass — the four presets and the fixture pack (18 Oct 2026)
+
+The pass resolved the last seeds, proved the Brooklyn point, locked the category
+tags, scored every skip pool, ran the demographics and compare probes, and
+shipped the fixture pack. 55 calls; the pack lives in
+[`fixtures/`](../fixtures/README.md) — 76 redacted recordings, the four preset
+payloads, and a sha256 manifest the new CI job verifies.
+
+| Preset | Seed (all verified) | Door board | Skip pool |
+| --- | --- | --- | --- |
+| `austin-wholesale` | Aesop + Ilegal Mezcal + Khruangbin | 25 rows, 0.828–0.859 — Mezcalería Tobalá top | 4 of 5 below the 0.8386 floor; Franklin Barbecue scores inside (0.8655), the batch control |
+| `brooklyn-flagship` | Muji + Choplet + BKLYN CLAY + Kettl Tea (Kinfolk recorded, capped out — §26) | 25 rows, 0.910–0.931 — Stonefruit Espresso top; 5,523 heatmap cells; 83 locality polygons | 8 of 8 below the 0.9218 floor; Lilia closest at 0.9192 |
+| `brooklyn-collab` | same seed as flagship | 25 rows, 0.768–0.942 — BDDW top; ceramics tag a recorded dud (0 rows) | — |
+| `mumbai-colaba-wholesale` | Mary Lodge by Subko + Blue Tokai Bandra + Versova | 25 rows, 0.930–0.968 — Suzette top; the incumbent's own Nariman Point outlet at rank 2 | 5 of 5 below the 0.9295 floor; Leopold closest at 0.9171 |
+
+- **Brooklyn, the western demo city (kill rule 2).** Seven of seven seed
+  candidates resolved (Muji, Kinfolk, Choplet, BKLYN CLAY, Kettl Tea,
+  Marimekko, MatchaBar — Kinto and Matchaful return 0 rows; Hasami, Ippodo,
+  and Kettl-as-brand fall back to unrelated entities). The venue half measured
+  8 of 10, every resolved row the New York entity (Butler rank 4 of 5, the
+  rest rank 1) — **80% ≥ the 70% gate**; Toby's Estate Coffee has no New York
+  row and The West dissolves into Westin hotels. The point returns doors and
+  heatmap cells (5,523, both boundary variants; 83 localities via
+  `boundary=urn:entity:locality`), so **the flagship fallback is not needed**
+  — the toggle stays on Brooklyn.
+- **Brooklyn seed trim.** The recorded calls used five signals; the locked
+  preset caps at four (PLAN.md §26), so Kinfolk moves to `alternates`
+  (with Marimekko and MatchaBar) and each envelope's `source.request` keeps
+  the five-id provenance.
+- **Colaba door shape (preset tag).** Settled. The cafe tag keeps the door
+  shape — Suzette, Blue Tokai | Nariman Point, Zen Cafe — while the unfiltered
+  seed drifts to dining and anchors (Soi 69, THE GHETTO, Bayroute Palladium);
+  that also explains the 17 Oct unfiltered run topping out with event venues.
+  Seed retries: Subko and Blue Tokai resolve as places (ranks 1/1/4); Subko
+  Mini At Kitab Khana resolves in `/search` but is `not_found` to insights —
+  excluded from the seed, with the warnings preserved in the recordings.
+- **Austin.** Five new venue resolves (La Condesa, Suerte, Here Nor There,
+  Kemuri Tatsu-Ya, Easy Tiger) complete the ten-venue list — 10 of 10
+  resolved, 7 top-row, 7 within 2 km. The bar-tagged board stays door-shaped
+  (0.828–0.859) where the unfiltered take-50 tops out with taste anchors
+  (Franklin Barbecue, Uncommon Objects, Cathedral of Junk).
+- **Compare.** The preset-grade pair (Mezcalería Tobalá × Ilegal Mezcal,
+  `filter.type=urn:entity:brand`) returned 12 shared-tag rows in the
+  `{tags, a, b, matchEntities}` envelope; `matchEntities` was empty as in
+  every probe.
+- **Demographics.** Rows carry age buckets and gender deltas per signal input;
+  `filter.results.entities` is ignored (the door-batch probe returned the same
+  seed profiles), and coverage is partial — 3 of 5 Brooklyn seed entities
+  carry profiles at all.
+- **Fixture pack.** `fixtures/presets/*.json` (the four payloads), 76 redacted
+  recordings under `fixtures/qloo/` (including `misses/`), and
+  `fixtures/manifest.json` with sha256 per file. Regenerate with
+  `python fixtures/tools/redact.py`; verify with `python fixtures/tools/redact.py
+  --verify` (`make check-fixtures`), unit tests via `make test-fixtures`.
+- **Quota.** 55 calls this pass → **9,801 of 10,000 remaining** (199 spent).
+  The rolling ~30-day window resets mid-November — inside judging — so read
+  `X-Month-RateLimit-Reset` before the prewarm batch.
+
+### From the preset lock pass (18 Oct)
+
+18. **A console-encoding crash can kill a run after the call succeeds.** The
+    first Austin resolve batch died printing an accented name on the cp1252
+    console — after the calls, before the state write; `run_spike.py` now
+    forces UTF-8 with `errors=replace` on stdout/stderr, and the batch re-ran.
+    Never couple a successful call to a fragile print.
+19. **Parallel runner processes race on `spike/state.json`.** Two concurrent
+    batches both load and save it; the last writer wins and the other batch's
+    entries vanish (the Colaba adds were lost this way). The state file is a
+    convenience ledger — pass explicit ids and treat the recordings as the
+    contract.
+20. **`/search` success does not imply insights usability.** Subko Mini At
+    Kitab Khana resolved in `/search` but every seed-signalled insights call
+    returned `not_found` for it; the seed excluded it and the warnings ride in
+    the recordings.
+21. **Demographics ignores `filter.results.entities`.** The batch probe
+    returned the same per-signal-input profiles as the plain seed call (3 of 5
+    Brooklyn seed entities carry profiles) — per-door profiles need per-door
+    calls.
+22. **Top-row city drift persists on `/search`.** Easy Tiger → Bengaluru
+    (Austin row rank 2), Butler → Moscow and Thessaloniki (NY rank 4), Blind
+    Pig → Kharkiv (Austin rank 5), Uchi → London and Montreal (Uchiko Austin
+    rank 4). Key ids on `geocode.city`, never on rank.
+23. **Specialty brand coverage is thin in both directions.** Kinto, Matchaful,
+    and Kocoatrait return 0 rows; Hasami, Ippodo, and Kettl fall back to
+    unrelated entities (Royal Copenhagen, Skinny Bunny Tea, Kettlebell Kings);
+    Subko, Blue Tokai, Third Wave, Dandelion, and Paul and Mike resolve as
+    places but never as brands. Specialty names need place-side resolution.
+24. **A tag can be a dud in one direction.** `urn:tag:genre:place:ceramics`
+    returned 0 rows on the collab call while `urn:tag:genre:place:art_gallery`
+    returned 25 — probe a tag against the direction before a preset locks it.
+25. **Locality boundaries are the heavy call.** One `boundary=urn:entity:locality`
+    heatmap returned 83 polygons in ~46 s (~6 MB once redacted) — fetch once,
+    cache it, and never per keystroke.
+
+**What follows:** fixture mode reads `fixtures/` and makes no outbound calls;
+the prewarm (PLAN.md §13) re-runs the four payloads live before the freeze and
+stores the completed runs with their traces. All traps 18–25 land in
+[DECISIONS.md](DECISIONS.md) and the service epics that depend on them.

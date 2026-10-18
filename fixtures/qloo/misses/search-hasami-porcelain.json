@@ -1,0 +1,24 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050840-resolve-brand-hasami-porcelain.json",
+    "recorded": "2026-10-18 05:08:40",
+    "label": "resolve-brand-hasami-porcelain",
+    "status": 200,
+    "request": "/search?query=Hasami%20Porcelain&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "0D24B752-7E4E-4C9B-B764-C8CA1D9C9CF5",
+      "name": "Royal Copenhagen",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    }
+  ],
+  "note": "Falls back to Royal Copenhagen."
+}

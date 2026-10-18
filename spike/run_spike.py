@@ -653,6 +653,11 @@ def cmd_raw(args) -> None:
 # --------------------------------------------------------------------------
 
 def main() -> None:
+    # Windows consoles default to cp1252 and venue names carry non-ASCII glyphs;
+    # a failed print must never kill a run that already spent quota.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
 

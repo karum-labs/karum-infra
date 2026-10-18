@@ -1,0 +1,102 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050925-resolve-place-toby-s-estate-coffee.json",
+    "recorded": "2026-10-18 05:09:25",
+    "label": "resolve-place-toby-s-estate-coffee",
+    "status": 200,
+    "request": "/search?query=Toby%27s%20Estate%20Coffee&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "694D34DF-3BB5-4EFD-B619-B9358DF90CBF",
+      "name": "Toby's Estate Coffee Roasters",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 14.5603246,
+        "lon": 121.0247749
+      },
+      "geocode": {
+        "city": "Makati",
+        "name": "Bel-Air",
+        "country": "Philippines"
+      },
+      "disambiguation": "G/F V Corporate Center, L.P. Leviste Street, Salcedo Village Makati City Metro Manila Philippines"
+    },
+    {
+      "entity_id": "9AC5941C-6BC2-4BD4-8FA9-606791B598D9",
+      "name": "Toby’s Estate Coffee Roasters",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 14.554674799999999,
+        "lon": 121.0168384
+      },
+      "geocode": {
+        "city": "Makati",
+        "name": "San Lorenzo",
+        "country": "Philippines"
+      },
+      "disambiguation": "G/F, Senta Condominium Legazpi Street Legazpi Village, Makati Metro Manila, Philippines"
+    },
+    {
+      "entity_id": "F8A925B6-1BFF-4C5E-B381-0539BE02F799",
+      "name": "Toby's Estate Coffee Roasters Singapore",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 1.2899494,
+        "lon": 103.8373996
+      },
+      "geocode": {
+        "city": "Singapore",
+        "name": "Riverside",
+        "country": "Singapore"
+      },
+      "disambiguation": "8 Rodyk St Singapore 238216"
+    },
+    {
+      "entity_id": "06DC6D13-A2BD-40EC-8F96-282610685CB1",
+      "name": "TOBY'S ESTATE -Coffee Roasters-",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": -7.2615419999999995,
+        "lon": 112.7396095
+      },
+      "geocode": {
+        "city": "Surabaya",
+        "name": "RW 10",
+        "country": "Indonesia",
+        "admin1_region": "East Java"
+      },
+      "disambiguation": "Tunjungan Plaza 5 L.UG Jl. Embong Malang No.4 Kedungdoro Kec. Tegalsari, Surabaya, Jawa Timur 60261, Indonesia"
+    },
+    {
+      "entity_id": "991C17B0-F02F-4A08-B932-D01E0CDD4C7D",
+      "name": "Toby's Estate Coffee Roasters",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": -33.8858584,
+        "lon": 151.1944136
+      },
+      "geocode": {
+        "city": "Council of the City of Sydney",
+        "name": "Sydney CBD",
+        "metro": "Sydney",
+        "country": "Australia",
+        "admin1_region": "New South Wales"
+      },
+      "disambiguation": "32-36 City Rd Chippendale NSW 2008 Australia"
+    }
+  ],
+  "note": "All rows are overseas; no New York venue row."
+}

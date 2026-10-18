@@ -1,0 +1,792 @@
+{
+  "fixture_version": 1,
+  "generated_by": "fixtures/tools/redact.py",
+  "generated_from": "spike/out recordings, 16-18 Oct 2026 (see spike/RECORDING.md)",
+  "redaction": "fields Karum consumes only; never raw Qloo JSON (QLOO_APIS.md §1, PLAN.md §4)",
+  "files": [
+    {
+      "path": "presets/austin-wholesale.json",
+      "sha256": "3a65081c944a7fc3f13c6393909aac881d0cc0e53851f130aaf0afb472f6faa4",
+      "bytes": 4096,
+      "kind": "preset"
+    },
+    {
+      "path": "presets/brooklyn-collab.json",
+      "sha256": "87927f293dbdf132da69e17ed9b3843e02b9deb30e309fd2b6aa6901fd3d8814",
+      "bytes": 2571,
+      "kind": "preset"
+    },
+    {
+      "path": "presets/brooklyn-flagship.json",
+      "sha256": "ab42bb393b894469c67ca739d63e375325761708f51a0593bea1507ecd059fc8",
+      "bytes": 6304,
+      "kind": "preset"
+    },
+    {
+      "path": "presets/mumbai-colaba-wholesale.json",
+      "sha256": "17dac72b17dbf1823b073b296ac0407db90bb6feaa033bd2c3d82e18a03e83f9",
+      "bytes": 4506,
+      "kind": "preset"
+    },
+    {
+      "path": "qloo/austin-wholesale/compare-tobala-ilegal.json",
+      "sha256": "ad1c02f31818b5f0ac40327f9f48e9c405511868d71dfde9b2c2218a60855553",
+      "bytes": 3377,
+      "kind": "compare",
+      "source": {
+        "recording": "20261018-051720-austin-compare-tobala-ilegal.json",
+        "label": "austin-compare-tobala-ilegal"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/demographics-seed.json",
+      "sha256": "b90c1cd845fb88a0a1c22eac4a21307da5aa2bb3ba240370682d2793ea89b65d",
+      "bytes": 1455,
+      "kind": "demographics",
+      "source": {
+        "recording": "20261018-052008-austin-demographics-seed.json",
+        "label": "austin-demographics-seed"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/insights-doors-baseline.json",
+      "sha256": "f8fd0605ca5a2609b45c400f0a2b8257f8b05af7fd3a846ae2d800b56d89c493",
+      "bytes": 582922,
+      "kind": "insights",
+      "source": {
+        "recording": "20261017-140353-brand-doors-baseline.json",
+        "label": "brand-doors-baseline"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/insights-doors-category-bar.json",
+      "sha256": "1f7d759ac782b754c999fb7eec1acc9789b0b7bf7254ed89b4697fde0701bb96",
+      "bytes": 645533,
+      "kind": "insights",
+      "source": {
+        "recording": "20261017-140600-brand-doors-category-bar.json",
+        "label": "brand-doors-category-bar"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/insights-doors-control-place-signal.json",
+      "sha256": "d825eac5c8b6ce5e7d0648e17fb6cc83032d2d6bab7dba089a60a0ecf6894be8",
+      "bytes": 702864,
+      "kind": "insights",
+      "source": {
+        "recording": "20261017-140356-brand-doors-control-place-signal.json",
+        "label": "brand-doors-control-place-signal"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/insights-doors-take50.json",
+      "sha256": "641455aadd8f2813be73e3a5a45da18e83109a4e1030909f896484ed5f984489",
+      "bytes": 1164794,
+      "kind": "insights",
+      "source": {
+        "recording": "20261017-140359-brand-doors-take50.json",
+        "label": "brand-doors-take50"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/insights-skip-batch-probe.json",
+      "sha256": "4655830bccdc0e76b408a671eba9608773aeb4df2bb10078147b0d2bdd6c1f4f",
+      "bytes": 126525,
+      "kind": "insights",
+      "source": {
+        "recording": "20261017-140503-skip-pool-batch-probe.json",
+        "label": "skip-pool-batch-probe"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/insights-skip-ranked.json",
+      "sha256": "c5746ce20dd6ff6babd4ade59f5f0a9767bfecac581cfd0f10ec11de205df7a6",
+      "bytes": 1139458,
+      "kind": "insights",
+      "source": {
+        "recording": "20261017-140501-skip-pool-ranked.json",
+        "label": "skip-pool-ranked"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/search-aesop.json",
+      "sha256": "3e23a6740b329a74b27c044e6cc1bf6782cd33211e3a6bd21860df73ef6dbca4",
+      "bytes": 537,
+      "kind": "search",
+      "source": {
+        "recording": "20261017-140127-resolve-brand-aesop.json",
+        "label": "resolve-brand-aesop"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/search-easy-tiger.json",
+      "sha256": "606ab40957c015f8e1cd2ab462244ec2c819a6ad4f9ec52da9c65c9527d913a9",
+      "bytes": 2873,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050826-resolve-place-easy-tiger.json",
+        "label": "resolve-place-easy-tiger"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/search-franklin-barbecue.json",
+      "sha256": "0ade5f7c50b6d04c582e178d29aee07c2a48d1cb255716a4e2bc228ca76f17f9",
+      "bytes": 2597,
+      "kind": "search",
+      "source": {
+        "recording": "20261017-140129-resolve-place-franklin-barbecue.json",
+        "label": "resolve-place-franklin-barbecue"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/search-here-nor-there.json",
+      "sha256": "35897828250f73d3263c9d56e5ad9d76f1a15bfce1138bf6b7c55a2842710ce1",
+      "bytes": 2935,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050800-resolve-place-here-nor-there.json",
+        "label": "resolve-place-here-nor-there"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/search-kemuri-tatsu-ya.json",
+      "sha256": "1a2faca79816ed273a7ae64aa734550fd4026dac6b1d8b3ef7d8f525374baf21",
+      "bytes": 2781,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050825-resolve-place-kemuri-tatsu-ya.json",
+        "label": "resolve-place-kemuri-tatsu-ya"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/search-khruangbin.json",
+      "sha256": "023b89c60d48418ac46764214537918850f5cd50c82c589574155b324dffb8e4",
+      "bytes": 1097,
+      "kind": "search",
+      "source": {
+        "recording": "20261017-140135-resolve-artist-khruangbin.json",
+        "label": "resolve-artist-khruangbin"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/search-la-condesa.json",
+      "sha256": "17ce308ab7491a6fbcd6ceca54ffbba22168ff7ed96e1b2373409dc4369c0828",
+      "bytes": 2665,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050756-resolve-place-la-condesa.json",
+        "label": "resolve-place-la-condesa"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/search-maggie-maes.json",
+      "sha256": "d2c8590976b1a6ded57873c665dbbbbe0c89519c0a5eb699121678d710e5dbcf",
+      "bytes": 2619,
+      "kind": "search",
+      "source": {
+        "recording": "20261017-140134-resolve-place-maggie-mae-s.json",
+        "label": "resolve-place-maggie-mae-s"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/search-suerte.json",
+      "sha256": "72fda70d68eed94de15143f9ef24f69b76799f10bc576b594bdfc15a53ac977e",
+      "bytes": 2662,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050758-resolve-place-suerte.json",
+        "label": "resolve-place-suerte"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/search-the-blind-pig-pub.json",
+      "sha256": "b19a9e1394c071a33a7f5bfff4c7841e9f5a7cecaae7d332e3101adb9c36722b",
+      "bytes": 2834,
+      "kind": "search",
+      "source": {
+        "recording": "20261017-140132-resolve-place-the-blind-pig-pub.json",
+        "label": "resolve-place-the-blind-pig-pub"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/search-uchiko-austin.json",
+      "sha256": "ec0200cb599a2aa0cdd531c8cafafffb571d1ac0f631455857bdf55649faeba1",
+      "bytes": 2710,
+      "kind": "search",
+      "source": {
+        "recording": "20261017-140226-resolve-place-uchi.json",
+        "label": "resolve-place-uchi"
+      }
+    },
+    {
+      "path": "qloo/austin-wholesale/search-whislers.json",
+      "sha256": "c3ce103f727fa7229a897dd893659913edeb6859aef978227523768218229216",
+      "bytes": 2687,
+      "kind": "search",
+      "source": {
+        "recording": "20261017-140227-resolve-place-whisler-s.json",
+        "label": "resolve-place-whisler-s"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-collab/insights-collab-ceramics.json",
+      "sha256": "c122a90d3d7f3100a070828c8e9e40f87e3594c5f32d80bb8840718bfb25c479",
+      "bytes": 775,
+      "kind": "insights",
+      "source": {
+        "recording": "20261018-051104-brooklyn-collab-ceramics.json",
+        "label": "brooklyn-collab-ceramics"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-collab/insights-collab-galleries.json",
+      "sha256": "446eee8f0b10b94d40e47be7108fdbcc45e5f3168e17eeeedf27666517259a0f",
+      "bytes": 456032,
+      "kind": "insights",
+      "source": {
+        "recording": "20261018-051103-brooklyn-collab-galleries.json",
+        "label": "brooklyn-collab-galleries"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/demographics-door-batch-probe.json",
+      "sha256": "684515bb82976e172b0cd135c2a17c6956e5374da4d9192ee1f6783edd0ef2a7",
+      "bytes": 2032,
+      "kind": "demographics",
+      "source": {
+        "recording": "20261018-052010-brooklyn-demographics-door-batch-probe.json",
+        "label": "brooklyn-demographics-door-batch-probe"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/demographics-seed.json",
+      "sha256": "23f10317a94a35185b3e5d6802a2d6362189d639aa515cdcf0ccb3f53786dd42",
+      "bytes": 1556,
+      "kind": "demographics",
+      "source": {
+        "recording": "20261018-052010-brooklyn-demographics-seed.json",
+        "label": "brooklyn-demographics-seed"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/insights-doors-cafe-tag.json",
+      "sha256": "7ddfd581cb5e2be434035c9a5f763919a56c29920b76ae51afe4ea1ac9de123a",
+      "bytes": 641317,
+      "kind": "insights",
+      "source": {
+        "recording": "20261018-051106-brooklyn-doors-cafe-tag.json",
+        "label": "brooklyn-doors-cafe-tag"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/insights-heatmap-cells-geohash.json",
+      "sha256": "dcc4c2c10c2beedf80a40b7e7d15cb77704328f1a6c740cafa60343650069503",
+      "bytes": 1316373,
+      "kind": "heatmap",
+      "source": {
+        "recording": "20261018-051122-brooklyn-heatmap-seed-geohash.json",
+        "label": "brooklyn-heatmap-seed-geohash"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/insights-heatmap-cells.json",
+      "sha256": "eaca2f8f76138b48129b1043fc8ca9b609879fdbd78420d8943af01cecafe2c8",
+      "bytes": 1316080,
+      "kind": "heatmap",
+      "source": {
+        "recording": "20261018-051112-brooklyn-heatmap-seed.json",
+        "label": "brooklyn-heatmap-seed"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/insights-heatmap-localities.json",
+      "sha256": "89b075b32e15ee1fde7501c5115eb4d4d3b20c338d26041f958c467b3327b091",
+      "bytes": 6350470,
+      "kind": "locality",
+      "source": {
+        "recording": "20261018-051637-brooklyn-heatmap-seed-localities.json",
+        "label": "brooklyn-heatmap-seed-localities"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/insights-skip-batch-probe.json",
+      "sha256": "6da8a54c21e2a6817f1e48c9fb21407a2dcdad3349c2229c4c6087063305d348",
+      "bytes": 226432,
+      "kind": "insights",
+      "source": {
+        "recording": "20261018-051107-skip-pool-batch-probe.json",
+        "label": "skip-pool-batch-probe"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/insights-skip-ranked.json",
+      "sha256": "0c7acabad1d64577047d774c95a359af880006a1c657ea6e1cec09ae2bb5ade8",
+      "bytes": 1096741,
+      "kind": "insights",
+      "source": {
+        "recording": "20261018-051103-skip-pool-ranked.json",
+        "label": "skip-pool-ranked"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-bakeri.json",
+      "sha256": "c3557cb2be24fbf0e2774bbc39472f007309713cea47f1351ae84aa87a71742f",
+      "bytes": 2704,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050923-resolve-place-bakeri.json",
+        "label": "resolve-place-bakeri"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-bklyn-clay.json",
+      "sha256": "28f2e3a73367174f99ec3d5f6b9db9b9ee69f186dc9926834268914688463373",
+      "bytes": 2826,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050842-resolve-place-bklyn-clay.json",
+        "label": "resolve-place-bklyn-clay"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-butler.json",
+      "sha256": "438a9843ef9e6e2aefdad32998da22648ec8cb9569abeb13fd9de7f476dc8de9",
+      "bytes": 2821,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050927-resolve-place-butler.json",
+        "label": "resolve-place-butler"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-cafe-mogador.json",
+      "sha256": "48de3087ec14ae8b1846e53f66b6e87407ed37076419d465d52715b8e34b190b",
+      "bytes": 2778,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050928-resolve-place-cafe-mogador.json",
+        "label": "resolve-place-cafe-mogador"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-choplet-ceramic-studio.json",
+      "sha256": "fd67fa2de2713c7c4208ebbc8118efa3713aad2889061709dbc8d46300ee5437",
+      "bytes": 2955,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050840-resolve-place-choplet-ceramic-studio.json",
+        "label": "resolve-place-choplet-ceramic-studio"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-devocion.json",
+      "sha256": "c95a67f02c36023bec679b6a2e586b20b1634dcf93afa6f4c4d30044443ea11b",
+      "bytes": 2721,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050920-resolve-place-devocion.json",
+        "label": "resolve-place-devocion"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-fresh-kills-bar.json",
+      "sha256": "df8ee1dbcc4799324a8a2c89b008a328b123c73f40200dbe02847a999b38d72d",
+      "bytes": 2791,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050926-resolve-place-fresh-kills-bar.json",
+        "label": "resolve-place-fresh-kills-bar"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-kettl-tea.json",
+      "sha256": "ba13f88dfac70281e811bcd912be4362c0682991cd4f8930dad2c6470a3f3925",
+      "bytes": 2737,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050924-resolve-place-kettl-tea.json",
+        "label": "resolve-place-kettl-tea"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-kinfolk.json",
+      "sha256": "3d62595ba0ab7c9d68c92deaa5e8348890de1db259e9526763fd367940a2b57d",
+      "bytes": 545,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050921-resolve-brand-kinfolk.json",
+        "label": "resolve-brand-kinfolk"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-lilia.json",
+      "sha256": "694a4b150f3703c6af26744df0c26afcdb7707eb7dbfa0a3e51049ac16297a07",
+      "bytes": 2846,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050930-resolve-place-lilia.json",
+        "label": "resolve-place-lilia"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-maison-premiere.json",
+      "sha256": "a9cea58b243b85ded879b74ffa98dce2a2536e7801da797156265639bb48f2e4",
+      "bytes": 2841,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050922-resolve-place-maison-premiere.json",
+        "label": "resolve-place-maison-premiere"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-marimekko.json",
+      "sha256": "03ccada080e339c705c7ed3f6e5aaa0cdc1ab422384ece1f193f4adba1286299",
+      "bytes": 553,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050920-resolve-brand-marimekko.json",
+        "label": "resolve-brand-marimekko"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-matchabar.json",
+      "sha256": "65398a8a1911034f279c76072b45dae189b525fa89d9933c42b4ce2e38913aa3",
+      "bytes": 2838,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050922-resolve-place-matchabar.json",
+        "label": "resolve-place-matchabar"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-muji.json",
+      "sha256": "d19a5a9df1d6dfef5926802e485e98860d369338807bf031c9799c80676b1b32",
+      "bytes": 533,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050842-resolve-brand-muji.json",
+        "label": "resolve-brand-muji"
+      }
+    },
+    {
+      "path": "qloo/brooklyn-flagship/search-sey-coffee.json",
+      "sha256": "24a1c7fd69765d5aaf49457ed8a896b5f35f053ed875429097384349791e8039",
+      "bytes": 2790,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050922-resolve-place-sey-coffee.json",
+        "label": "resolve-place-sey-coffee"
+      }
+    },
+    {
+      "path": "qloo/misses/search-blue-tokai-brand.json",
+      "sha256": "24cddf1247598848857c4017573e6045b906e69f7844dc81da63115bae99549d",
+      "bytes": 1660,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-051143-resolve-brand-blue-tokai-coffee-roasters.json",
+        "label": "resolve-brand-blue-tokai-coffee-roasters"
+      }
+    },
+    {
+      "path": "qloo/misses/search-dandelion-chocolate.json",
+      "sha256": "43a754a155d6d57836f69d7045e2b7822ed6bf56acf7736a5f5f3337ae409623",
+      "bytes": 1613,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-051146-resolve-brand-dandelion-chocolate.json",
+        "label": "resolve-brand-dandelion-chocolate"
+      }
+    },
+    {
+      "path": "qloo/misses/search-hasami-porcelain.json",
+      "sha256": "4d1038a82ec08ca2456f74414e9db83d5be16363fbefdcd8b59458c75e94787d",
+      "bytes": 628,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050840-resolve-brand-hasami-porcelain.json",
+        "label": "resolve-brand-hasami-porcelain"
+      }
+    },
+    {
+      "path": "qloo/misses/search-ippodo-tea.json",
+      "sha256": "f6eafe6cd4909c689f9dddcedaea092db818bcd162829c5e87fcb1f3baf3eccd",
+      "bytes": 1560,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050843-resolve-brand-ippodo-tea.json",
+        "label": "resolve-brand-ippodo-tea"
+      }
+    },
+    {
+      "path": "qloo/misses/search-kettl-brand.json",
+      "sha256": "31bc336022a23cb992723a0dd698551d2683d371f52745786423ec8cd0f9b494",
+      "bytes": 1281,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050845-resolve-brand-kettl.json",
+        "label": "resolve-brand-kettl"
+      }
+    },
+    {
+      "path": "qloo/misses/search-kinto.json",
+      "sha256": "81f560c0c6db72f6b930b6ff859f1357593b8e1ee815755d5abe3212e2f6394b",
+      "bytes": 357,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050839-resolve-brand-kinto.json",
+        "label": "resolve-brand-kinto"
+      }
+    },
+    {
+      "path": "qloo/misses/search-kocoatrait.json",
+      "sha256": "ad0d8bb681fa338d5fe59d98243c862c51a4dacdf910eec10d2ddc5d736d70a4",
+      "bytes": 377,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-051212-resolve-brand-kocoatrait.json",
+        "label": "resolve-brand-kocoatrait"
+      }
+    },
+    {
+      "path": "qloo/misses/search-madre-mezcal-any-type.json",
+      "sha256": "dec17651a2c0064d19fd0c55fe7e6cb1888aaf690a3a25dade9268bbd5952614",
+      "bytes": 2821,
+      "kind": "search",
+      "source": {
+        "recording": "20261017-140224-madre-mezcal-any-type.json",
+        "label": "madre-mezcal-any-type"
+      }
+    },
+    {
+      "path": "qloo/misses/search-madre-mezcal-brand.json",
+      "sha256": "28e411d3e9184d5fa4932c38108c951f0cbd045864afe67a0d726b7bb9204ef9",
+      "bytes": 1579,
+      "kind": "search",
+      "source": {
+        "recording": "20261017-140126-resolve-brand-madre-mezcal.json",
+        "label": "resolve-brand-madre-mezcal"
+      }
+    },
+    {
+      "path": "qloo/misses/search-matchaful.json",
+      "sha256": "2b345c90e51d75b6bc0d938bb22050d23c02a0b3f6af33b5d73f1caacfe2a859",
+      "bytes": 373,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050846-resolve-brand-matchaful.json",
+        "label": "resolve-brand-matchaful"
+      }
+    },
+    {
+      "path": "qloo/misses/search-paul-and-mike.json",
+      "sha256": "47d3371d918e071cad4eed3fab9ea04956d5b40a6757b596754eef8dd8d53cd4",
+      "bytes": 1547,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-051213-resolve-brand-paul-and-mike.json",
+        "label": "resolve-brand-paul-and-mike"
+      }
+    },
+    {
+      "path": "qloo/misses/search-subko-brand.json",
+      "sha256": "8f39d26dcd9c5b400f7f7a54108ebd70194941afb49e3c79c075f77c75b55fa0",
+      "bytes": 1641,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-051141-resolve-brand-subko-coffee-roasters.json",
+        "label": "resolve-brand-subko-coffee-roasters"
+      }
+    },
+    {
+      "path": "qloo/misses/search-the-west.json",
+      "sha256": "1f52f8d15c3c3211fe0da670fa65ae582da2b7079af810da14d1994a33c48024",
+      "bytes": 3070,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050924-resolve-place-the-west.json",
+        "label": "resolve-place-the-west"
+      }
+    },
+    {
+      "path": "qloo/misses/search-third-wave-brand.json",
+      "sha256": "87ae52368f6e1449db4885f3290e1de49dcbe6a6251f7196b1e104d253771c54",
+      "bytes": 1556,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-051145-resolve-brand-third-wave-coffee.json",
+        "label": "resolve-brand-third-wave-coffee"
+      }
+    },
+    {
+      "path": "qloo/misses/search-toby-s-estate-coffee.json",
+      "sha256": "a4fd53364c9d4642289972b7cf78b0a8ea5b6ef5e139cb305720dbc7a4c3f51e",
+      "bytes": 2939,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-050925-resolve-place-toby-s-estate-coffee.json",
+        "label": "resolve-place-toby-s-estate-coffee"
+      }
+    },
+    {
+      "path": "qloo/mumbai-colaba-wholesale/compare-leopold-probe.json",
+      "sha256": "868d952705bead4ac4b8373ec753dce31e530f1f147885aee0260512a48f80bb",
+      "bytes": 11405,
+      "kind": "compare",
+      "source": {
+        "recording": "20261016-101324-raw-v2-analysis-compare-a-signal-interests-entities-68a744f0.json",
+        "label": "raw-v2-analysis-compare-a-signal-interests-entities-68a744f0-1ce"
+      }
+    },
+    {
+      "path": "qloo/mumbai-colaba-wholesale/demographics-seed.json",
+      "sha256": "69f997b4a7a5305b93c3622ddc1c200ebe5dd88ebb79b3d41b2eb594ee81c7a7",
+      "bytes": 1682,
+      "kind": "demographics",
+      "source": {
+        "recording": "20261018-052008-colaba-demographics-seed.json",
+        "label": "colaba-demographics-seed"
+      }
+    },
+    {
+      "path": "qloo/mumbai-colaba-wholesale/insights-doors-baseline.json",
+      "sha256": "c5183a3046445009f791fecf2382e9fe5bc73cf08afb48a84c8e26ca2857d373",
+      "bytes": 352854,
+      "kind": "insights",
+      "source": {
+        "recording": "20261017-140021-brand-doors-baseline.json",
+        "label": "brand-doors-baseline"
+      }
+    },
+    {
+      "path": "qloo/mumbai-colaba-wholesale/insights-doors-cafe-tag.json",
+      "sha256": "dfd62d997b3e2cc3adb1892d81ced4de60d03ef26eb5e08fdd8cff6cb64a4c2c",
+      "bytes": 658433,
+      "kind": "insights",
+      "source": {
+        "recording": "20261018-051311-colaba-doors-cafe-tag.json",
+        "label": "colaba-doors-cafe-tag"
+      }
+    },
+    {
+      "path": "qloo/mumbai-colaba-wholesale/insights-doors-control-place-signal.json",
+      "sha256": "b2c1081a96620dbf5ecbf2482382e750d258fefb2f03070398c8f02bc193ab9b",
+      "bytes": 762752,
+      "kind": "insights",
+      "source": {
+        "recording": "20261017-140024-brand-doors-control-place-signal.json",
+        "label": "brand-doors-control-place-signal"
+      }
+    },
+    {
+      "path": "qloo/mumbai-colaba-wholesale/insights-doors-plus-tags.json",
+      "sha256": "ea95fe9ed46cbac1337354734d5a679c6aa239d5d8e1bfb5f09d8c8d0cdcb3f2",
+      "bytes": 604579,
+      "kind": "insights",
+      "source": {
+        "recording": "20261017-140030-brand-doors-plus-tags.json",
+        "label": "brand-doors-plus-tags"
+      }
+    },
+    {
+      "path": "qloo/mumbai-colaba-wholesale/insights-doors-take50.json",
+      "sha256": "1f5fc8da4d8b16b0c2f00999868e0d7c08df2158ab89e12a30e9d71ee1981239",
+      "bytes": 793289,
+      "kind": "insights",
+      "source": {
+        "recording": "20261017-140027-brand-doors-take50.json",
+        "label": "brand-doors-take50"
+      }
+    },
+    {
+      "path": "qloo/mumbai-colaba-wholesale/insights-doors-untagged.json",
+      "sha256": "e73a8391d6eff82f5408a5f6a85096f9d8be0f6fccc32f0a41c8d052f735d72f",
+      "bytes": 639484,
+      "kind": "insights",
+      "source": {
+        "recording": "20261018-051307-colaba-doors-untagged.json",
+        "label": "colaba-doors-untagged"
+      }
+    },
+    {
+      "path": "qloo/mumbai-colaba-wholesale/insights-skip-batch-probe.json",
+      "sha256": "0b5a84851a7792b286f246aa97a1a6b0b310a67b7294231671923cbc8c5574b1",
+      "bytes": 59626,
+      "kind": "insights",
+      "source": {
+        "recording": "20261018-051304-colaba-skip-batch.json",
+        "label": "colaba-skip-batch"
+      }
+    },
+    {
+      "path": "qloo/mumbai-colaba-wholesale/search-blue-tokai-coffee.json",
+      "sha256": "0bed1f6550b2e879ebb024a82ad2e317a04a4a8c8e611a97c621a91203d16dad",
+      "bytes": 3122,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-051214-resolve-place-blue-tokai-coffee.json",
+        "label": "resolve-place-blue-tokai-coffee"
+      }
+    },
+    {
+      "path": "qloo/mumbai-colaba-wholesale/search-leopold-cafe.json",
+      "sha256": "d4c254508c15fdbbd9382f2d9cd1ce0323c01608fa3a4347ea995b8fbda22d01",
+      "bytes": 3048,
+      "kind": "search",
+      "source": {
+        "recording": "20261016-090729-resolve-place-leopold-cafe.json",
+        "label": "resolve-place-leopold-cafe"
+      }
+    },
+    {
+      "path": "qloo/mumbai-colaba-wholesale/search-subko.json",
+      "sha256": "5c349b8ac78f3d66036293770b3e963f51a2a98a794a1bbe785f1728431b79a0",
+      "bytes": 2906,
+      "kind": "search",
+      "source": {
+        "recording": "20261018-051212-resolve-place-subko.json",
+        "label": "resolve-place-subko"
+      }
+    },
+    {
+      "path": "qloo/tags/bar-genre.json",
+      "sha256": "ffc7d072c8697663d3d63e5e2d73aeafba123b2d36d499c731f7bd45801abe76",
+      "bytes": 2280,
+      "kind": "tags",
+      "source": {
+        "recording": "20261017-140523-tags-bar-genre.json",
+        "label": "tags-bar-genre"
+      }
+    },
+    {
+      "path": "qloo/tags/cafe-genre.json",
+      "sha256": "572e13b964d9dc3b502278d0e2548945b120651ed9619ab3d512da2b4d93b830",
+      "bytes": 3753,
+      "kind": "tags",
+      "source": {
+        "recording": "20261018-050947-tags-cafe-genre.json",
+        "label": "tags-cafe-genre"
+      }
+    },
+    {
+      "path": "qloo/tags/ceramics-genre.json",
+      "sha256": "efae246e2b171404b845a6ad456f48f54ae52d48310540b43d2bc0d46255bf4b",
+      "bytes": 588,
+      "kind": "tags",
+      "source": {
+        "recording": "20261018-050947-tags-ceramics-genre.json",
+        "label": "tags-ceramics-genre"
+      }
+    },
+    {
+      "path": "qloo/tags/gallery-genre.json",
+      "sha256": "9b761eabcc11bb73058ab8108d7c89abbc94536889172a46d40b2a892faf6542",
+      "bytes": 1169,
+      "kind": "tags",
+      "source": {
+        "recording": "20261018-051001-tags-gallery-genre.json",
+        "label": "tags-gallery-genre"
+      }
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-051143-resolve-brand-blue-tokai-coffee-roasters.json",
+    "recorded": "2026-10-18 05:11:43",
+    "label": "resolve-brand-blue-tokai-coffee-roasters",
+    "status": 200,
+    "request": "/search?query=Blue%20Tokai%20Coffee%20Roasters&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "22B1BC87-CDFE-4340-86F8-8E0E6E1E6A7D",
+      "name": "Blue Bottle Coffee",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "E6BC1B43-71EA-4CAD-9CF5-BCADD6951F31",
+      "name": "Stumptown Coffee Roasters",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "D012BBB3-EA3F-45E6-BA69-1710C0947A7D",
+      "name": "La Colombe Coffee Roasters",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "371E7897-B3B4-403A-B5BE-9CBF231A8979",
+      "name": "Verve Coffee Roasters",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "3E4E3707-5B4E-43CD-96B4-E78B47DE03C2",
+      "name": "Ritual Coffee Roasters",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    }
+  ],
+  "note": "Falls back to Blue Bottle; Blue Tokai resolves as places instead."
+}

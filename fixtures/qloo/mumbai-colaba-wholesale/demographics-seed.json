@@ -1,0 +1,58 @@
+{
+  "fixture_version": 1,
+  "kind": "demographics",
+  "source": {
+    "recording": "20261018-052008-colaba-demographics-seed.json",
+    "recorded": "2026-10-18 05:20:08",
+    "label": "colaba-demographics-seed",
+    "status": 200,
+    "request": "/v2/insights?signal.interests.entities=0DE2E903-CCB5-4523-BAF0-3EC15514248C,6CEDF620-266F-4B72-B14E-875532C321B1,617683A6-DCF8-4104-8A1A-7484D1F9601C&filter.type=urn:demographics"
+  },
+  "rows": [
+    {
+      "entity_id": "617683A6-DCF8-4104-8A1A-7484D1F9601C",
+      "age": {
+        "24_and_younger": -0.019,
+        "25_to_29": 0.046,
+        "30_to_34": 0.356,
+        "35_to_44": -0.255,
+        "45_to_54": -0.28500000000000003,
+        "55_and_older": -0.254
+      },
+      "gender": {
+        "male": 0.179,
+        "female": -0.179
+      }
+    },
+    {
+      "entity_id": "6CEDF620-266F-4B72-B14E-875532C321B1",
+      "age": {
+        "24_and_younger": 0.0020000000000000005,
+        "25_to_29": 0.11000000000000001,
+        "30_to_34": -0.06300000000000001,
+        "35_to_44": 0.14,
+        "45_to_54": -0.363,
+        "55_and_older": -0.19299999999999998
+      },
+      "gender": {
+        "male": 0.21599999999999991,
+        "female": -0.21599999999999991
+      }
+    },
+    {
+      "entity_id": "0DE2E903-CCB5-4523-BAF0-3EC15514248C",
+      "age": {
+        "24_and_younger": 0.007000000000000001,
+        "25_to_29": 0.059,
+        "30_to_34": 0.020999999999999998,
+        "35_to_44": -0.0020000000000000018,
+        "45_to_54": -0.5449999999999999,
+        "55_and_older": -0.13199999999999998
+      },
+      "gender": {
+        "male": -0.23000000000000004,
+        "female": 0.23000000000000004
+      }
+    }
+  ]
+}

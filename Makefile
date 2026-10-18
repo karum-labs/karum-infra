@@ -8,6 +8,11 @@
 # check-protos` runs lint, the provenance-marker check, and the cross-language
 # contract test. CI runs the generate step inside Docker (PLAN.md §1.4);
 # `make generate-docker` is the local equivalent.
+#
+# Fixture tooling: `make redact-fixtures` regenerates the redacted pack from
+# local recordings (spike/out/, git-ignored); `make check-fixtures` verifies
+# hashes and preset schemas without recordings; `make test-fixtures` runs the
+# projection tests.
 
 include versions.env
 
@@ -22,7 +27,7 @@ BUF_DOCKER_IMAGE ?= bufbuild/buf:$(BUF_VERSION)
 VENV_PYTHON := $(firstword $(wildcard .venv/Scripts/python.exe) $(wildcard .venv/bin/python))
 PYTHON ?= $(if $(VENV_PYTHON),$(VENV_PYTHON),python)
 
-.PHONY: help up down logs test prewarm eval lint-proto breaking generate generate-docker check-proto-docs contract-test check-protos spike
+.PHONY: help up down logs test prewarm eval lint-proto breaking generate generate-docker check-proto-docs contract-test check-protos redact-fixtures check-fixtures test-fixtures spike
 
 ## help: list available targets.
 help:
@@ -89,6 +94,18 @@ contract-test:
 
 ## check-protos: lint, doc markers, and the stub contract test (run `make generate` first).
 check-protos: lint-proto check-proto-docs contract-test
+
+## redact-fixtures: regenerate the fixture pack from local recordings (needs spike/out/).
+redact-fixtures:
+	$(PYTHON) fixtures/tools/redact.py
+
+## check-fixtures: verify fixture hashes and preset schemas (CI-safe; no recordings needed).
+check-fixtures:
+	$(PYTHON) fixtures/tools/redact.py --verify
+
+## test-fixtures: unit-test the redaction projections.
+test-fixtures:
+	$(PYTHON) -m unittest discover -s fixtures/tools -p "test_*.py"
 
 ## spike ARGS="key": run the Qloo spike runner (see spike/README.md).
 spike:

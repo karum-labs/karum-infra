@@ -1,0 +1,23 @@
+{
+  "fixture_version": 1,
+  "kind": "tags",
+  "source": {
+    "recording": "20261018-050947-tags-ceramics-genre.json",
+    "recorded": "2026-10-18 05:09:47",
+    "label": "tags-ceramics-genre",
+    "status": 200,
+    "request": "/v2/tags?filter.query=ceramics&filter.tag.types=urn:tag:genre&take=25"
+  },
+  "rows": [
+    {
+      "id": "urn:tag:genre:place:ceramics",
+      "name": "Ceramics",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:ceramics_wholesaler",
+      "name": "Ceramics Wholesaler",
+      "type": "urn:tag:genre:place"
+    }
+  ]
+}

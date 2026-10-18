@@ -1,0 +1,23 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261017-140127-resolve-brand-aesop.json",
+    "recorded": "2026-10-17 14:01:27",
+    "label": "resolve-brand-aesop",
+    "status": 200,
+    "request": "/search?query=Aesop&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "32F867B9-E6DF-44C3-BCE4-40160C7ED5E4",
+      "name": "Aesop",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    }
+  ]
+}

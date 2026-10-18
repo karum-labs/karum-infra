@@ -13,7 +13,9 @@ direction and the Doors-to-Skip mechanism (see the extension section of
 - **The only host the script calls is `https://hackathon.api.qloo.com`** (plus the
   opt-in DI-1 production-host check, which is expected to return 401).
 - **Every raw response is saved to `spike/out/` (git-ignored).** Raw Qloo JSON never
-  gets committed: redact before promoting anything into the fixture pack.
+  gets committed: promote only through `fixtures/tools/redact.py` (`make redact-fixtures`),
+  which keeps the fields Karum consumes and regenerates the sha256 manifest
+  (`make check-fixtures` verifies the committed pack).
 - **Unsupported parameters are silently ignored.** The script always prints a
   no-parameter baseline next to each variant, so a no-op is visible as an unchanged
   count and unchanged top names.
@@ -55,6 +57,11 @@ curl.exe -s "https://hackathon.api.qloo.com/" -H "X-Api-Key: $env:QLOO_API_KEY"
    place-signal control, take-50 distribution, optional mixed tag signal) and
    `skip-pool` calibrates the skip floor (ranked set vs a candidate batch) —
    **both verified 17 Oct**, 21 calls.
+6. Preset lock (18 Oct): Brooklyn seed and venue resolves, tag catalogues,
+   doors + heatmap + localities, the collab pass, skip pools for all three
+   cities, demographics and compare probes — **55 calls**; the four preset
+   payloads and the redacted recordings ship in `fixtures/` (see
+   [RECORDING.md](RECORDING.md) and `../fixtures/README.md`).
 
 Record every answer in [RECORDING.md](RECORDING.md), then tick the item in
 QLOO_APIS.md §5, close the matching §9 row with the observed answer and a date, and
@@ -99,8 +106,10 @@ up) into `spike/out/`.
   record the headers and the reset timing by hand (item 7) — whether the quota resets
   before judging (Nov 2–16) matters.
 - Quota: 10,000 requests/month. The full spike used 123 calls, the 17 Oct extension
-  21 more (144 total; 9,856 remaining on 17 Oct; the DI-1 prod-host 401 is not metered) —
-  keep it that way: baseline-paired probes only.
+  21 more, and the 18 Oct preset lock pass 55 (199 total; 9,801 remaining on 18 Oct;
+  the DI-1 prod-host 401 is not metered). Live spend is closed — the next metered
+  use is the prewarm (PLAN §13); read `X-Month-RateLimit-Reset` first (the window
+  turns over mid-November, inside judging).
 - **Affinity bands move with the seed and the city** (17 Oct: Austin brand seed 0.847–0.866
   vs place control 0.973–0.983; Colaba: both ~0.94–0.97): score percentiles within the
   returned set and cut against the relative floor `skip-pool` prints — no fixed raw

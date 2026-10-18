@@ -1,0 +1,105 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050825-resolve-place-kemuri-tatsu-ya.json",
+    "recorded": "2026-10-18 05:08:25",
+    "label": "resolve-place-kemuri-tatsu-ya",
+    "status": 200,
+    "request": "/search?query=Kemuri%20Tatsu-ya&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "63EE651B-659C-4C48-9779-86E3053D0C31",
+      "name": "Kemuri Tatsu-Ya",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.253838,
+        "lon": -97.712949
+      },
+      "geocode": {
+        "city": "Austin",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "2713 E 2nd St Austin, TX 78702"
+    },
+    {
+      "entity_id": "7184D7D2-F741-49B2-B1E6-E010E3BB7723",
+      "name": "Shinjuku no kemuri yakitori izakaya",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 35.6942765,
+        "lon": 139.701897
+      },
+      "geocode": {
+        "city": "Shinjuku",
+        "name": "Kabukichō 1-chōme",
+        "metro": "Tokyo",
+        "country": "Japan",
+        "admin1_region": "Tokyo"
+      },
+      "disambiguation": "1F 1 Chome-15-7 Kabukicho Shinjuku City, Tokyo 160-0021 Japan"
+    },
+    {
+      "entity_id": "07C23A4E-B920-4848-BB97-0DCBBF6C7DB8",
+      "name": "Ramen Tatsu-Ya",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.2539275,
+        "lon": -97.7631794
+      },
+      "geocode": {
+        "city": "Austin",
+        "name": "Zilker",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "1234 S Lamar Blvd Austin, TX 78704"
+    },
+    {
+      "entity_id": "B3DE8DA3-69B3-4058-9B4C-0CB4C7DA8720",
+      "name": "Ramen Tatsu-ya",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.361154,
+        "lon": -97.71515
+      },
+      "geocode": {
+        "city": "Austin",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "8557 Research Blvd Apt 126 Austin, TX 78758"
+    },
+    {
+      "entity_id": "6EE1ED51-803E-4CC7-A414-38FA8C5E9DF8",
+      "name": "Druz'ya",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 54.9868768,
+        "lon": 73.3754891
+      },
+      "geocode": {
+        "city": "Omsk",
+        "name": "Центральный административный округ",
+        "country": "Russia",
+        "admin1_region": "Omsk Oblast"
+      },
+      "disambiguation": "Ulitsa Karla Libknekhta, 11 Omsk Omsk Oblast, Russia 644043"
+    }
+  ]
+}

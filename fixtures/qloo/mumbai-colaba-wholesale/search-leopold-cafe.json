@@ -1,0 +1,103 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261016-090729-resolve-place-leopold-cafe.json",
+    "recorded": "2026-10-16 09:07:29",
+    "label": "resolve-place-leopold-cafe",
+    "status": 200,
+    "request": "/search?query=Leopold%20Cafe&types=urn%3Aentity%3Aplace&take=5&page=1&filter.location=18.9221%2C72.8317&filter.radius=5.0&sort_by=distance"
+  },
+  "rows": [
+    {
+      "entity_id": "F97CE8BE-520F-428E-8576-C61A2C2E9C04",
+      "name": "Ground Reality Tours Mumbai",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 18.9222493,
+        "lon": 72.8317035
+      },
+      "geocode": {
+        "city": "Mumbai",
+        "name": "A Ward",
+        "country": "India",
+        "admin1_region": "Maharashtra"
+      },
+      "disambiguation": "near leopold cafe Apollo Bandar, Colaba Mumbai, Maharashtra 400001 India"
+    },
+    {
+      "entity_id": "73F1D59C-C6E4-4A18-A171-AFFAF255EFFD",
+      "name": "Pallavi Goyal, Kala Ghoda, Mumbai",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 18.9220343,
+        "lon": 72.8320718
+      },
+      "geocode": {
+        "city": "Mumbai",
+        "name": "A Ward",
+        "country": "India",
+        "admin1_region": "Maharashtra"
+      },
+      "disambiguation": "near Mg st. cafe Apollo Bandar, Colaba Mumbai, Maharashtra 400001 India"
+    },
+    {
+      "entity_id": "2916A74A-3F12-4673-B3EF-AE7776DF0A36",
+      "name": "Booster store",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 18.9225894,
+        "lon": 72.8316014
+      },
+      "geocode": {
+        "city": "Mumbai",
+        "name": "A Ward",
+        "country": "India",
+        "admin1_region": "Maharashtra"
+      },
+      "disambiguation": "Akbar plaza Mathuradas building Akbar plaza Colaba Causeway, next to mini, near Leopold cafe Mumbai, Maharashtra 400001, India"
+    },
+    {
+      "entity_id": "5507B328-650C-499E-A588-8A3B76EC7508",
+      "name": "SAMSONITE",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 18.9225826,
+        "lon": 72.83126159999999
+      },
+      "geocode": {
+        "city": "Mumbai",
+        "name": "A Ward",
+        "country": "India",
+        "admin1_region": "Maharashtra"
+      },
+      "disambiguation": "ground floor, 2nd Rahim Mansion 46, Colaba Causeway, opp. Leopold Cafe, beside olampia Restaurant, Scindia Society, Police Colony, Apollo Bandar, Colaba Mumbai, Maharashtra 400001 India"
+    },
+    {
+      "entity_id": "45F9F8EC-4CE1-4817-AB85-235D77CCD1A7",
+      "name": "ROYAL BUTTON",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 18.9227264,
+        "lon": 72.8318771
+      },
+      "geocode": {
+        "city": "Mumbai",
+        "name": "A Ward",
+        "country": "India",
+        "admin1_region": "Maharashtra"
+      },
+      "disambiguation": "Nawroji Ferdonji street Colaba Causeway, near leopold cafe Mumbai, Maharashtra 400001 India"
+    }
+  ]
+}

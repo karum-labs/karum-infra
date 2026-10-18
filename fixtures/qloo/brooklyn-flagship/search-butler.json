@@ -1,0 +1,105 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050927-resolve-place-butler.json",
+    "recorded": "2026-10-18 05:09:27",
+    "label": "resolve-place-butler",
+    "status": 200,
+    "request": "/search?query=Butler&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "67C772D4-03B0-4C93-A9BE-938348A70AE7",
+      "name": "Butler",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 55.766114599999995,
+        "lon": 37.5956173
+      },
+      "geocode": {
+        "city": "Moscow",
+        "name": "Tverskoy",
+        "country": "Russia",
+        "admin1_region": "Moscow"
+      },
+      "disambiguation": "Trekhprudnyy Pereulok, 15 Moscow Russia 123001"
+    },
+    {
+      "entity_id": "73D8475E-E700-4BF1-906A-C54D459E5015",
+      "name": "BUTLER",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.631777799999995,
+        "lon": 22.942674
+      },
+      "geocode": {
+        "city": "Thessaloniki Municipal Unit",
+        "name": "1st District of Thessaloniki",
+        "country": "Greece",
+        "admin1_region": "Macedonia and Thrace"
+      },
+      "disambiguation": "Mitropoleos 42 Thessaloniki 546 23 Greece"
+    },
+    {
+      "entity_id": "054D2774-2575-43AC-9A9F-08F144FD87CD",
+      "name": "Butler",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 38.0115668,
+        "lon": 23.6924152
+      },
+      "geocode": {
+        "city": "Municipality of Peristeri",
+        "name": "4th District of Peristeri",
+        "metro": "Municipality of Athens",
+        "country": "Greece",
+        "admin1_region": "Attica"
+      },
+      "disambiguation": "Emiliou Veaki 37 Peristeri 121 34 Greece"
+    },
+    {
+      "entity_id": "1EB1DDC1-0907-46FC-8D07-DB1BBCD020CA",
+      "name": "Butler",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7118004,
+        "lon": -73.9646546
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Williamsburg",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "95 S 5th St Brooklyn, NY 11249"
+    },
+    {
+      "entity_id": "666A04F0-DE65-41D5-BC74-20BE2A7AE3C3",
+      "name": "Butler University",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 39.8399145,
+        "lon": -86.17260209999999
+      },
+      "geocode": {
+        "city": "Indianapolis",
+        "country": "United States",
+        "admin1_region": "Indiana"
+      },
+      "disambiguation": "4600 Sunset Ave Indianapolis, IN 46208"
+    }
+  ],
+  "note": "The New York row is resolve rank 4 of 5 (top rows are Moscow/Thessaloniki)."
+}

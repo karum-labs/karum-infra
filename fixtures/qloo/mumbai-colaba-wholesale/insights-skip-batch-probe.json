@@ -1,0 +1,1969 @@
+{
+  "fixture_version": 1,
+  "kind": "insights",
+  "source": {
+    "recording": "20261018-051304-colaba-skip-batch.json",
+    "recorded": "2026-10-18 05:13:04",
+    "label": "colaba-skip-batch",
+    "status": 200,
+    "request": "/v2/insights?filter.type=urn:entity:place&signal.interests.entities=0DE2E903-CCB5-4523-BAF0-3EC15514248C,BC400638-8F5F-4F9C-9634-4833CA61E26F,6CEDF620-266F-4B72-B14E-875532C321B1,617683A6-DCF8-4104-8A1A-7484D1F9601C&filter.location=POINT(72.83%2018.93)&filter.location.radius=8000&take=25&filter.results.entities=68A744F0-1CE7-4C73-9A60-80C7A5713F72,AE5CB53B-F858-4FFC-8D87-2DDD803A9B2F,41966C27-754D-4135-931F-64CF4F2418CA,F13D82F2-95EF-49CF-8EEF-7B838CA53668,75C0A119-48D6-4E7A-B719-47269354E130"
+  },
+  "rows": [
+    {
+      "entity_id": "68A744F0-1CE7-4C73-9A60-80C7A5713F72",
+      "name": "Leopold Cafe",
+      "type": "urn:entity",
+      "subtype": "urn:entity:place",
+      "disambiguation": "Police Station Shahid Bhagat Singh Road Colaba Causeway, near Colaba Mumbai, Maharashtra 400001, India",
+      "location": {
+        "lat": 18.9227947,
+        "lon": 72.83166589999999
+      },
+      "popularity": 0.9983687461948865,
+      "tags": [
+        {
+          "id": "urn:tag:cuisine:qloo:chinese",
+          "name": "Chinese",
+          "type": "urn:tag:cuisine:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:menu_highlight:qloo:sizzlers",
+          "name": "Sizzlers",
+          "type": "urn:tag:menu_highlight:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:cuisine:qloo:seafood",
+          "name": "Seafood",
+          "type": "urn:tag:cuisine:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:planning:place:usually_a_wait",
+          "name": "Usually a wait",
+          "type": "urn:tag:planning:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:beverage_offering:qloo:wine",
+          "name": "Wine",
+          "type": "urn:tag:beverage_offering:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_type:qloo:walk_ins",
+          "name": "Walk ins",
+          "type": "urn:tag:service_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:interests:qloo:social_dining",
+          "name": "Social dining",
+          "type": "urn:tag:interests:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:planning:place:brunch_reservations_recommended",
+          "name": "Brunch reservations recommended",
+          "type": "urn:tag:planning:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:activity_type:qloo:sightseeing",
+          "name": "Sightseeing",
+          "type": "urn:tag:activity_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:specialty_dish:place:blueberry_cheesecake",
+          "name": "Blueberry cheesecake",
+          "type": "urn:tag:specialty_dish:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:age_range:qloo:18_24",
+          "name": "18 24",
+          "type": "urn:tag:age_range:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_type:qloo:drive_thru",
+          "name": "Drive thru",
+          "type": "urn:tag:service_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_type:qloo:dine_in",
+          "name": "Dine in",
+          "type": "urn:tag:service_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:beverage_offering:qloo:beer",
+          "name": "Beer",
+          "type": "urn:tag:beverage_offering:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:walkable",
+          "name": "Walkable",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:dietary_option:qloo:vegetarian",
+          "name": "Vegetarian",
+          "type": "urn:tag:dietary_option:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:cuisine:qloo:pasta",
+          "name": "Pasta",
+          "type": "urn:tag:cuisine:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenity:qloo:bar",
+          "name": "Bar",
+          "type": "urn:tag:amenity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:dining_options:place:catering",
+          "name": "Catering",
+          "type": "urn:tag:dining_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:happy_hour",
+          "name": "Happy hour",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:time_of_day_fit:qloo:late_night",
+          "name": "Late night",
+          "type": "urn:tag:time_of_day_fit:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:hot_tea",
+          "name": "Hot tea",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:menu_highlight:qloo:blueberry_cheesecake",
+          "name": "Blueberry cheesecake",
+          "type": "urn:tag:menu_highlight:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenity:qloo:takeout",
+          "name": "Takeout",
+          "type": "urn:tag:amenity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:central",
+          "name": "Central",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:parking:place:parking",
+          "name": "Parking",
+          "type": "urn:tag:parking:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenity:qloo:outdoor_seating",
+          "name": "Outdoor seating",
+          "type": "urn:tag:amenity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:activity_type:qloo:people_watching",
+          "name": "People watching",
+          "type": "urn:tag:activity_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:restaurant",
+          "name": "Restaurant",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:beverage_offering:qloo:coffee_and_tea",
+          "name": "Coffee and tea",
+          "type": "urn:tag:beverage_offering:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:age_range:qloo:35_44",
+          "name": "35 44",
+          "type": "urn:tag:age_range:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:small_plates",
+          "name": "Small plates",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:nearby_attraction:qloo:gateway_of_india",
+          "name": "Gateway of india",
+          "type": "urn:tag:nearby_attraction:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:happy_hour_drinks",
+          "name": "Happy hour drinks",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:restaurant:cafe",
+          "name": "Cafe",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:jain_vegetarian_food",
+          "name": "Jain vegetarian food",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:beer",
+          "name": "Beer",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:casual",
+          "name": "Casual",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_type:qloo:bar_service",
+          "name": "Bar service",
+          "type": "urn:tag:service_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:nostalgic",
+          "name": "Nostalgic",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenity:qloo:restrooms",
+          "name": "Restrooms",
+          "type": "urn:tag:amenity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:menu_highlight:qloo:chili_cheese_toast",
+          "name": "Chili cheese toast",
+          "type": "urn:tag:menu_highlight:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_options:place:onsite_services",
+          "name": "Onsite services",
+          "type": "urn:tag:service_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:payments:place:nfc_mobile_payments",
+          "name": "Nfc mobile payments",
+          "type": "urn:tag:payments:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:menu_highlight:qloo:keema_pav",
+          "name": "Keema pav",
+          "type": "urn:tag:menu_highlight:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:specialty_dish:place:bombay_masala_sandwich",
+          "name": "Bombay masala sandwich",
+          "type": "urn:tag:specialty_dish:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:quick_bite",
+          "name": "Quick bite",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:decor:qloo:old_world",
+          "name": "Old world",
+          "type": "urn:tag:decor:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:decor:qloo:vintage",
+          "name": "Vintage",
+          "type": "urn:tag:decor:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:classic",
+          "name": "Classic",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:cuisine:qloo:north_indian",
+          "name": "North indian",
+          "type": "urn:tag:cuisine:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:cost_description:place:₹400_to_₹1600",
+          "name": "₹400 to ₹1600",
+          "type": "urn:tag:cost_description:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:cuisine:qloo:american",
+          "name": "American",
+          "type": "urn:tag:cuisine:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:bustling",
+          "name": "Bustling",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:decor:qloo:classic",
+          "name": "Classic",
+          "type": "urn:tag:decor:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:cramped",
+          "name": "Cramped",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:restaurant:coffee_shop",
+          "name": "Coffee shop",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:category:place:restaurant",
+          "name": "Restaurant",
+          "type": "urn:tag:category:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:customer_identity:qloo:groups_of_friends",
+          "name": "Groups of friends",
+          "type": "urn:tag:customer_identity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:dining_options:place:brunch",
+          "name": "Brunch",
+          "type": "urn:tag:dining_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:specialty_dish:place:korean_chicken_wings",
+          "name": "Korean chicken wings",
+          "type": "urn:tag:specialty_dish:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:time_of_day_fit:qloo:evening",
+          "name": "Evening",
+          "type": "urn:tag:time_of_day_fit:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:menu_highlight:qloo:tandoori_chicken_fullivale",
+          "name": "Tandoori chicken fullivale",
+          "type": "urn:tag:menu_highlight:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:cuisine",
+          "name": "Cuisine",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:authentic",
+          "name": "Authentic",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:activity_type:qloo:dining_drinking",
+          "name": "Dining drinking",
+          "type": "urn:tag:activity_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_options:place:no_contact_delivery",
+          "name": "No contact delivery",
+          "type": "urn:tag:service_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:historic",
+          "name": "Historic",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:time_of_day_fit:qloo:morning",
+          "name": "Morning",
+          "type": "urn:tag:time_of_day_fit:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:dining_options:place:counter_seating",
+          "name": "Counter seating",
+          "type": "urn:tag:dining_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:alcohol",
+          "name": "Alcohol",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_options:place:delivery",
+          "name": "Delivery",
+          "type": "urn:tag:service_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:interests:qloo:local_history",
+          "name": "Local history",
+          "type": "urn:tag:interests:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:menu_highlight:qloo:chicken_tikka",
+          "name": "Chicken tikka",
+          "type": "urn:tag:menu_highlight:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenities:place:bar_onsite",
+          "name": "Bar onsite",
+          "type": "urn:tag:amenities:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:ok_to_order_just_drinks",
+          "name": "Ok to order just drinks",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:customer_identity:qloo:foodies",
+          "name": "Foodies",
+          "type": "urn:tag:customer_identity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:wine",
+          "name": "Wine",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:restaurant:american",
+          "name": "American",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:accessibility:place:wheelchair_accessible_restroom",
+          "name": "Wheelchair accessible restroom",
+          "type": "urn:tag:accessibility:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:culinary_style:qloo:traditional",
+          "name": "Traditional",
+          "type": "urn:tag:culinary_style:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:event:place:anniversary",
+          "name": "Anniversary",
+          "type": "urn:tag:event:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:setting:qloo:urban",
+          "name": "Urban",
+          "type": "urn:tag:setting:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:setting:qloo:historic",
+          "name": "Historic",
+          "type": "urn:tag:setting:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:beverage_offering:qloo:fresh_juices",
+          "name": "Fresh juices",
+          "type": "urn:tag:beverage_offering:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:healthy_options",
+          "name": "Healthy options",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:hard_liquor",
+          "name": "Hard liquor",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:culinary_style:qloo:casual",
+          "name": "Casual",
+          "type": "urn:tag:culinary_style:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:payments:place:google_pay",
+          "name": "Google pay",
+          "type": "urn:tag:payments:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:menu_highlight:qloo:pan_fried_chili_fish",
+          "name": "Pan fried chili fish",
+          "type": "urn:tag:menu_highlight:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:lively",
+          "name": "Lively",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:category:place:cafe",
+          "name": "Cafe",
+          "type": "urn:tag:category:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:restaurant:breakfast",
+          "name": "Breakfast",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:accessibility:place:wheelchair_accessible_entrance",
+          "name": "Wheelchair accessible entrance",
+          "type": "urn:tag:accessibility:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:activity_type:qloo:social_community",
+          "name": "Social community",
+          "type": "urn:tag:activity_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:payments:place:credit_cards",
+          "name": "Credit cards",
+          "type": "urn:tag:payments:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:restaurant:bar",
+          "name": "Bar",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:gluten_free_options",
+          "name": "Gluten free options",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_type:qloo:outdoor_seating",
+          "name": "Outdoor seating",
+          "type": "urn:tag:service_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:coffee",
+          "name": "Coffee",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:interests:qloo:casual_drinking",
+          "name": "Casual drinking",
+          "type": "urn:tag:interests:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:category:place:breakfast_restaurant",
+          "name": "Breakfast restaurant",
+          "type": "urn:tag:category:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:vibrant",
+          "name": "Vibrant",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:shopping_district",
+          "name": "Shopping district",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenities:place:restroom",
+          "name": "Restroom",
+          "type": "urn:tag:amenities:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:vegan_options",
+          "name": "Vegan meals",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenity:qloo:delivery",
+          "name": "Delivery",
+          "type": "urn:tag:amenity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:category:place:bar",
+          "name": "Bar",
+          "type": "urn:tag:category:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:children:place:good_for_kids",
+          "name": "Good for kids",
+          "type": "urn:tag:children:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:happy_hour_food",
+          "name": "Happy hour food",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenity:qloo:private_dining_room",
+          "name": "Private dining room",
+          "type": "urn:tag:amenity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:payments:place:debit_cards",
+          "name": "Debit cards",
+          "type": "urn:tag:payments:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_type:qloo:reservations",
+          "name": "Reservations",
+          "type": "urn:tag:service_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:nearby_attraction:qloo:nariman_point",
+          "name": "Nariman point",
+          "type": "urn:tag:nearby_attraction:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_options:place:dine_in",
+          "name": "Dine in",
+          "type": "urn:tag:service_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:time_of_day_fit:qloo:afternoon",
+          "name": "Afternoon",
+          "type": "urn:tag:time_of_day_fit:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:customer_identity:qloo:young_adults",
+          "name": "Young adults",
+          "type": "urn:tag:customer_identity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:interests:qloo:cultural_heritage",
+          "name": "Cultural heritage",
+          "type": "urn:tag:interests:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:planning:place:accepts_reservations",
+          "name": "Accepts reservations",
+          "type": "urn:tag:planning:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:dietary_option:qloo:organic",
+          "name": "Organic",
+          "type": "urn:tag:dietary_option:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:cuisine:qloo:indian",
+          "name": "Indian",
+          "type": "urn:tag:cuisine:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:dining_options:place:dinner",
+          "name": "Dinner",
+          "type": "urn:tag:dining_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:customer_identity:qloo:international_visitors",
+          "name": "International visitors",
+          "type": "urn:tag:customer_identity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:specialty_dish:place:mocktails",
+          "name": "Mocktails",
+          "type": "urn:tag:specialty_dish:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:setting:qloo:iconic_landmark",
+          "name": "Iconic landmark",
+          "type": "urn:tag:setting:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:dining_options:place:order_ahead",
+          "name": "Order ahead",
+          "type": "urn:tag:dining_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:menu_highlight:qloo:korean_chicken_wings",
+          "name": "Korean chicken wings",
+          "type": "urn:tag:menu_highlight:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:specialty_dish:place:non_veg",
+          "name": "Non veg",
+          "type": "urn:tag:specialty_dish:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:visit_intent:qloo:special_occasion",
+          "name": "Special occasion",
+          "type": "urn:tag:visit_intent:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:dining_options:place:dessert",
+          "name": "Dessert",
+          "type": "urn:tag:dining_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:menu_highlight:qloo:french_cheese_cake",
+          "name": "French cheese cake",
+          "type": "urn:tag:menu_highlight:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:getting_here:place:not_for_display",
+          "name": "Not for display",
+          "type": "urn:tag:getting_here:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:dining_options:place:lunch",
+          "name": "Lunch",
+          "type": "urn:tag:dining_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:vegetarian_options",
+          "name": "Vegetarian meals",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:beverage_offering:qloo:cocktails",
+          "name": "Cocktails",
+          "type": "urn:tag:beverage_offering:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:payments:place:price_level",
+          "name": "Price level",
+          "type": "urn:tag:payments:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:children:place:kids_menu",
+          "name": "Kids menu",
+          "type": "urn:tag:children:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:touristic",
+          "name": "Touristic",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:beverage_offering:qloo:full_bar",
+          "name": "Full bar",
+          "type": "urn:tag:beverage_offering:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:dining_options:place:breakfast",
+          "name": "Breakfast",
+          "type": "urn:tag:dining_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:category:place:american_restaurant",
+          "name": "American restaurant",
+          "type": "urn:tag:category:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:dining_options:place:table_service",
+          "name": "Table service",
+          "type": "urn:tag:dining_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:accessibility:place:wheelchair_accessible_seating",
+          "name": "Wheelchair accessible seating",
+          "type": "urn:tag:accessibility:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:late_night_food",
+          "name": "Late night food",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:beverage_offering:qloo:spirits",
+          "name": "Spirits",
+          "type": "urn:tag:beverage_offering:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:age_range:qloo:25_29",
+          "name": "25 29",
+          "type": "urn:tag:age_range:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_type:qloo:delivery",
+          "name": "Delivery",
+          "type": "urn:tag:service_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:old_school",
+          "name": "Old school",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:customer_identity:qloo:locals",
+          "name": "Locals",
+          "type": "urn:tag:customer_identity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:planning:place:dinner_reservations_recommended",
+          "name": "Dinner reservations recommended",
+          "type": "urn:tag:planning:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:offerings:place:cocktails",
+          "name": "Cocktails",
+          "type": "urn:tag:offerings:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:category:place:coffee_shop",
+          "name": "Coffee shop",
+          "type": "urn:tag:category:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:time_of_day_fit:qloo:midday",
+          "name": "Midday",
+          "type": "urn:tag:time_of_day_fit:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:customer_identity:qloo:celebrities",
+          "name": "Celebrities",
+          "type": "urn:tag:customer_identity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_type:qloo:takeout",
+          "name": "Takeout",
+          "type": "urn:tag:service_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:decor:qloo:casual",
+          "name": "Casual",
+          "type": "urn:tag:decor:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:customer_identity:qloo:tourists",
+          "name": "Tourists",
+          "type": "urn:tag:customer_identity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:menu_highlight:qloo:bombay_masala_sandwich",
+          "name": "Bombay masala sandwich",
+          "type": "urn:tag:menu_highlight:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:historic",
+          "name": "Historic",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:cuisine:qloo:continental",
+          "name": "Continental",
+          "type": "urn:tag:cuisine:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:visit_intent:qloo:destination",
+          "name": "Destination",
+          "type": "urn:tag:visit_intent:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:nearby_attraction:qloo:colaba_causeway",
+          "name": "Colaba causeway",
+          "type": "urn:tag:nearby_attraction:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:place:large_group",
+          "name": "Large group",
+          "type": "urn:tag:ambience:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:dietary_option:qloo:gluten_free",
+          "name": "Gluten free",
+          "type": "urn:tag:dietary_option:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_options:place:takeout",
+          "name": "Takeout",
+          "type": "urn:tag:service_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:setting:qloo:city_center",
+          "name": "City center",
+          "type": "urn:tag:setting:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:decor:qloo:historic",
+          "name": "Historic",
+          "type": "urn:tag:decor:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:interests:qloo:urban_exploration",
+          "name": "Urban exploration",
+          "type": "urn:tag:interests:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:view:qloo:street_view",
+          "name": "Street view",
+          "type": "urn:tag:view:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place",
+          "name": "Place",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:social",
+          "name": "Social",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:culinary_style:qloo:authentic",
+          "name": "Authentic",
+          "type": "urn:tag:culinary_style:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:noise_level:qloo:loud",
+          "name": "Loud",
+          "type": "urn:tag:noise_level:qloo",
+          "weight": null
+        }
+      ],
+      "query": {
+        "affinity": 0.9171072544375217,
+        "distance": 820.1313957697466
+      },
+      "properties": {
+        "address": "Police Station Shahid Bhagat Singh Road Colaba Causeway, near Colaba Mumbai, Maharashtra 400001, India",
+        "business_rating": 4.199999809265137,
+        "good_for": [
+          {
+            "id": "urn:tag:children:place:good_kids",
+            "name": "Good for kids",
+            "type": "urn:tag:children:place",
+            "weight": 0.8333333333333333
+          },
+          {
+            "id": "urn:tag:ambience:place:large_group",
+            "name": "Large Group",
+            "type": "urn:tag:ambience:place",
+            "weight": 0.9886363636363636
+          }
+        ],
+        "hours": {
+          "friday": [
+            {
+              "opens": "T07:30:00",
+              "closed": false,
+              "closes": "T00:30:00"
+            }
+          ],
+          "monday": [
+            {
+              "opens": "T07:30:00",
+              "closed": false,
+              "closes": "T00:30:00"
+            }
+          ],
+          "sunday": [
+            {
+              "opens": "T07:30:00",
+              "closed": false,
+              "closes": "T00:30:00"
+            }
+          ],
+          "tuesday": [
+            {
+              "opens": "T07:30:00",
+              "closed": false,
+              "closes": "T00:30:00"
+            }
+          ],
+          "saturday": [
+            {
+              "opens": "T07:30:00",
+              "closed": false,
+              "closes": "T00:30:00"
+            }
+          ],
+          "thursday": [
+            {
+              "opens": "T07:30:00",
+              "closed": false,
+              "closes": "T00:30:00"
+            }
+          ],
+          "wednesday": [
+            {
+              "opens": "T07:30:00",
+              "closed": false,
+              "closes": "T00:30:00"
+            }
+          ]
+        },
+        "is_closed": false,
+        "phone": "+918585828201",
+        "price_level": 4,
+        "price_range": {
+          "to": null,
+          "from": null,
+          "currency": "usd"
+        },
+        "website": "https://www.instagram.com/leopoldcafemumbai?igsh=Mm90dW1hNzc1aWg3",
+        "geocode": {
+          "city": "Mumbai",
+          "name": "A Ward",
+          "country": "India",
+          "admin1_region": "Maharashtra"
+        }
+      }
+    },
+    {
+      "entity_id": "AE5CB53B-F858-4FFC-8D87-2DDD803A9B2F",
+      "name": "Cafe Mondegar",
+      "type": "urn:entity",
+      "subtype": "urn:entity:place",
+      "disambiguation": "Metro House Colaba Causeway, near Regal Cinema, Apollo Bandar, Colaba Mumbai, Maharashtra 400001 India",
+      "location": {
+        "lat": 18.924050299999998,
+        "lon": 72.8321547
+      },
+      "popularity": 0.9949743713181638,
+      "tags": [
+        {
+          "id": "urn:tag:activity_type:qloo:dining_drinking",
+          "name": "Dining drinking",
+          "type": "urn:tag:activity_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:charming",
+          "name": "Charming",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:accessibility:place:wheelchair_accessible_restroom",
+          "name": "Wheelchair accessible restroom",
+          "type": "urn:tag:accessibility:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:category:place:pub",
+          "name": "Pub",
+          "type": "urn:tag:category:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenity:qloo:jukebox",
+          "name": "Jukebox",
+          "type": "urn:tag:amenity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:view:qloo:street_view",
+          "name": "Street view",
+          "type": "urn:tag:view:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:retro",
+          "name": "Retro",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:nearby_attraction:qloo:gateway_of_india",
+          "name": "Gateway of india",
+          "type": "urn:tag:nearby_attraction:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:decor:qloo:retro",
+          "name": "Retro",
+          "type": "urn:tag:decor:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:activity_type:qloo:sightseeing",
+          "name": "Sightseeing",
+          "type": "urn:tag:activity_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:time_of_day_fit:qloo:midday",
+          "name": "Midday",
+          "type": "urn:tag:time_of_day_fit:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:activity_type:qloo:culture_arts",
+          "name": "Culture arts",
+          "type": "urn:tag:activity_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:nearby_attraction:qloo:leopold_cafe",
+          "name": "Leopold cafe",
+          "type": "urn:tag:nearby_attraction:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:decor:qloo:historic",
+          "name": "Historic",
+          "type": "urn:tag:decor:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:specialty_dish:place:french_fries",
+          "name": "French fries",
+          "type": "urn:tag:specialty_dish:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:central",
+          "name": "Central",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place",
+          "name": "Place",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenity:qloo:restrooms",
+          "name": "Restrooms",
+          "type": "urn:tag:amenity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:setting:qloo:city_center",
+          "name": "City center",
+          "type": "urn:tag:setting:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:decor:qloo:themed",
+          "name": "Themed",
+          "type": "urn:tag:decor:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:interests:qloo:urban_exploration",
+          "name": "Urban exploration",
+          "type": "urn:tag:interests:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:specialty_dish:place:kingfisher_beer_and_onion_rings",
+          "name": "Kingfisher beer and onion rings",
+          "type": "urn:tag:specialty_dish:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:lively",
+          "name": "Lively",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:specialty_dish:place:roast",
+          "name": "Roast",
+          "type": "urn:tag:specialty_dish:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:walkable",
+          "name": "Walkable",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:buzzing",
+          "name": "Buzzing",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:bustling",
+          "name": "Bustling",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:visit_intent:qloo:destination",
+          "name": "Destination",
+          "type": "urn:tag:visit_intent:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:decor:qloo:functional",
+          "name": "Functional",
+          "type": "urn:tag:decor:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:time_of_day_fit:qloo:morning",
+          "name": "Morning",
+          "type": "urn:tag:time_of_day_fit:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:authentic",
+          "name": "Authentic",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:casual",
+          "name": "Casual",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:lively",
+          "name": "Lively",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:nostalgic",
+          "name": "Nostalgic",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:interests:qloo:classic_rock",
+          "name": "Classic rock",
+          "type": "urn:tag:interests:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:time_of_day_fit:qloo:afternoon",
+          "name": "Afternoon",
+          "type": "urn:tag:time_of_day_fit:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:setting:qloo:pub",
+          "name": "Pub",
+          "type": "urn:tag:setting:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:energetic",
+          "name": "Energetic",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:interests:qloo:heritage_preservation",
+          "name": "Heritage preservation",
+          "type": "urn:tag:interests:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:setting:qloo:irani_cafe",
+          "name": "Irani cafe",
+          "type": "urn:tag:setting:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:welcoming",
+          "name": "Welcoming",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenity:qloo:table_service",
+          "name": "Table service",
+          "type": "urn:tag:amenity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:nearby_attraction:qloo:colaba_causeway",
+          "name": "Colaba causeway",
+          "type": "urn:tag:nearby_attraction:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:time_of_day_fit:qloo:late_night",
+          "name": "Late night",
+          "type": "urn:tag:time_of_day_fit:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenity:qloo:merchandise_shop",
+          "name": "Merchandise shop",
+          "type": "urn:tag:amenity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:activity_type:qloo:listening_to_jukebox_music",
+          "name": "Listening to jukebox music",
+          "type": "urn:tag:activity_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenity:qloo:bar",
+          "name": "Bar",
+          "type": "urn:tag:amenity:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:historic",
+          "name": "Historic",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:decor:qloo:casual",
+          "name": "Casual",
+          "type": "urn:tag:decor:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:setting:qloo:commercial",
+          "name": "Commercial",
+          "type": "urn:tag:setting:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:decor:qloo:irani_cafe_aesthetic",
+          "name": "Irani cafe aesthetic",
+          "type": "urn:tag:decor:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:comfortable",
+          "name": "Comfortable",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:nearby_attraction:qloo:regal_cinema",
+          "name": "Regal cinema",
+          "type": "urn:tag:nearby_attraction:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:setting:qloo:historic",
+          "name": "Historic",
+          "type": "urn:tag:setting:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:interests:qloo:local_history",
+          "name": "Local history",
+          "type": "urn:tag:interests:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:visit_intent:qloo:special_occasion",
+          "name": "Special occasion",
+          "type": "urn:tag:visit_intent:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:pub",
+          "name": "Pub",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:specialty_dish:place:cheese_chilli_toast",
+          "name": "Cheese chilli toast",
+          "type": "urn:tag:specialty_dish:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:specialty_dish:place:alfredo_pasta",
+          "name": "Alfredo pasta",
+          "type": "urn:tag:specialty_dish:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:interests:qloo:cartoons",
+          "name": "Cartoons",
+          "type": "urn:tag:interests:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:specialty_dish:place:non_veg",
+          "name": "Non veg",
+          "type": "urn:tag:specialty_dish:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:activity_type:qloo:social_community",
+          "name": "Social community",
+          "type": "urn:tag:activity_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:specialty_dish:place:fish_and_chips",
+          "name": "Fish and chips",
+          "type": "urn:tag:specialty_dish:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:activity_type:qloo:nightlife",
+          "name": "Nightlife",
+          "type": "urn:tag:activity_type:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:social",
+          "name": "Social",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:time_of_day_fit:qloo:evening",
+          "name": "Evening",
+          "type": "urn:tag:time_of_day_fit:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:touristic",
+          "name": "Touristic",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:tourist_attraction",
+          "name": "Tourist attraction",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:historic",
+          "name": "Historic",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:ambience:qloo:bright",
+          "name": "Bright",
+          "type": "urn:tag:ambience:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:neighborhood_characteristic:qloo:iconic",
+          "name": "Iconic",
+          "type": "urn:tag:neighborhood_characteristic:qloo",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:amenity:qloo:full_menu",
+          "name": "Full menu",
+          "type": "urn:tag:amenity:qloo",
+          "weight": null
+        }
+      ],
+      "query": {
+        "affinity": 0.8908857429560749,
+        "distance": 699.3206299190936
+      },
+      "properties": {
+        "address": "Metro House Colaba Causeway, near Regal Cinema, Apollo Bandar, Colaba Mumbai, Maharashtra 400001 India",
+        "business_rating": 4.400000095367432,
+        "good_for": [
+          {
+            "id": "urn:tag:genre:place:restaurant:pub",
+            "name": "Pub",
+            "type": "urn:tag:genre:place",
+            "weight": 0.8314606741573034
+          }
+        ],
+        "hours": {
+          "friday": [
+            {
+              "opens": null,
+              "closed": true,
+              "closes": null
+            }
+          ],
+          "monday": [
+            {
+              "opens": null,
+              "closed": true,
+              "closes": null
+            }
+          ],
+          "sunday": [
+            {
+              "opens": null,
+              "closed": true,
+              "closes": null
+            }
+          ],
+          "tuesday": [
+            {
+              "opens": null,
+              "closed": true,
+              "closes": null
+            }
+          ],
+          "saturday": [
+            {
+              "opens": "T08:00:00",
+              "closed": false,
+              "closes": "T23:30:00"
+            }
+          ],
+          "thursday": [
+            {
+              "opens": null,
+              "closed": true,
+              "closes": null
+            }
+          ],
+          "wednesday": [
+            {
+              "opens": null,
+              "closed": true,
+              "closes": null
+            }
+          ]
+        },
+        "is_closed": false,
+        "phone": "+919833322277",
+        "price_level": 2,
+        "price_range": {
+          "to": null,
+          "from": null,
+          "currency": "usd"
+        },
+        "geocode": {
+          "city": "Mumbai",
+          "name": "A Ward",
+          "country": "India",
+          "admin1_region": "Maharashtra"
+        }
+      }
+    },
+    {
+      "entity_id": "41966C27-754D-4135-931F-64CF4F2418CA",
+      "name": "US CLUB",
+      "type": "urn:entity",
+      "subtype": "urn:entity:place",
+      "disambiguation": "WR23+5XP Colaba Causeway, Badhwar Park, Apollo Bandar, Colaba Mumbai, Maharashtra 400005 India",
+      "location": {
+        "lat": 18.900451099999998,
+        "lon": 72.8049602
+      },
+      "popularity": 0.9614785997999332,
+      "tags": [
+        {
+          "id": "urn:tag:amenities:place:restroom",
+          "name": "Restroom",
+          "type": "urn:tag:amenities:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:category:place:sports_club",
+          "name": "Sports club",
+          "type": "urn:tag:category:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place",
+          "name": "Place",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:sports_club",
+          "name": "Sports club",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:tourist_attraction",
+          "name": "Tourist attraction",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:accessibility:place:wheelchair_accessible_entrance",
+          "name": "Wheelchair accessible entrance",
+          "type": "urn:tag:accessibility:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:accessibility:place:wheelchair_accessible_parking_lot",
+          "name": "Wheelchair accessible parking lot",
+          "type": "urn:tag:accessibility:place",
+          "weight": null
+        }
+      ],
+      "query": {
+        "affinity": 0.8557504811185663,
+        "distance": 4211.11105971778
+      },
+      "properties": {
+        "address": "WR23+5XP Colaba Causeway, Badhwar Park, Apollo Bandar, Colaba Mumbai, Maharashtra 400005 India",
+        "business_rating": 4.599999904632568,
+        "is_closed": false,
+        "price_range": {
+          "to": null,
+          "from": null,
+          "currency": "usd"
+        },
+        "geocode": {
+          "city": "Mumbai",
+          "name": "A Ward",
+          "country": "India",
+          "admin1_region": "Maharashtra"
+        }
+      }
+    },
+    {
+      "entity_id": "75C0A119-48D6-4E7A-B719-47269354E130",
+      "name": "High Street Phoenix",
+      "type": "urn:entity",
+      "subtype": "urn:entity:place",
+      "disambiguation": "Sky Zone, High Street Phoenix, Senapati Bapat Marg, Lower Parel Shop No.F-11, 1st Floor Mumbai, Maharashtra 400013 India",
+      "location": {
+        "lat": 18.9948509,
+        "lon": 72.8252115
+      },
+      "popularity": 0.999086215561749,
+      "tags": [],
+      "query": {
+        "affinity": 0.8395272253031454,
+        "distance": 7228.6618676058715
+      },
+      "properties": {
+        "address": "Sky Zone, High Street Phoenix, Senapati Bapat Marg, Lower Parel Shop No.F-11, 1st Floor Mumbai, Maharashtra 400013 India",
+        "business_rating": 4.300000190734863,
+        "is_closed": false,
+        "price_range": {
+          "to": null,
+          "from": null,
+          "currency": "usd"
+        },
+        "website": "https://phoenixpalladium.com/",
+        "geocode": {
+          "city": "Mumbai",
+          "name": "G/S Ward",
+          "country": "India",
+          "admin1_region": "Maharashtra"
+        }
+      }
+    },
+    {
+      "entity_id": "F13D82F2-95EF-49CF-8EEF-7B838CA53668",
+      "name": "Royal Halls NSCI - Luxurious Banquet Hall | Marriage Hall | Event Hall in Mumbai",
+      "type": "urn:entity",
+      "subtype": "urn:entity:place",
+      "disambiguation": "C-Gate 1st Floor Lala Lajpatrai Marg, near National Sports Club of India, Lotus Colony, Worli Mumbai, Maharashtra 400018 India",
+      "location": {
+        "lat": 18.986487399999998,
+        "lon": 72.8150163
+      },
+      "popularity": 0.9963912943830859,
+      "tags": [
+        {
+          "id": "urn:tag:accessibility:place:wheelchair_accessible_entrance",
+          "name": "Wheelchair accessible entrance",
+          "type": "urn:tag:accessibility:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:category:place:banquet_hall",
+          "name": "Banquet hall",
+          "type": "urn:tag:category:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:tourist_attraction",
+          "name": "Tourist attraction",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:parking:place:free_parking_lot",
+          "name": "Free parking lot",
+          "type": "urn:tag:parking:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place",
+          "name": "Place",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_options:place:takeout",
+          "name": "Takeout",
+          "type": "urn:tag:service_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:event_venue",
+          "name": "Event venue",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:restaurant",
+          "name": "Restaurant",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:service_options:place:onsite_services",
+          "name": "Onsite services",
+          "type": "urn:tag:service_options:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:accessibility:place:wheelchair_accessible_parking_lot",
+          "name": "Wheelchair accessible parking lot",
+          "type": "urn:tag:accessibility:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:children:place:good_for_kids_birthday",
+          "name": "Good for kids birthday",
+          "type": "urn:tag:children:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:genre:place:restaurant:banquet_hall",
+          "name": "Banquet hall",
+          "type": "urn:tag:genre:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:category:place:event_venue",
+          "name": "Event venue",
+          "type": "urn:tag:category:place",
+          "weight": null
+        },
+        {
+          "id": "urn:tag:category:place:event_management_company",
+          "name": "Event management company",
+          "type": "urn:tag:category:place",
+          "weight": null
+        }
+      ],
+      "query": {
+        "affinity": 0.832582176794258,
+        "distance": 6475.756726020594
+      },
+      "properties": {
+        "address": "C-Gate 1st Floor Lala Lajpatrai Marg, near National Sports Club of India, Lotus Colony, Worli Mumbai, Maharashtra 400018 India",
+        "business_rating": 4.800000190734863,
+        "hours": {
+          "friday": [
+            {
+              "opens": "T09:00:00",
+              "closed": false,
+              "closes": "T18:00:00"
+            }
+          ],
+          "monday": [
+            {
+              "opens": "T09:00:00",
+              "closed": false,
+              "closes": "T18:00:00"
+            }
+          ],
+          "sunday": [
+            {
+              "opens": "T09:00:00",
+              "closed": false,
+              "closes": "T18:00:00"
+            }
+          ],
+          "tuesday": [
+            {
+              "opens": "T09:00:00",
+              "closed": false,
+              "closes": "T18:00:00"
+            }
+          ],
+          "saturday": [
+            {
+              "opens": "T09:00:00",
+              "closed": false,
+              "closes": "T18:00:00"
+            }
+          ],
+          "thursday": [
+            {
+              "opens": "T09:00:00",
+              "closed": false,
+              "closes": "T18:00:00"
+            }
+          ],
+          "wednesday": [
+            {
+              "opens": "T09:00:00",
+              "closed": false,
+              "closes": "T18:00:00"
+            }
+          ]
+        },
+        "is_closed": false,
+        "phone": "+919372573680",
+        "price_range": {
+          "to": null,
+          "from": null,
+          "currency": "usd"
+        },
+        "website": "https://royalhalls.in/",
+        "geocode": {
+          "city": "Mumbai",
+          "name": "G/S Ward",
+          "country": "India",
+          "admin1_region": "Maharashtra"
+        }
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "not_found",
+      "signal.interests.entities": [
+        "BC400638-8F5F-4F9C-9634-4833CA61E26F"
+      ]
+    }
+  ]
+}

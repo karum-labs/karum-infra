@@ -1,0 +1,105 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050800-resolve-place-here-nor-there.json",
+    "recorded": "2026-10-18 05:08:00",
+    "label": "resolve-place-here-nor-there",
+    "status": 200,
+    "request": "/search?query=Here%20Nor%20There&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "6B617A2A-19C0-4B1A-A678-EBBAC91B3FE9",
+      "name": "Here Nor There",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.2684109,
+        "lon": -97.7413784
+      },
+      "geocode": {
+        "city": "Austin",
+        "name": "Downtown",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "612 Brazos St Austin, TX 78701"
+    },
+    {
+      "entity_id": "0D723AF8-18A4-4E2C-9CD1-AD656703F154",
+      "name": "Here Nor There",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 44.4488712,
+        "lon": -64.38147409999999
+      },
+      "geocode": {
+        "city": "Mahone Bay",
+        "name": "Mahone Bay",
+        "country": "Canada",
+        "admin1_region": "Nova Scotia"
+      },
+      "disambiguation": "529 Main St Mahone Bay, NS B0J 0C6 Canada"
+    },
+    {
+      "entity_id": "F5ECD1FE-E5CE-4135-8A21-904DCE283510",
+      "name": "Here Nor There",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.728946199999996,
+        "lon": -73.9863865
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "East Village",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "315 E 9th St New York, NY 10003"
+    },
+    {
+      "entity_id": "3DA657F2-443F-4C6D-9F0D-AC08201B3559",
+      "name": "Here There Restaurant",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 54.3792489,
+        "lon": 18.6072026
+      },
+      "geocode": {
+        "city": "Gdansk",
+        "name": "Wrzeszcz Górny",
+        "country": "Poland",
+        "admin1_region": "Pomeranian Voivodeship"
+      },
+      "disambiguation": "Romana Dmowskiego 15 80-243 Gdańsk Poland"
+    },
+    {
+      "entity_id": "01C7EA84-6BCB-451C-BED0-25679D1C28C5",
+      "name": "《雷爾飛斯 There fix》iPhone手機現場維修中心｜iMac電腦維修升級｜iPad平板維修 換電池｜MacBook維修 換電池｜主機板維修",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 23.0028526,
+        "lon": 120.20330999999999
+      },
+      "geocode": {
+        "city": "Tainan",
+        "name": "North District",
+        "country": "Taiwan",
+        "admin1_region": "Tainan"
+      },
+      "disambiguation": "704, Taiwan, Tainan City, North District, Heshun Village, Lane 47, Section 3, Ximen Rd, 59號"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050924-resolve-place-kettl-tea.json",
+    "recorded": "2026-10-18 05:09:24",
+    "label": "resolve-place-kettl-tea",
+    "status": 200,
+    "request": "/search?query=Kettl%20Tea&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "98F7EBDF-987C-4741-B6F8-5C7511DC0021",
+      "name": "Kettl Tea",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7125158,
+        "lon": -73.9487857
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Williamsburg",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "150 Ainslie St 2nd fl Brooklyn, NY 11211"
+    },
+    {
+      "entity_id": "03733782-6FDE-4687-84C6-BCF04B45DA7D",
+      "name": "Kettl Tea - Bowery",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.726662399999995,
+        "lon": -73.99193389999999
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "NoHo",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "348 Bowery New York, NY 10012"
+    },
+    {
+      "entity_id": "2800BF71-2C03-447F-BB40-C8E4ADC7616D",
+      "name": "The Singing Kettle Tea Room & Bistro",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 50.4644172,
+        "lon": -3.5362704999999997
+      },
+      "geocode": {
+        "city": "Torquay",
+        "name": "Torre",
+        "country": "United Kingdom",
+        "admin1_region": "England"
+      },
+      "disambiguation": "3, Kistor Place Belgrave Rd Torquay TQ2 5HP United Kingdom"
+    },
+    {
+      "entity_id": "4FBDB894-B57D-4707-B8F4-01188FAEDE98",
+      "name": "Cup & Kettle Tea",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 39.1679773,
+        "lon": -86.5333003
+      },
+      "geocode": {
+        "city": "Bloomington",
+        "country": "United States",
+        "admin1_region": "Indiana"
+      },
+      "disambiguation": "208 N Walnut St #100 Bloomington, IN 47408"
+    },
+    {
+      "entity_id": "C8065303-8281-4A1B-9C17-22A09AC1E1AB",
+      "name": "The Tea Kettle Restaurant",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 41.287311599999995,
+        "lon": -72.4071127
+      },
+      "geocode": {
+        "city": "Old Saybrook",
+        "country": "United States",
+        "admin1_region": "Connecticut"
+      },
+      "disambiguation": "1395 Boston Post Rd Old Saybrook, CT 06475"
+    }
+  ]
+}

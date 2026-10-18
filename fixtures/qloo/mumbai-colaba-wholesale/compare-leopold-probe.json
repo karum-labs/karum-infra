@@ -1,0 +1,366 @@
+{
+  "fixture_version": 1,
+  "kind": "compare",
+  "source": {
+    "recording": "20261016-101324-raw-v2-analysis-compare-a-signal-interests-entities-68a744f0.json",
+    "recorded": "2026-10-16 10:13:24",
+    "label": "raw-v2-analysis-compare-a-signal-interests-entities-68a744f0-1ce",
+    "status": 200,
+    "request": "/v2/analysis/compare?a.signal.interests.entities=68A744F0-1CE7-4C73-9A60-80C7A5713F72&b.signal.interests.entities=B6DA90E2-E073-4CE1-83CC-678F089C92EC&filter.type=urn:entity:brand&take=50"
+  },
+  "rows": [
+    {
+      "tag_id": "urn:tag:offerings:place:alcohol",
+      "name": "Alcohol",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "01FE8354-6E33-48DF-B188-50E056F3995E",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:dining_options:place:lunch",
+      "name": "Lunch",
+      "type": "urn:tag",
+      "subtype": "urn:tag:dining_options:place",
+      "entity_id": "0AEEB7BB-4BB5-4992-94AE-C3D0B67D0FA3",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:genre:place:restaurant:breakfast",
+      "name": "Breakfast",
+      "type": "urn:tag",
+      "subtype": "urn:tag:genre:place",
+      "entity_id": "0B642F73-E670-4A3A-9055-82FEC0ED7044",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:private_dining_room",
+      "name": "Private dining room",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "1A22780F-DAD0-42B2-87F7-550DC7738759",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:dining_options:place:brunch",
+      "name": "Brunch",
+      "type": "urn:tag",
+      "subtype": "urn:tag:dining_options:place",
+      "entity_id": "238D5AFD-23E3-4857-A885-01B6F07A6776",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:category:place:american_restaurant",
+      "name": "American Restaurant",
+      "type": "urn:tag",
+      "subtype": "urn:tag:category:place",
+      "entity_id": "302B8AB2-0E26-4F16-BAB5-7EAA05179506",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:dining_options:place:dinner",
+      "name": "Dinner",
+      "type": "urn:tag",
+      "subtype": "urn:tag:dining_options:place",
+      "entity_id": "30B8692E-DAB6-4FD9-BAC4-36C3BD84EEA6",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:vegetarian_options_only",
+      "name": "Vegetarian options only",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "3D03276C-19CC-4F35-B42B-A4ABB95B9CF7",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:genre:place:restaurant:bar",
+      "name": "Bar",
+      "type": "urn:tag",
+      "subtype": "urn:tag:genre:place",
+      "entity_id": "4605D188-E989-44F1-8F31-3F37B28D2A71",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:genre:place:restaurant",
+      "name": "Restaurant",
+      "type": "urn:tag",
+      "subtype": "urn:tag:genre:place",
+      "entity_id": "47BA6D7D-8A7D-4092-B356-CBA3480873CA",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:dining_options:place:order_ahead",
+      "name": "Order ahead",
+      "type": "urn:tag",
+      "subtype": "urn:tag:dining_options:place",
+      "entity_id": "4883F529-49F0-4FDF-8D59-A7321AA04E3A",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:cocktails",
+      "name": "Cocktails",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "4B226DB8-4431-44D3-92D8-C94559E3F8D9",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:category:place:bar",
+      "name": "Bar",
+      "type": "urn:tag",
+      "subtype": "urn:tag:category:place",
+      "entity_id": "5601114F-279C-4CAD-AFF4-4EFB432B2EB2",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:dining_options:place:catering",
+      "name": "Catering",
+      "type": "urn:tag",
+      "subtype": "urn:tag:dining_options:place",
+      "entity_id": "5C569DC2-F7A4-4C01-8299-3DE89D396E68",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:dining_options:place:breakfast",
+      "name": "Breakfast",
+      "type": "urn:tag",
+      "subtype": "urn:tag:dining_options:place",
+      "entity_id": "5CCBF8B4-5119-4D36-94A7-23AF5AC75636",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:quick_bite",
+      "name": "Quick bite",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "64849E21-8F4A-409F-B3C6-FFD1CD7AEE9A",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:category:place:restaurant",
+      "name": "Restaurant",
+      "type": "urn:tag",
+      "subtype": "urn:tag:category:place",
+      "entity_id": "660CF45C-A69C-4473-87F9-451F4A936EBD",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:dining_options:place:table_service",
+      "name": "Table service",
+      "type": "urn:tag",
+      "subtype": "urn:tag:dining_options:place",
+      "entity_id": "67946589-45E4-4E80-9283-F6FEF0D1B86D",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:genre:place",
+      "name": "Place",
+      "type": "urn:tag",
+      "subtype": "urn:tag:genre:place",
+      "entity_id": "69142520-E6CC-47A4-A12E-526BC0B5A764",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:category:place:coffee_shop",
+      "name": "Coffee Shop",
+      "type": "urn:tag",
+      "subtype": "urn:tag:category:place",
+      "entity_id": "6DDB7993-086E-43D3-9367-525BAD62E7EB",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:dining_options:place:dessert",
+      "name": "Dessert",
+      "type": "urn:tag",
+      "subtype": "urn:tag:dining_options:place",
+      "entity_id": "76C6F436-8FB9-4C83-A774-CE6B563981B7",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:happy_hour",
+      "name": "Happy hour",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "7F61BC94-4DF5-4A3F-9A80-8A2FB65DAAD9",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:wine",
+      "name": "Wine",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "801D66FA-73FE-4AC0-A17D-DBA83DBA24A4",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:coffee",
+      "name": "Coffee",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "93805461-CACD-4EF5-9CE1-D4D96FE84BB9",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:organic_dishes",
+      "name": "Organic dishes",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "948B5ACE-2302-4C5F-B3B7-887CCCCC2A32",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:cuisine",
+      "name": "Cuisine",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "A0E1518D-C943-4320-96FA-A0BF250DC2B4",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:ok_to_order_just_drinks",
+      "name": "OK to order just drinks",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "A13B19F3-32C7-4F08-BD96-93AC331E35C1",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:vegetarian_options",
+      "name": "Vegetarian Meals",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "A33DE81E-09E6-4383-8A68-973D5A3C0983",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:beer",
+      "name": "Beer",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "A86777A2-FEA1-488B-B617-A9503CA90789",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:genre:place:restaurant:coffee_shop",
+      "name": "Coffee Shop",
+      "type": "urn:tag",
+      "subtype": "urn:tag:genre:place",
+      "entity_id": "A99D605D-CDD4-43A6-8703-2DA386503CD5",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:category:place:cafe",
+      "name": "Cafe",
+      "type": "urn:tag",
+      "subtype": "urn:tag:category:place",
+      "entity_id": "A9A110D7-4975-48D9-92EC-FA01FB364846",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:happy_hour_drinks",
+      "name": "Happy hour drinks",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "AA4C5298-4F37-4392-80CE-F8447B72960E",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:genre:place:restaurant:american",
+      "name": "American",
+      "type": "urn:tag",
+      "subtype": "urn:tag:genre:place",
+      "entity_id": "B661DCED-DF9C-4B39-8E36-1B5CA7687D44",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:small_plates",
+      "name": "Small plates",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "B9142892-000F-428A-8874-77FDE1A56A7D",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:category:place:breakfast_restaurant",
+      "name": "Breakfast Restaurant",
+      "type": "urn:tag",
+      "subtype": "urn:tag:category:place",
+      "entity_id": "BDC039B4-6A06-4802-B362-4D881187E81B",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:cost_description:place:expensive",
+      "name": "Expensive",
+      "type": "urn:tag",
+      "subtype": "urn:tag:cost_description:place",
+      "entity_id": "BDDD0C37-E148-4FC9-A18E-EF74E0FF5132",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:jain_vegetarian_food",
+      "name": "Jain vegetarian food",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "D7A2713B-B17F-4263-B725-3D16992A6B35",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:genre:place:restaurant:cafe",
+      "name": "Cafe",
+      "type": "urn:tag",
+      "subtype": "urn:tag:genre:place",
+      "entity_id": "DE9EA38D-6DF4-4E4D-9D63-B87EC7B632A9",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:gluten_free_options",
+      "name": "Gluten Free Options",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "DFD9DE0C-10EC-4886-B5E7-D607B5DDCEEF",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:hard_liquor",
+      "name": "Hard liquor",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "EA1E8E80-3357-4C1E-BE1C-F0CB2314BFC2",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:late_night_food",
+      "name": "Late-night food",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "F16A819D-694C-42A0-96EA-7460C8EE3E86",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:event:place:work_dinner",
+      "name": "Work Dinner",
+      "type": "urn:tag",
+      "subtype": "urn:tag:event:place",
+      "entity_id": "F5F3953A-FEC1-4EFE-8B55-1CB775641549",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:prepared_foods",
+      "name": "Prepared foods",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "F8E07FD3-817A-47CB-9069-E87D55CDB3C8",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:genre:brand:dining",
+      "name": "Dining",
+      "type": "urn:tag",
+      "subtype": "urn:tag:genre:brand",
+      "entity_id": "DA64657B-785C-4A2E-911D-F6A4D93CB2AC",
+      "count": "1"
+    }
+  ],
+  "note": "16 Oct probe pair (Leopold Cafe x incumbent brand); the preset-grade pair is recorded at prewarm."
+}

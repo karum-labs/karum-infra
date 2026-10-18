@@ -1,0 +1,101 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261017-140227-resolve-place-whisler-s.json",
+    "recorded": "2026-10-17 14:02:27",
+    "label": "resolve-place-whisler-s",
+    "status": 200,
+    "request": "/search?query=Whisler%27s&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "AD3677DA-5D2D-4FBD-8DCA-93D7ED616938",
+      "name": "Whisler’s",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.2619325,
+        "lon": -97.72273799999999
+      },
+      "geocode": {
+        "city": "Austin",
+        "name": "East Cesar Chavez",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "1816 E 6th St Austin, TX 78702"
+    },
+    {
+      "entity_id": "23EA549E-DF09-4162-A0FD-549F57D92761",
+      "name": "Whisler's Drive-Up",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 37.181341499999995,
+        "lon": -94.3137131
+      },
+      "geocode": {
+        "city": "Carthage",
+        "country": "United States",
+        "admin1_region": "Missouri"
+      },
+      "disambiguation": "300 N Garrison Ave Carthage, MO 64836"
+    },
+    {
+      "entity_id": "858E9279-51B1-47C4-A102-9751E15CEE0A",
+      "name": "Whisler's Well Drilling",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.167354599999996,
+        "lon": -77.41952239999999
+      },
+      "geocode": {
+        "city": "North Newton Township",
+        "country": "United States",
+        "admin1_region": "Pennsylvania"
+      },
+      "disambiguation": "366 Greenspring Rd Newville, PA 17241"
+    },
+    {
+      "entity_id": "AD9E719D-7F4F-4F6F-A77D-0E4263E27FA5",
+      "name": "Whisler's Hamburgers At Redings Mill Train Depot",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 37.0198531,
+        "lon": -94.5148529
+      },
+      "geocode": {
+        "city": "Redings Mill",
+        "name": "Redings Mill",
+        "country": "United States",
+        "admin1_region": "Missouri"
+      },
+      "disambiguation": "101-185 Rollings Rd Joplin, MO 64804"
+    },
+    {
+      "entity_id": "CC973305-B512-437D-A104-39DA2490463C",
+      "name": "Whislers Floor And Paint Center",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 28.1098949,
+        "lon": -81.6252815
+      },
+      "geocode": {
+        "city": "Haines City",
+        "country": "United States",
+        "admin1_region": "Florida"
+      },
+      "disambiguation": "706 Ingraham Ave Haines City, FL 33844"
+    }
+  ]
+}

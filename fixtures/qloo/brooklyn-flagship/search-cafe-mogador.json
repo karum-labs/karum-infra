@@ -1,0 +1,107 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050928-resolve-place-cafe-mogador.json",
+    "recorded": "2026-10-18 05:09:28",
+    "label": "resolve-place-cafe-mogador",
+    "status": 200,
+    "request": "/search?query=Cafe%20Mogador&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "94ED4726-A194-4DD1-8C8E-04741512A1E4",
+      "name": "Cafe Mogador",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7274314,
+        "lon": -73.98431149999999
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "East Village",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "101 St Marks Pl New York, NY 10009"
+    },
+    {
+      "entity_id": "6B01A2DC-33FA-40B3-8BA5-47A9ECEA63BE",
+      "name": "Cafe Mogador",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7197416,
+        "lon": -73.9599664
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Williamsburg",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "133 Wythe Ave Brooklyn, NY 11249"
+    },
+    {
+      "entity_id": "5B89F3C8-9146-4586-9730-76C9F74FAE08",
+      "name": "Cafe Mogador",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 34.0615192,
+        "lon": -6.7728174999999995
+      },
+      "geocode": {
+        "city": "Salé",
+        "name": "Layayda لعيايدة",
+        "country": "Morocco",
+        "admin1_region": "Rabat-Salé-Kénitra"
+      },
+      "disambiguation": "366G+JV3 Salé Morocco"
+    },
+    {
+      "entity_id": "F1518CB8-B984-4862-90A3-B0D559A80632",
+      "name": "Café du Mogador",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 48.876058199999996,
+        "lon": 2.3317338
+      },
+      "geocode": {
+        "city": "Paris",
+        "name": "Opéra",
+        "metro": "Paris",
+        "country": "France",
+        "admin1_region": "Ile-de-France"
+      },
+      "disambiguation": "57 Rue de la Chau. d'Antin 75009 Paris France"
+    },
+    {
+      "entity_id": "9F8E5390-BFF4-4C0E-9BFE-EF456D3D1999",
+      "name": "Café de l'Opéra",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 48.873878999999995,
+        "lon": 2.3310545
+      },
+      "geocode": {
+        "city": "Paris",
+        "name": "Opéra",
+        "metro": "Paris",
+        "country": "France",
+        "admin1_region": "Ile-de-France"
+      },
+      "disambiguation": "9 Rue de Mogador 75009 Paris France"
+    }
+  ]
+}

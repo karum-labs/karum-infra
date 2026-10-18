@@ -1,0 +1,23 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050920-resolve-brand-marimekko.json",
+    "recorded": "2026-10-18 05:09:20",
+    "label": "resolve-brand-marimekko",
+    "status": 200,
+    "request": "/search?query=Marimekko&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "334199C3-D599-492F-B8E9-76911A42F0C1",
+      "name": "Marimekko",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "fixture_version": 1,
+  "kind": "tags",
+  "source": {
+    "recording": "20261018-050947-tags-cafe-genre.json",
+    "recorded": "2026-10-18 05:09:47",
+    "label": "tags-cafe-genre",
+    "status": 200,
+    "request": "/v2/tags?filter.query=cafe&filter.tag.types=urn:tag:genre&take=25"
+  },
+  "rows": [
+    {
+      "id": "urn:tag:genre:place:restaurant:cafe",
+      "name": "Cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:cafe",
+      "name": "Cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:cafeteria",
+      "name": "Cafeteria",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:cafeteria",
+      "name": "Cafeteria",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:cafe_wine_bar",
+      "name": "Cafe + Wine Bar",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:restaurant_cafe",
+      "name": "Restaurant Or Cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:restaurant_or_cafe",
+      "name": "Restaurant or cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:art_cafe",
+      "name": "Art cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:chocolate_cafe",
+      "name": "Chocolate cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:dog_cafe",
+      "name": "Dog cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:vegetarian_cafe_deli",
+      "name": "Vegetarian Cafe And Deli",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:children_s_cafe",
+      "name": "Children's cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:cosplay_cafe",
+      "name": "Cosplay cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:comic_cafe",
+      "name": "Comic cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:cha_chaan_teng_hong_kong_style_cafe",
+      "name": "Cha chaan teng (Hong Kong-style cafe)",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:cat_cafe",
+      "name": "Cat cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:animal_cafe",
+      "name": "Animal cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:childrens_cafe",
+      "name": "Childrens cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:cat_cafe",
+      "name": "Cat Cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:internet_cafe",
+      "name": "Internet Cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:art_cafe",
+      "name": "Art Cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:restaurant_cafe",
+      "name": "Restaurant Or Cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:dog_cafe",
+      "name": "Dog Cafe",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:vegetarian_cafe_deli",
+      "name": "Vegetarian Cafe And Deli",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:childrens_cafe",
+      "name": "Childrens Cafe",
+      "type": "urn:tag:genre:place"
+    }
+  ]
+}

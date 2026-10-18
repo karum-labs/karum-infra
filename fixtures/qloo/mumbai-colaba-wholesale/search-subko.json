@@ -1,0 +1,102 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-051212-resolve-place-subko.json",
+    "recorded": "2026-10-18 05:12:12",
+    "label": "resolve-place-subko",
+    "status": 200,
+    "request": "/search?query=Subko&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "0DE2E903-CCB5-4523-BAF0-3EC15514248C",
+      "name": "Mary Lodge by Subko",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 19.0531629,
+        "lon": 72.83001999999999
+      },
+      "geocode": {
+        "city": "Mumbai",
+        "name": "H/W Ward",
+        "country": "India",
+        "admin1_region": "Maharashtra"
+      },
+      "disambiguation": "Ground Floor, Mary Lodge 21A, Chapel Rd, next to Saba Heritage building, Ranwar, Bandra West Mumbai, Maharashtra 400050 India"
+    },
+    {
+      "entity_id": "5E3C01ED-0371-45A0-9FDA-E7F0AE8D3D0B",
+      "name": "SubKO",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 41.786012299999996,
+        "lon": -88.08277609999999
+      },
+      "geocode": {
+        "city": "Lisle",
+        "name": "Lisle",
+        "country": "United States",
+        "admin1_region": "Illinois"
+      },
+      "disambiguation": "1600 Maple Ave Lisle, IL 60532"
+    },
+    {
+      "entity_id": "BC400638-8F5F-4F9C-9634-4833CA61E26F",
+      "name": "Subko Mini At Kitab Khana",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 18.932164999999998,
+        "lon": 72.831931
+      },
+      "geocode": {
+        "city": "Mumbai",
+        "name": "A Ward",
+        "country": "India",
+        "admin1_region": "Maharashtra"
+      },
+      "disambiguation": "45, Ground Floor, Flora Fountain Somaiya Bhavan 47, Mahatma Gandhi Road, Fort Mumbai, Maharashtra 400001 India"
+    },
+    {
+      "entity_id": "B7EC18DB-2347-4D23-937A-3C93D271F3B0",
+      "name": "SubKoch Online Shopping Store - Yahan Sub Milta Hai",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 31.5821851,
+        "lon": 74.3621938
+      },
+      "geocode": {
+        "city": "Shalimar Tehsil",
+        "name": "Makhan Pura",
+        "country": "Pakistan",
+        "admin1_region": "Punjab"
+      },
+      "disambiguation": "Ghaus Park Kot Khawaja Saeed, Lahore, Punjab 54000 Pakistan"
+    },
+    {
+      "entity_id": "DA4C4DB4-8957-444C-AB0C-213709E163FE",
+      "name": "Subko at Museum of Solutions",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 19.005922899999998,
+        "lon": 72.8274354
+      },
+      "geocode": {
+        "city": "Mumbai",
+        "country": "India",
+        "admin1_region": "Maharashtra"
+      },
+      "disambiguation": "First floor, Victoria House, Victoria Mills 6, Pandurang Budhkar Marg, Lower Parel Mumbai, Maharashtra 400013 India"
+    }
+  ]
+}

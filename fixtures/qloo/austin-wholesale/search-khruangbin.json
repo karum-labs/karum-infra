@@ -1,0 +1,43 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261017-140135-resolve-artist-khruangbin.json",
+    "recorded": "2026-10-17 14:01:35",
+    "label": "resolve-artist-khruangbin",
+    "status": 200,
+    "request": "/search?query=Khruangbin&types=urn%3Aentity%3Aartist&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "BAF6317A-DF94-4C90-92AE-63F86560C21B",
+      "name": "Khruangbin",
+      "types": [
+        "urn:entity:artist"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": "Khruangbin"
+    },
+    {
+      "entity_id": "9446057A-BC4E-468A-BBC7-A3D8F9B70C83",
+      "name": "Khruangbin & Leon Bridges",
+      "types": [
+        "urn:entity:artist"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": "Khruangbin & Leon Bridges"
+    },
+    {
+      "entity_id": "B52260DE-8051-48A5-80AC-B78D0A48D12F",
+      "name": "Khruangbin @ Villain",
+      "types": [
+        "urn:entity:artist"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": "Khruangbin @ Villain"
+    }
+  ]
+}

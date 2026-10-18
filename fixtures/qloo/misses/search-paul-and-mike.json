@@ -1,0 +1,64 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-051213-resolve-brand-paul-and-mike.json",
+    "recorded": "2026-10-18 05:12:13",
+    "label": "resolve-brand-paul-and-mike",
+    "status": 200,
+    "request": "/search?query=Paul%20and%20Mike&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "4282B7B0-8C22-4C9A-BA5C-DE81F51ED8CB",
+      "name": "Jean-Paul Gaultier",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "C1DC3CF1-82DC-42B9-853D-D67783050BA6",
+      "name": "J. Paul Getty Museum",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "AEA9379E-E13E-4DBA-ADFD-C18BA60AF732",
+      "name": "Paul Hewitt",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "AFD82A78-0946-41EB-B292-30AACE983F64",
+      "name": "Paul Valentine",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "98FFBCF0-E2DF-4A77-93A1-EB75D6D60836",
+      "name": "Paul Smith",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    }
+  ],
+  "note": "Falls back to fashion designers."
+}

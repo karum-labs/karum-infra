@@ -1,0 +1,106 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261017-140226-resolve-place-uchi.json",
+    "recorded": "2026-10-17 14:02:26",
+    "label": "resolve-place-uchi",
+    "status": 200,
+    "request": "/search?query=Uchi&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "B9E7DBDF-B160-4ECC-9A3B-F8B6CE79CD7B",
+      "name": "UCHI",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 51.5537098,
+        "lon": -0.055978999999999994
+      },
+      "geocode": {
+        "city": "London",
+        "name": "Hackney",
+        "metro": "London",
+        "country": "United Kingdom",
+        "admin1_region": "England"
+      },
+      "disambiguation": "144 Clarence Rd Lower Clapton, London E5 8DY United Kingdom"
+    },
+    {
+      "entity_id": "FF76F2AC-290F-4910-9182-7DA0BDF52618",
+      "name": "Uchi",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 45.519574,
+        "lon": -73.561362
+      },
+      "geocode": {
+        "city": "Montreal",
+        "name": "Ville-Marie",
+        "metro": "Montreal",
+        "country": "Canada",
+        "admin1_region": "Quebec"
+      },
+      "disambiguation": "1799 R. Atateken Montreal, Quebec H2L 3L7 Canada"
+    },
+    {
+      "entity_id": "AC0AACA3-0701-4433-98FE-BC33F5E22D44",
+      "name": "Uchisar Castle",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 38.6299062,
+        "lon": 34.805403
+      },
+      "geocode": {
+        "city": "Uçhisar",
+        "name": "Uçhisar",
+        "country": "Turkey",
+        "admin1_region": "Nevşehir"
+      },
+      "disambiguation": "Tekelli 50240 Uçhisar/Nevşehir Merkez/Nevşehir Türkiye"
+    },
+    {
+      "entity_id": "314D0217-CAF0-4758-AB13-6C5CEB355431",
+      "name": "Uchiko Austin",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.3107759,
+        "lon": -97.73998429999999
+      },
+      "geocode": {
+        "city": "Austin",
+        "name": "Rosedale",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "4200 N Lamar Blvd Austin, TX 78756"
+    },
+    {
+      "entity_id": "546AA8EC-4773-408D-8697-9370194A7D9D",
+      "name": "Uchi Houston",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 29.7448938,
+        "lon": -95.3907229
+      },
+      "geocode": {
+        "city": "Houston",
+        "metro": "Houston",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "904 Westheimer Rd Houston, TX 77006"
+    }
+  ]
+}

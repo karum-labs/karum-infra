@@ -1,0 +1,103 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050756-resolve-place-la-condesa.json",
+    "recorded": "2026-10-18 05:07:56",
+    "label": "resolve-place-la-condesa",
+    "status": 200,
+    "request": "/search?query=La%20Condesa&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "2F3A2590-4B4A-4647-BB78-34BDC9EF0E57",
+      "name": "La Condesa",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.265639099999998,
+        "lon": -97.7477811
+      },
+      "geocode": {
+        "city": "Austin",
+        "name": "Downtown",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "400A W 2nd St Austin, TX 78701"
+    },
+    {
+      "entity_id": "3111A36B-4BA9-4C36-9B2A-EFB5C0907918",
+      "name": "La Condesa",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 18.824223699999997,
+        "lon": -98.95090549999999
+      },
+      "geocode": {
+        "city": "Cuautla Morelos",
+        "name": "Santa Inés",
+        "country": "Mexico",
+        "admin1_region": "Morelos"
+      },
+      "disambiguation": "62744, Av Insurgentes 203 Emiliano Zapata Cuautla, Mor. Mexico"
+    },
+    {
+      "entity_id": "9E09D4C3-E54E-4085-9179-7DF0BA9F9CFD",
+      "name": "La Condesa",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 48.878263,
+        "lon": 2.3425556
+      },
+      "geocode": {
+        "city": "Paris",
+        "name": "Opéra",
+        "metro": "Paris",
+        "country": "France",
+        "admin1_region": "Ile-de-France"
+      },
+      "disambiguation": "13 Rue Claude Rodier 75009 Paris France"
+    },
+    {
+      "entity_id": "782F543C-2F06-4ADC-B9D5-79984460AB7A",
+      "name": "La Condesa",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 20.6673243,
+        "lon": -105.2494485
+      },
+      "geocode": {
+        "city": "Las Jarretaderas",
+        "country": "Mexico",
+        "admin1_region": "Jalisco"
+      },
+      "disambiguation": "Marina Vallarta 48335 Puerto Vallarta, Jal. Mexico"
+    },
+    {
+      "entity_id": "C1DED527-1811-479B-ACC3-4BCC40C6DA56",
+      "name": "La Condesa",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 43.9519579,
+        "lon": -77.3491653
+      },
+      "geocode": {
+        "city": "Prince Edward",
+        "country": "Canada",
+        "admin1_region": "Ontario"
+      },
+      "disambiguation": "270 Wellington Main St Wellington, ON K0K 3L0 Canada"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050826-resolve-place-easy-tiger.json",
+    "recorded": "2026-10-18 05:08:26",
+    "label": "resolve-place-easy-tiger",
+    "status": 200,
+    "request": "/search?query=Easy%20Tiger&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "42B8D1B4-027D-4D34-BC01-8E4F1F476F24",
+      "name": "Easy Tiger",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 12.974351799999999,
+        "lon": 77.6071375
+      },
+      "geocode": {
+        "city": "Bengaluru",
+        "name": "Ashok Nagar",
+        "country": "India",
+        "admin1_region": "Karnataka"
+      },
+      "disambiguation": "1/A, Church St opposite Starbucks Café, Shanthala Nagar, Ashok Nagar Bengaluru, Karnataka 560001 India"
+    },
+    {
+      "entity_id": "5BDBA83F-4C98-4178-BA52-ADB7D9E1162D",
+      "name": "Easy Tiger",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.264011399999998,
+        "lon": -97.726993
+      },
+      "geocode": {
+        "city": "Austin",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "1501 E 7th St Austin, TX 78702"
+    },
+    {
+      "entity_id": "0FD2DFA2-D2A2-432A-8F91-471279628B21",
+      "name": "Easy Tiger Hostel - Jungle Bar",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 17.609944,
+        "lon": 106.311033
+      },
+      "geocode": {
+        "city": "Ba Don",
+        "country": "Vietnam",
+        "admin1_region": "Quảng Bình"
+      },
+      "disambiguation": "Nhà bán vé và hàng lưu niệm., ĐT20 Phong NHA Bố Trạch Quảng Bình, Vietnam"
+    },
+    {
+      "entity_id": "68C30D51-F042-4855-85D9-5C93828316F2",
+      "name": "Easy Tiger - The Linc",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.3272944,
+        "lon": -97.7072153
+      },
+      "geocode": {
+        "city": "Austin",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "6406 N Interstate 35 Frontage Rd #1100 Austin, TX 78752"
+    },
+    {
+      "entity_id": "9FF5AFDC-901C-49A5-82A6-1C48BD6195C9",
+      "name": "Easy Tiger",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 24.497082799999998,
+        "lon": 54.3649357
+      },
+      "geocode": {
+        "city": "Abu Dhabi",
+        "name": "Al Danah",
+        "country": "United Arab Emirates",
+        "admin1_region": "Abu Dhabi Emirate"
+      },
+      "disambiguation": "Al Ain Palace Hotel W Corniche Rd Abu Dhabi United Arab Emirates"
+    }
+  ],
+  "note": "Top row is Bengaluru; the Austin row is rank 2 and the preset pins it."
+}

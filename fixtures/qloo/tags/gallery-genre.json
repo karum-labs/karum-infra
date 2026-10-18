@@ -1,0 +1,43 @@
+{
+  "fixture_version": 1,
+  "kind": "tags",
+  "source": {
+    "recording": "20261018-051001-tags-gallery-genre.json",
+    "recorded": "2026-10-18 05:10:01",
+    "label": "tags-gallery-genre",
+    "status": 200,
+    "request": "/v2/tags?filter.query=gallery&filter.tag.types=urn:tag:genre&take=25"
+  },
+  "rows": [
+    {
+      "id": "urn:tag:genre:place:art_gallery",
+      "name": "Art gallery",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:art_gallery",
+      "name": "Art Gallery",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:aboriginal_art_gallery",
+      "name": "Aboriginal art gallery",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:art_gallery",
+      "name": "Art Gallery",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:aboriginal_art_gallery",
+      "name": "Aboriginal Art Gallery",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:aboriginal_art_gallery",
+      "name": "Aboriginal Art Gallery",
+      "type": "urn:tag:genre:place"
+    }
+  ]
+}

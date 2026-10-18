@@ -1,0 +1,13 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050839-resolve-brand-kinto.json",
+    "recorded": "2026-10-18 05:08:39",
+    "label": "resolve-brand-kinto",
+    "status": 200,
+    "request": "/search?query=Kinto&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [],
+  "note": "0 rows: no Kinto brand entity."
+}

@@ -1,0 +1,110 @@
+{
+  "fixture_version": 1,
+  "kind": "compare",
+  "source": {
+    "recording": "20261018-051720-austin-compare-tobala-ilegal.json",
+    "recorded": "2026-10-18 05:17:20",
+    "label": "austin-compare-tobala-ilegal",
+    "status": 200,
+    "request": "/v2/analysis/compare?a.signal.interests.entities=A29A1AE5-57F9-4C42-95CD-143C90F4B55A&b.signal.interests.entities=41C4BB40-E667-416F-9541-63FD7E7FFFF5&filter.type=urn:entity:brand&take=50"
+  },
+  "rows": [
+    {
+      "tag_id": "urn:tag:offerings:place:alcohol",
+      "name": "Alcohol",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "01FE8354-6E33-48DF-B188-50E056F3995E",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:food",
+      "name": "Food",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "0D14ADCC-93FB-4983-99C7-83F90D7B9CCA",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:event:place:date_night",
+      "name": "Date Night",
+      "type": "urn:tag",
+      "subtype": "urn:tag:event:place",
+      "entity_id": "17A204F5-5A49-493E-8CE3-16072DE13CAA",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:genre:place:restaurant:bar",
+      "name": "Bar",
+      "type": "urn:tag",
+      "subtype": "urn:tag:genre:place",
+      "entity_id": "4605D188-E989-44F1-8F31-3F37B28D2A71",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:genre:place:restaurant",
+      "name": "Restaurant",
+      "type": "urn:tag",
+      "subtype": "urn:tag:genre:place",
+      "entity_id": "47BA6D7D-8A7D-4092-B356-CBA3480873CA",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:cocktails",
+      "name": "Cocktails",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "4B226DB8-4431-44D3-92D8-C94559E3F8D9",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:category:place:bar",
+      "name": "Bar",
+      "type": "urn:tag",
+      "subtype": "urn:tag:category:place",
+      "entity_id": "5601114F-279C-4CAD-AFF4-4EFB432B2EB2",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:genre:place",
+      "name": "Place",
+      "type": "urn:tag",
+      "subtype": "urn:tag:genre:place",
+      "entity_id": "69142520-E6CC-47A4-A12E-526BC0B5A764",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:event:place:birthday",
+      "name": "Birthday",
+      "type": "urn:tag",
+      "subtype": "urn:tag:event:place",
+      "entity_id": "7F1E6B11-1A22-46ED-973F-DC7CCE3B8D48",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:cost_description:place:moderately_expensive",
+      "name": "Moderately expensive",
+      "type": "urn:tag",
+      "subtype": "urn:tag:cost_description:place",
+      "entity_id": "A7E9D5DF-853E-4A68-BD80-8AB2E88BEBB1",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:beer",
+      "name": "Beer",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "A86777A2-FEA1-488B-B617-A9503CA90789",
+      "count": "1"
+    },
+    {
+      "tag_id": "urn:tag:offerings:place:hard_liquor",
+      "name": "Hard liquor",
+      "type": "urn:tag",
+      "subtype": "urn:tag:offerings:place",
+      "entity_id": "EA1E8E80-3357-4C1E-BE1C-F0CB2314BFC2",
+      "count": "1"
+    }
+  ],
+  "note": "Preset-grade pair: Mezcaleria Tobala x Ilegal Mezcal; 12 shared-tag rows."
+}

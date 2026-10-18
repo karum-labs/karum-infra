@@ -1,0 +1,64 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-051146-resolve-brand-dandelion-chocolate.json",
+    "recorded": "2026-10-18 05:11:46",
+    "label": "resolve-brand-dandelion-chocolate",
+    "status": 200,
+    "request": "/search?query=Dandelion%20Chocolate&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "98D37ED1-6A73-4E92-9902-F47587061D71",
+      "name": "Lindt Chocolate",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "F9F50E36-AD00-4F55-BB6B-10CFAEBD3013",
+      "name": "Chocolate Aguila",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "F5F43AD1-65E2-4D3A-AEB4-2DDDC1112096",
+      "name": "Chocolate City",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "AD735606-31B1-4563-A58D-4D1C894E43E0",
+      "name": "Ghirardelli Chocolate Company",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "FF62EE44-CA58-45DD-9C7F-D41B734FE765",
+      "name": "Whittaker's Chocolate Lovers",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    }
+  ],
+  "note": "Falls back to Lindt and other large chocolate brands."
+}

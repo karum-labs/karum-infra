@@ -1,0 +1,99 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261017-140129-resolve-place-franklin-barbecue.json",
+    "recorded": "2026-10-17 14:01:29",
+    "label": "resolve-place-franklin-barbecue",
+    "status": 200,
+    "request": "/search?query=Franklin%20Barbecue&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "CE9EE2BD-D7AE-4349-B627-3D051D98AE77",
+      "name": "Franklin Barbecue",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.270125,
+        "lon": -97.73134189999999
+      },
+      "geocode": {
+        "city": "Austin",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "900 E 11th St Austin, TX 78702"
+    },
+    {
+      "entity_id": "BD91B239-AD6B-4ACD-9612-7953E0E43230",
+      "name": "Guess Family Barbecue",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 31.5372344,
+        "lon": -97.15259569999999
+      },
+      "geocode": {
+        "city": "Waco",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "2803 Franklin Ave Waco, TX 76710"
+    },
+    {
+      "entity_id": "C7889DF5-E2F8-4C80-BBE1-025FCEEE555A",
+      "name": "Bar H Barbecue",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 34.286827599999995,
+        "lon": -83.1329765
+      },
+      "geocode": {
+        "city": "Franklin Springs",
+        "country": "United States",
+        "admin1_region": "Georgia"
+      },
+      "disambiguation": "1380 E Main St Franklin Springs, GA 30639"
+    },
+    {
+      "entity_id": "C69B4E7B-45F7-400B-BFF6-B1E45759C006",
+      "name": "Franklin Barbecue",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": -0.3875492,
+        "lon": 31.4702576
+      },
+      "geocode": {
+        "city": "Lwengo Town Council",
+        "country": "Uganda",
+        "admin1_region": "Lwengo"
+      },
+      "disambiguation": "Mbarara - Masaka Rd Lwensinga Uganda"
+    },
+    {
+      "entity_id": "D0D79BCD-6DB6-4A1C-8145-04F0A05947B3",
+      "name": "Yummy Bones Barbecue Port Washington",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 43.3886549,
+        "lon": -87.8694649
+      },
+      "geocode": {
+        "city": "Port Washington",
+        "country": "United States",
+        "admin1_region": "Wisconsin"
+      },
+      "disambiguation": "201 N Franklin St Port Washington, WI 53074"
+    }
+  ]
+}

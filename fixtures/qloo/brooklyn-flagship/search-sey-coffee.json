@@ -1,0 +1,105 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050922-resolve-place-sey-coffee.json",
+    "recorded": "2026-10-18 05:09:22",
+    "label": "resolve-place-sey-coffee",
+    "status": 200,
+    "request": "/search?query=Sey%20Coffee&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "1F7B4F4E-2443-4CEE-9B23-E3E54142A8AE",
+      "name": "SEY Coffee",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7053167,
+        "lon": -73.9324176
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Williamsburg",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "18 Grattan St Brooklyn, NY 11206"
+    },
+    {
+      "entity_id": "5AF0BF2B-5CC6-4736-9FBC-79AA2DC83628",
+      "name": "Sey Coffee",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 13.8794492,
+        "lon": 121.1070376
+      },
+      "geocode": {
+        "city": "San Jose",
+        "name": "Poblacion",
+        "country": "Philippines",
+        "admin1_region": "Batangas"
+      },
+      "disambiguation": "Edcla Bldg |, San Jose Batangas Philippines"
+    },
+    {
+      "entity_id": "382DB2E4-0E58-4DF9-AB81-916946B71EE0",
+      "name": "Turkish coffee",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7728841,
+        "lon": 29.729439799999998
+      },
+      "geocode": {
+        "city": "Korfez",
+        "name": "Atalar",
+        "country": "Turkey",
+        "admin1_region": "Kocaeli"
+      },
+      "disambiguation": "No: Atalar, Seyhan Sk. No:4 41780 Belen/Kocaeli Türkiye"
+    },
+    {
+      "entity_id": "B100C963-17A0-4205-8B3A-88ADE8A6F49A",
+      "name": "Incognito Coffee",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 49.280399599999996,
+        "lon": -123.119709
+      },
+      "geocode": {
+        "city": "Vancouver",
+        "name": "Downtown",
+        "metro": "Vancouver",
+        "country": "Canada",
+        "admin1_region": "British Columbia"
+      },
+      "disambiguation": "Atrium of VSO School Of Music 843 Seymour St Vancouver, BC V6B 3L4 Canada"
+    },
+    {
+      "entity_id": "10AD7320-A5A8-4A8C-A0E4-D7904D81CF06",
+      "name": "Federal Coffee Company",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 37.0021044,
+        "lon": 35.319845199999996
+      },
+      "geocode": {
+        "city": "Kurtuluş Mahallesi",
+        "name": "Kurtuluş",
+        "country": "Turkey",
+        "admin1_region": "Adana"
+      },
+      "disambiguation": "Kurtuluş Ziyapaşa Blv. 3/A 01130 Seyhan/Adana Türkiye"
+    }
+  ]
+}

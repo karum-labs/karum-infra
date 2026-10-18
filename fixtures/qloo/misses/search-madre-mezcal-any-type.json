@@ -1,0 +1,104 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261017-140224-madre-mezcal-any-type.json",
+    "recorded": "2026-10-17 14:02:24",
+    "label": "madre-mezcal-any-type",
+    "status": 200,
+    "request": "/search?query=Madre%20Mezcal&take=5"
+  },
+  "rows": [
+    {
+      "entity_id": "223403CD-A9C1-49C3-94C7-CBCF0C5164C1",
+      "name": "Madre Mezcaleria",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.6769202,
+        "lon": -73.9638341
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Prospect Heights",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "706 Washington Ave Brooklyn, NY 11238"
+    },
+    {
+      "entity_id": "D68F5E21-F497-4655-9E56-3A5E3B6EB388",
+      "name": "Madre Mezcal",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 42.324348099999995,
+        "lon": -122.9071419
+      },
+      "geocode": {
+        "city": "Medford",
+        "country": "United States",
+        "admin1_region": "Oregon"
+      },
+      "disambiguation": "2716 W Main St Medford, OR 97501"
+    },
+    {
+      "entity_id": "E97893C3-E380-4C7B-945F-1F30412125C6",
+      "name": "Madre! Oaxacan Restaurant and Mezcaleria",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 33.8355173,
+        "lon": -118.31483519999999
+      },
+      "geocode": {
+        "city": "Torrance",
+        "metro": "Los Angeles",
+        "country": "United States",
+        "admin1_region": "California"
+      },
+      "disambiguation": "1261 Cabrillo Ave Ste 100 Torrance, CA 90501"
+    },
+    {
+      "entity_id": "3C0E9511-F8D8-4212-AB39-ACF6711973B1",
+      "name": "Madre Mexican Restaurant and Mezcaleria",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 34.0857743,
+        "lon": -118.3616964
+      },
+      "geocode": {
+        "city": "Los Angeles",
+        "name": "Fairfax",
+        "metro": "Los Angeles",
+        "country": "United States",
+        "admin1_region": "California"
+      },
+      "disambiguation": "801 N Fairfax Ave #101 Los Angeles, CA 90046"
+    },
+    {
+      "entity_id": "ECE31370-A57E-46D8-8F50-8276B7A77B76",
+      "name": "A'Toda Madre Mezcaleria and Tequileria",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 14.563906999999999,
+        "lon": 121.02937809999999
+      },
+      "geocode": {
+        "city": "Makati",
+        "name": "Poblacion",
+        "country": "Philippines"
+      },
+      "disambiguation": "Sunette Tower Durban Makati City Metro Manila, Philippines"
+    }
+  ],
+  "note": "Any-type search returns same-name places in other cities only."
+}

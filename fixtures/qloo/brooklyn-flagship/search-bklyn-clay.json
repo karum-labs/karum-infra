@@ -1,0 +1,104 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-050842-resolve-place-bklyn-clay.json",
+    "recorded": "2026-10-18 05:08:42",
+    "label": "resolve-place-bklyn-clay",
+    "status": 200,
+    "request": "/search?query=BKLYN%20CLAY&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "6E449EFE-6006-4023-8EEC-0F1F720BDC94",
+      "name": "BKLYN CLAY",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.6811723,
+        "lon": -73.9706719
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Prospect Heights",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "535 Carlton Ave Brooklyn, NY 11238"
+    },
+    {
+      "entity_id": "9C8C5DC3-E2BE-4450-B2AF-3763F52C520A",
+      "name": "BKLYN CLAY West",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.7247225,
+        "lon": -74.0109277
+      },
+      "geocode": {
+        "city": "New York",
+        "name": "Tribeca",
+        "metro": "New York City",
+        "country": "United States",
+        "admin1_region": "New York"
+      },
+      "disambiguation": "288 West St New York, NY 10013"
+    },
+    {
+      "entity_id": "C2FD7238-2B6F-4E0A-A5EA-DECF81744A5F",
+      "name": "White Clay Creek State Park",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 39.7348663,
+        "lon": -75.7580196
+      },
+      "geocode": {
+        "city": "North Star",
+        "name": "North Star",
+        "country": "United States",
+        "admin1_region": "Delaware"
+      },
+      "disambiguation": "Park Office 750 Thompson Station Rd Newark, DE 19711"
+    },
+    {
+      "entity_id": "43EF8900-1D74-4E66-BDEA-FF80DC48C4E0",
+      "name": "Clay Cafe Hout Bay | Child-friendly Restaurant & Ceramic Painting",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": -34.017117,
+        "lon": 18.3797843
+      },
+      "geocode": {
+        "city": "Constantia",
+        "name": "Cape Town Ward 74",
+        "country": "South Africa",
+        "admin1_region": "Western Cape"
+      },
+      "disambiguation": "Clay Cafe 4080 Hout Bay Main Rd Hout Bay, Cape Town 7872, South Africa"
+    },
+    {
+      "entity_id": "F1B60447-F5A3-41BD-9859-BE1E3FA0E171",
+      "name": "Jellystone Park™ Clay's Resort",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 40.8579055,
+        "lon": -81.591516
+      },
+      "geocode": {
+        "city": "Lawrence Township",
+        "country": "United States",
+        "admin1_region": "Ohio"
+      },
+      "disambiguation": "12951 Patterson St NW North Lawrence, OH 44666"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-051212-resolve-brand-kocoatrait.json",
+    "recorded": "2026-10-18 05:12:12",
+    "label": "resolve-brand-kocoatrait",
+    "status": 200,
+    "request": "/search?query=Kocoatrait&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [],
+  "note": "0 rows: no Kocoatrait brand entity."
+}

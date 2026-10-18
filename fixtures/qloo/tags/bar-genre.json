@@ -1,0 +1,89 @@
+{
+  "fixture_version": 1,
+  "kind": "tags",
+  "source": {
+    "recording": "20261017-140523-tags-bar-genre.json",
+    "recorded": "2026-10-17 14:05:23",
+    "label": "tags-bar-genre",
+    "status": 200,
+    "request": "/v2/tags?filter.query=bar&filter.tag.types=urn:tag:genre&take=15"
+  },
+  "rows": [
+    {
+      "id": "urn:tag:genre:place:restaurant:bar",
+      "name": "Bar",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:bar",
+      "name": "Bar",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:music:bar",
+      "name": "Bar",
+      "type": "urn:tag:genre:music"
+    },
+    {
+      "id": "urn:tag:genre:place:barber_shop",
+      "name": "Barber shop",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:bar_grill",
+      "name": "Bar & grill",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:barbecue",
+      "name": "Barbecue restaurant",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:bar_tabac",
+      "name": "Bar tabac",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:barbecue_area",
+      "name": "Barbecue area",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:music:baroque",
+      "name": "Baroque",
+      "type": "urn:tag:genre:music"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:bar_pmu",
+      "name": "Bar PMU",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:place:hotel:bar_grill",
+      "name": "Bar & Grill",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:music:bard",
+      "name": "Bard",
+      "type": "urn:tag:genre:music"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:barber_shop",
+      "name": "Barber Shop",
+      "type": "urn:tag:genre:place"
+    },
+    {
+      "id": "urn:tag:genre:music:baroque_pop",
+      "name": "Baroque Pop",
+      "type": "urn:tag:genre:music"
+    },
+    {
+      "id": "urn:tag:genre:place:restaurant:barley_rice",
+      "name": "Barley rice restaurant",
+      "type": "urn:tag:genre:place"
+    }
+  ],
+  "note": "Canary that produced the Austin door category URN."
+}

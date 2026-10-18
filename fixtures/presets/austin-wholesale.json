@@ -1,0 +1,113 @@
+{
+  "preset_id": "austin-wholesale",
+  "label": "Sola in Austin",
+  "mode": "wholesale",
+  "brand": "Sola — yuzu-mezcal aperitif (no Qloo brand entity; the seed swaps in verified substitutes)",
+  "city": "Austin, TX, US",
+  "point": {
+    "lat": 30.2672,
+    "lon": -97.7431
+  },
+  "radii_m": {
+    "doors": 8000
+  },
+  "category_tags": {
+    "doors": "urn:tag:genre:place:restaurant:bar"
+  },
+  "seed_entities": [
+    {
+      "entity_id": "32F867B9-E6DF-44C3-BCE4-40160C7ED5E4",
+      "name": "Aesop",
+      "kind": "brand",
+      "note": "substitute — Madre Mezcal and the Sola brand itself do not resolve (qloo/misses/)"
+    },
+    {
+      "entity_id": "41C4BB40-E667-416F-9541-63FD7E7FFFF5",
+      "name": "Ilegal Mezcal",
+      "kind": "brand",
+      "note": "mezcal anchor for the aperitif story"
+    },
+    {
+      "entity_id": "BAF6317A-DF94-4C90-92AE-63F86560C21B",
+      "name": "Khruangbin",
+      "kind": "artist",
+      "note": "artist entity; /search type urn:entity:artist"
+    }
+  ],
+  "skip_candidates": [
+    {
+      "entity_id": "AD3677DA-5D2D-4FBD-8DCA-93D7ED616938",
+      "name": "Whisler's",
+      "affinity": 0.8343,
+      "verdict": "skip",
+      "note": "below the returned floor on the same call (0.8386)"
+    },
+    {
+      "entity_id": "314D0217-CAF0-4758-AB13-6C5CEB355431",
+      "name": "Uchiko Austin",
+      "affinity": 0.8306,
+      "verdict": "skip",
+      "note": "below the returned floor; resolve rank 4 of 5 (top rows are London and Montreal)"
+    },
+    {
+      "entity_id": "572A6EDD-A341-4C1D-8316-6DB97A55BE78",
+      "name": "Maggie Mae's",
+      "affinity": 0.8160,
+      "verdict": "skip",
+      "note": "Sixth Street bar; below every returned door"
+    },
+    {
+      "entity_id": "AFB7D16C-D6E0-482D-9A12-41C17D9A9CCF",
+      "name": "Blind Pig Pub",
+      "affinity": 0.8115,
+      "verdict": "skip",
+      "note": "Sixth Street bar; the Austin row was resolve rank 5 of 5"
+    }
+  ],
+  "skip_pool": {
+    "ranked_n": 50,
+    "ranked_min": 0.8386,
+    "ranked_max": 0.8655,
+    "note": "The batch probe scored five candidates; the four above land below the floor. Franklin Barbecue scored 0.8655 — inside the returned set, the control that the door board would keep."
+  },
+  "door_board": {
+    "tag": "urn:tag:genre:place:restaurant:bar",
+    "rows": 25,
+    "min": 0.828,
+    "max": 0.8593,
+    "top": [
+      "Mezcalería Tobalá",
+      "Midnight Cowboy",
+      "Clark's Oyster Bar - Austin"
+    ]
+  },
+  "recordings": [
+    "qloo/austin-wholesale/search-aesop.json",
+    "qloo/austin-wholesale/search-khruangbin.json",
+    "qloo/austin-wholesale/search-franklin-barbecue.json",
+    "qloo/austin-wholesale/search-the-blind-pig-pub.json",
+    "qloo/austin-wholesale/search-maggie-maes.json",
+    "qloo/austin-wholesale/search-uchiko-austin.json",
+    "qloo/austin-wholesale/search-whislers.json",
+    "qloo/austin-wholesale/search-la-condesa.json",
+    "qloo/austin-wholesale/search-suerte.json",
+    "qloo/austin-wholesale/search-here-nor-there.json",
+    "qloo/austin-wholesale/search-kemuri-tatsu-ya.json",
+    "qloo/austin-wholesale/search-easy-tiger.json",
+    "qloo/austin-wholesale/insights-doors-baseline.json",
+    "qloo/austin-wholesale/insights-doors-take50.json",
+    "qloo/austin-wholesale/insights-doors-control-place-signal.json",
+    "qloo/austin-wholesale/insights-doors-category-bar.json",
+    "qloo/austin-wholesale/insights-skip-ranked.json",
+    "qloo/austin-wholesale/insights-skip-batch-probe.json",
+    "qloo/austin-wholesale/compare-tobala-ilegal.json",
+    "qloo/austin-wholesale/demographics-seed.json",
+    "qloo/tags/bar-genre.json"
+  ],
+  "notes": [
+    "The unfiltered ranking is taste-shaped — its top slots are landmarks and retail (insights-doors-take50.json); the bar tag produces the door board (insights-doors-category-bar.json).",
+    "Easy Tiger's top search row is Bengaluru; the Austin row is rank 2 (search-easy-tiger.json).",
+    "A_taste displays within-set percentiles; the raw affinities above stay evidence-only and are not comparable across campaigns."
+  ],
+  "verified": "2026-10-18"
+}

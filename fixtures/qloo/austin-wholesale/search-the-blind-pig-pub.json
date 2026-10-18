@@ -1,0 +1,104 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261017-140132-resolve-place-the-blind-pig-pub.json",
+    "recorded": "2026-10-17 14:01:32",
+    "label": "resolve-place-the-blind-pig-pub",
+    "status": 200,
+    "request": "/search?query=The%20Blind%20Pig%20Pub&types=urn%3Aentity%3Aplace&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "AD865EC2-3440-447A-A5E4-6929B07DC2E4",
+      "name": "The Blind Pig Pub",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 49.9447909,
+        "lon": 36.3134537
+      },
+      "geocode": {
+        "city": "Kharkiv Urban Hromada",
+        "name": "Слобідський район",
+        "country": "Ukraine",
+        "admin1_region": "Kharkiv Oblast"
+      },
+      "disambiguation": "Byrona Ave, 169/24 Kharkiv Kharkiv Oblast, Ukraine 61000"
+    },
+    {
+      "entity_id": "D9B25624-1169-42A9-8241-51B093373E69",
+      "name": "The Blind Pig Pub",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 34.3670545,
+        "lon": -89.5187359
+      },
+      "geocode": {
+        "city": "Oxford",
+        "country": "United States",
+        "admin1_region": "Mississippi"
+      },
+      "disambiguation": "105 N Lamar Blvd Oxford, MS 38655"
+    },
+    {
+      "entity_id": "FF696121-1EAB-4AED-AC93-853BA997F66F",
+      "name": "The Blind Pig Pub",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 34.374645099999995,
+        "lon": -80.071696
+      },
+      "geocode": {
+        "city": "Hartsville",
+        "country": "United States",
+        "admin1_region": "South Carolina"
+      },
+      "disambiguation": "137 E Carolina Ave Hartsville, SC 29550"
+    },
+    {
+      "entity_id": "E87F453A-B3C8-4F05-8232-E7DFED5BFD14",
+      "name": "The Blind Pig Pub",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 48.876639,
+        "lon": 2.348816
+      },
+      "geocode": {
+        "city": "Paris",
+        "name": "Quartier de la Porte-Saint-Denis",
+        "metro": "Paris",
+        "country": "France",
+        "admin1_region": "Ile-de-France"
+      },
+      "disambiguation": "80 Rue du Faubourg Poissonnière 75010 Paris France"
+    },
+    {
+      "entity_id": "AFB7D16C-D6E0-482D-9A12-41C17D9A9CCF",
+      "name": "Blind Pig Pub",
+      "types": [
+        "urn:entity:place"
+      ],
+      "location": {
+        "lat": 30.2670732,
+        "lon": -97.7397914
+      },
+      "geocode": {
+        "city": "Austin",
+        "name": "Downtown",
+        "metro": "Austin",
+        "country": "United States",
+        "admin1_region": "Texas"
+      },
+      "disambiguation": "317 E 6th St Austin, TX 78701"
+    }
+  ],
+  "note": "The Austin row is resolve rank 5 of 5; the preset pins the Austin id."
+}

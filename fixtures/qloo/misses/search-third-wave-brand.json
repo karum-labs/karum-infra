@@ -1,0 +1,64 @@
+{
+  "fixture_version": 1,
+  "kind": "search",
+  "source": {
+    "recording": "20261018-051145-resolve-brand-third-wave-coffee.json",
+    "recorded": "2026-10-18 05:11:45",
+    "label": "resolve-brand-third-wave-coffee",
+    "status": 200,
+    "request": "/search?query=Third%20Wave%20Coffee&types=urn%3Aentity%3Abrand&take=5&page=1"
+  },
+  "rows": [
+    {
+      "entity_id": "6D5E3D3B-2C56-43F9-ABD9-174095A2CF2E",
+      "name": "WAVE Sports \\\\:",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "B13C02E3-BA3C-4B39-85B4-ACF12FEBC892",
+      "name": "Starbucks",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "CA02B8F9-F8B2-4912-AB69-A1B2249BE286",
+      "name": "Third Love",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "22B1BC87-CDFE-4340-86F8-8E0E6E1E6A7D",
+      "name": "Blue Bottle Coffee",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    },
+    {
+      "entity_id": "BF1E134E-8395-4BA2-B05D-1637F034EAD3",
+      "name": "Third Man Records",
+      "types": [
+        "urn:entity:brand"
+      ],
+      "location": null,
+      "geocode": null,
+      "disambiguation": ""
+    }
+  ],
+  "note": "Falls back to unrelated brands."
+}

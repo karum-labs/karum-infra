@@ -163,7 +163,7 @@ Optional place refinements, all documented in the snapshot — exact names and r
              &signal.interests.tags=<tag URN>        # optional; may be combined
 ```
 
-Requires `filter.type=urn:demographics` plus at least one of `signal.interests.entities` / `signal.interests.tags`; both may be sent together. Returns `results.demographics`: per `entity_id`, an `age` bucket map and a `gender` map of deltas (positive = stronger-than-average alignment). Sample shapes in §8.3. **Settled 16 Oct (spike 2/17):** no 403 — `urn:demographics` works; observed age buckets are fine-only (`24_and_younger` … `55_and_older`, deltas within ±0.5) and mixed entities+tags returns one profile row per input (DI-7 closed; DI-2 closed).
+Requires `filter.type=urn:demographics` plus at least one of `signal.interests.entities` / `signal.interests.tags`; both may be sent together. Returns `results.demographics`: per `entity_id`, an `age` bucket map and a `gender` map of deltas (positive = stronger-than-average alignment). Sample shapes in §8.3. **Settled 16 Oct (spike 2/17):** no 403 — `urn:demographics` works; observed age buckets are fine-only (`24_and_younger` … `55_and_older`, deltas within ±0.5) and mixed entities+tags returns one profile row per input (DI-7 closed; DI-2 closed). **Extended 18 Oct (preset lock):** one profile row per signal input confirmed; **`filter.results.entities` is ignored on demographics calls** — a batch probe over 8 candidate ids returned the same profiles as the plain seed call (DI-25); coverage is partial (3 of 5 Brooklyn seed entities carry profiles), so per-door profiles need per-door calls (fixture pack: `qloo/*/demographics-*.json`).
 
 ### 3.7 Heatmap — `/v2/insights` (epic 16, capability flag)
 
@@ -280,6 +280,8 @@ Full entity records (description, image, properties) by ID, plus lookups by 22 e
 ```
 
 **Locked by the 17 Oct extension:** comma-separated candidates return in one call, each with `query.affinity`, no `warnings` when every id exists. This is the Doors-to-Skip mechanism: score the venues a naive plan would visit against the same seed, then skip the ones below the returned shortlist's floor. Observed on the Austin seed: ranked set 0.839–0.866 (n=50); Franklin Barbecue 0.8655, Whisler's 0.8343, Uchiko Austin 0.8306, Maggie Mae's 0.8160, Blind Pig Pub 0.8115 — four of five below every ranked door. An absolute 0.45 floor never fires; the floor is relative to the campaign's returned set (PLAN §11).
+
+**Extended 18 Oct (preset lock):** the mechanism holds in all three demo cities — Brooklyn: 8 candidates all below the ranked floor (floor 0.9218; Lilia closest at 0.9192); Colaba: 5 of 5 below the cafe-tag floor (0.9295; Leopold closest at 0.9171); Austin: 4 of 5 below the unfiltered floor (0.8386; Franklin Barbecue scores inside at 0.8655 — a door, not a skip, kept as the batch control). The scored candidate ids and floors are locked into `fixtures/presets/*.json`.
 
 ## 4. Do-not-use list (honesty rules)
 
@@ -691,4 +693,5 @@ Every conflict found in the 16 Oct 2026 snapshot, each mapped to the §5 spike i
 | DI-22 | `/v2/analysis/compare` is documented as returning the same envelope as `/search` ("a `results` array of entities"); the real response is `results = {tags, a, b, matchEntities}` | **Closed 16 Oct** — observed shape; `a`/`b` = per-signal tag rows, `tags` = overlap (58 same-type vs 0 cross-type), `matchEntities` empty in every probe; parse `matchEntities`, not a results list (spike 19) |
 | DI-23 | `signal.interests.entities.include` is documented as a comma-separated id list ("force entities into affinity scoring"); the server requires a boolean | **Closed 16 Oct** — `include=<uuid>` → 400 "signal.interests.entities.include must be a boolean"; `include=true` accepted, byte-identical on the test call (spike 14) |
 | DI-24 | `/v2/tags` row shape: the documentation sample keys the URN as `tag_id` (and shows `types` / `tag_value`); compare output also uses `tag_id` | **Closed 17 Oct** — observed `/v2/tags` rows key it as `id`, keys `{id, name, type, parents, popularity, properties, tags}`, no `types`/`tag_value` (e.g. `urn:tag:genre:place:restaurant:bar` for Bar); parse `id` here and `tag_id` in compare output (extension) |
+| DI-25 | `filter.results.entities` is documented as restricting results to the listed entities; on `filter.type=urn:demographics` calls it is silently ignored — rows follow the signal inputs regardless, and missing entities raise no warning | **Closed 18 Oct** — the 8-candidate batch probe returned the identical three seed profiles as the plain seed call (no `warnings`); kept in the fixture pack (`qloo/brooklyn-flagship/demographics-door-batch-probe.json`) |
 
