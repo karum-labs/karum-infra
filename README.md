@@ -1,6 +1,6 @@
 # karum-infra
 
-Shared **protos, local Docker Compose, toolchain pins, and Cloud Run manifests** for [Karum](#readme) — the brand-operated expansion agent: a brand seed and a city go in, and doors, flagship corridors, collab partners, skip reasons, menu audits, and a field route come out.
+Shared **protos, the laptop run path, the demo VM, and toolchain pins** for [Karum](#readme) — the brand-operated expansion agent: a brand seed and a city go in, and doors, flagship corridors, collab partners, skip reasons, menu audits, and a field route come out.
 
 Karum reads the cultural taste of a city via **Qloo**, scores candidate doors on **affinity, shelf opportunity, and demographic alignment**, then drafts the shopkeeper pitch, battlecard, and field route with **Vertex AI**. A wrong door is a lost account.
 
@@ -8,7 +8,7 @@ Karum reads the cultural taste of a city via **Qloo**, scores candidate doors on
 
 | Repo | Role |
 | --- | --- |
-| **`karum-infra`** (this repo) | Shared protos, Compose, Cloud Run, fixture pack, Makefile, toolchain pins |
+| **`karum-infra`** (this repo) | Shared protos, demo VM Compose, Firebase deploy, fixture pack, Makefile, toolchain pins |
 | [`karum-client`](https://github.com/karum-labs/karum-client) | Flutter UI (web is the judge target; same screens on desktop) |
 | [`karum-server`](https://github.com/karum-labs/karum-server) | Go + Gin API gateway — geocoding, job orchestration, SSE, persistence |
 | [`karum-service-taste`](https://github.com/karum-labs/karum-service-taste) | Qloo integration, entity resolution, caching, taste scoring |
@@ -35,56 +35,53 @@ Karum reads the cultural taste of a city via **Qloo**, scores candidate doors on
 - **`QLOO_APIS.md`** — every Qloo endpoint Karum may call with exact parameters, mapped to PLAN epics, plus the spike checklist for the open questions.
 - **`QLOO_USE_CASES.md`** — the plain-language map of where Karum uses Qloo today (each call, its epic, its watch-outs) plus suggested additional use cases, grouped by build cost and spike gates.
 - **`spike/`** — the epic-9 probe runner (`run_spike.py`, stdlib-only) and recording sheet that work the QLOO_APIS.md §5 checklist against the hackathon host; raw responses stay local in `spike/out/`.
-- **`docker-compose.yml`** — the local stack (gateway, taste, AI, Redis) with healthchecks and a deterministic startup order. Postgres is the `POSTGRES_DSN` URI, not a container.
+- **`docker-compose.yml`** — the demo VM only. Caddy, gateway, taste, AI, and Redis. Postgres is the `POSTGRES_DSN` URI, not a container.
+- **`scripts/local-up.sh`** — the laptop path: the same processes, no Docker.
+- **`scripts/demo.sh`** — start, stop, or refresh the `karum-demo` VM and publish the Flutter web build to Firebase Hosting.
 - **`.env.example`** — every environment variable and which process reads it.
 - **`versions.env`** — the single source of truth for Go, Python, Flutter, and buf versions.
-- **`Makefile`** — `up`, `down`, `test`, `prewarm`, `eval`, plus proto tooling: `lint-proto`, `breaking`, `generate`, `check-proto-docs`, `contract-test`.
+- **`Makefile`** — `local`, `demo-on`, `demo-off`, `demo-refresh`, plus proto tooling.
 - **`.gitleaks.toml`** — secret-scan rules tuned to catch a committed Qloo key or GCP credential.
 
 ## Run path
 
-Requires **Docker** with the Compose plugin. Copy `.env.example` to `.env` and set `POSTGRES_DSN` before starting; Compose refuses to boot without that URI.
+Copy `.env.example` to `.env` and set `POSTGRES_DSN`. The laptop does not use Docker.
 
 ```bash
 cp .env.example .env
 
-# Build and start the full stack.
-make up
+# Taste, AI, the gateway, and Flutter, on this machine.
+make local
 
-# Follow logs.
-make logs
+# Backends only.
+make local-api
 
-# Stop the stack.
-make down
+# Stop them.
+make local-down
 ```
 
-### Host ports
+| Process | URL |
+| --- | --- |
+| gateway | http://127.0.0.1:8080 |
+| service-taste | http://127.0.0.1:8081/health |
+| service-ai | http://127.0.0.1:8082/health |
 
-| Service | Host port | Notes |
-| --- | --- | --- |
-| **gateway** | `8080` | The only service published to the host. Flutter web points here. |
-| service-taste | — | In-stack only (gRPC `8081`) |
-| service-ai | — | In-stack only (gRPC `8082`) |
-| redis | — | In-stack only (`6379`) |
+Logs are `.local/logs/`. `make local` opens Flutter itself, with `GATEWAY_URL=http://127.0.0.1:8080`.
 
-Confirm the gateway is healthy:
+ADC comes from `~/Projects/Karum/.envrc` (`GOOGLE_APPLICATION_CREDENTIALS`). `make demo-on` also points the gcloud CLI at project `karum-512016` before it touches the VM.
+
+## Demo VM
+
+Project `karum-512016`, zone `asia-south1-a`, instance `karum-demo` (`e2-medium`, Ubuntu 24.04). Firebase Hosting for the client is https://karum-512016.web.app. The API is https://35.244.55.185.sslip.io, served by Caddy on the VM.
 
 ```bash
-curl http://localhost:8080/health
+make demo-on       # start the VM
+make demo-status
+make demo-refresh  # sync this checkout, rebuild containers, publish the client
+make demo-off      # stop the CPU charge
 ```
 
-### Where logs go
-
-`docker compose logs -f` follows the combined stack output. Each service logs structured JSON to stdout, so `docker compose logs -f gateway` (or `service-taste`, `service-ai`) tails one process. Credentials are never logged.
-
-### Pointing Flutter web at the gateway
-
-The client reads its gateway base URL from `--dart-define`, so switching between local Compose and production is a build flag, not a code change:
-
-```bash
-cd ../karum-client
-flutter run -d chrome --dart-define=GATEWAY_URL=http://localhost:8080
-```
+`docker compose` runs only on that VM. The first refresh copies `karum-infra/.env` up if the VM does not have one yet, and leaves an existing VM `.env` in place.
 
 ## Toolchain versions
 

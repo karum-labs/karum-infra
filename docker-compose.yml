@@ -1,26 +1,20 @@
-# Karum local stack.
+# Karum demo VM stack. The laptop does not use this file.
 #
-# Brings up the Go gateway, the two microservices, and Redis with
-# healthchecks and a deterministic startup order, so gRPC clients never dial a
-# process that is still booting. Postgres is not in this stack: the gateway
-# reads POSTGRES_DSN and talks to that database directly.
+# `make local` starts the same processes on the machine with no Docker.
+# `make demo-refresh` copies the sibling repos onto karum-demo and runs
+# `docker compose up` there. Caddy is the public HTTPS endpoint.
 #
-# Every service builds from its sibling repo directory (../<repo>), so this
-# file expects the five repos to sit next to each other:
+# Postgres is POSTGRES_DSN (an external database). Redis runs only in this
+# Compose file, as the VM's cache.
 #
-#   karum/
+# Every service builds from its sibling repo directory (../<repo>), so the
+# VM keeps the same layout as the laptop:
+#
+#   /opt/karum/
 #     karum-infra/      (this repo)
-#     karum-client/
-#     karum-server/      -> gateway
+#     karum-server/
 #     karum-service-taste/
 #     karum-service-ai/
-#
-# Usage (from this repo's root):
-#   cp .env.example .env   # required: set POSTGRES_DSN before `up`
-#   docker compose up --build
-#
-# See the README for host ports, where logs go, and how Flutter web points at
-# the gateway.
 
 name: karum
 
@@ -79,6 +73,7 @@ services:
     environment:
       AI_PORT: "8082"
       AI_MODE: ${AI_MODE:-fixture}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       AI_GCP_PROJECT_ID: ${AI_GCP_PROJECT_ID:-}
       AI_GCP_LOCATION: ${AI_GCP_LOCATION:-us-central1}
       AI_GEMINI_MODEL: ${AI_GEMINI_MODEL:-gemini-2.5-flash}
@@ -101,9 +96,6 @@ services:
     build:
       context: ../karum-server
     restart: unless-stopped
-    # Publish the gateway to the host so the Flutter web app can reach it.
-    ports:
-      - "${GATEWAY_PORT:-8080}:8080"
     environment:
       GATEWAY_PORT: "8080"
       GATEWAY_MODE: ${GATEWAY_MODE:-fixture}
@@ -130,3 +122,24 @@ services:
       timeout: 4s
       retries: 5
       start_period: 8s
+
+  # --- Caddy: public HTTPS on the demo VM. --------------------------------
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      KARUM_API_HOST: ${KARUM_API_HOST:?set KARUM_API_HOST to the sslip.io name}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      gateway:
+        condition: service_healthy
+
+volumes:
+  caddy-data:
+  caddy-config:

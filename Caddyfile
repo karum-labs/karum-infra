@@ -1,0 +1,5 @@
+# Public HTTPS for the demo VM. The laptop does not run this file.
+# KARUM_API_HOST is the sslip.io name of the reserved IP, set on the VM.
+{$KARUM_API_HOST} {
+	reverse_proxy gateway:8080
+}

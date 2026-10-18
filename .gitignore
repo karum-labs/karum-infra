@@ -45,3 +45,6 @@ __pycache__/
 
 # Local virtualenvs (proto contract test, spikes).
 .venv/
+
+# PID files and logs from `make local`. Never commit them.
+.local/

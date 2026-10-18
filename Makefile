@@ -1,8 +1,10 @@
-# karum-infra — protos, local Compose, and toolchain pins for the Karum stack.
+# karum-infra — protos, the laptop stack, and the demo VM.
 #
-# This Makefile is the operator surface for the local dev stack. The prewarm and
-# eval targets are stubs until the sample-block fixtures and the leave-one-out
-# harness land (PLAN.md epics 7 and 5).
+# `make local` starts taste, AI, the gateway, and Flutter on this machine.
+# Docker Compose is only what `make demo-refresh` runs on the demo VM.
+#
+# The prewarm and eval targets are stubs until the sample-block fixtures and
+# the leave-one-out harness land (PLAN.md epics 7 and 5).
 #
 # Proto tooling: `make generate` emits the Go and Python stubs; `make
 # check-protos` runs lint, the provenance-marker check, and the cross-language
@@ -27,23 +29,51 @@ BUF_DOCKER_IMAGE ?= bufbuild/buf:$(BUF_VERSION)
 VENV_PYTHON := $(firstword $(wildcard .venv/Scripts/python.exe) $(wildcard .venv/bin/python))
 PYTHON ?= $(if $(VENV_PYTHON),$(VENV_PYTHON),python)
 
-.PHONY: help up down logs test prewarm eval lint-proto breaking generate generate-docker check-proto-docs contract-test check-protos redact-fixtures check-fixtures test-fixtures spike
+.PHONY: help up down logs local local-api local-down demo-on demo-off demo-status demo-refresh test prewarm eval lint-proto breaking generate generate-docker check-proto-docs contract-test check-protos redact-fixtures check-fixtures test-fixtures spike
 
 ## help: list available targets.
 help:
 	@python -c "import re,sys;print(*re.findall(r'^## (.*)',open(sys.argv[1],encoding='utf-8').read(),re.M),sep=chr(10))" "$(firstword $(MAKEFILE_LIST))"
 
-## up: build and start the full stack in the background, then wait for healthy.
+## local: start taste, AI, the gateway, and Flutter on this machine (no Docker).
+local:
+	./scripts/local-up.sh
+
+## local-api: same backends, without opening the Flutter client.
+local-api:
+	NO_CLIENT=1 ./scripts/local-up.sh
+
+## local-down: stop the processes `make local` started.
+local-down:
+	./scripts/local-down.sh
+
+## demo-on: start the demo VM. Docker brings the containers back.
+demo-on:
+	./scripts/demo.sh on
+
+## demo-off: stop the demo VM. CPU billing stops; the disk and IP remain.
+demo-off:
+	./scripts/demo.sh off
+
+## demo-status: print RUNNING or STOPPED.
+demo-status:
+	./scripts/demo.sh status
+
+## demo-refresh: sync this checkout onto the VM, rebuild containers, publish the client.
+demo-refresh:
+	./scripts/demo.sh refresh
+
+## up: build the demo Compose stack. Used on the VM, not for laptop development.
 up:
 	$(COMPOSE) up --build -d
 	@echo "Waiting for services to become healthy..."
 	@$(COMPOSE) ps
 
-## down: stop the stack and remove containers (keeps the Postgres volume).
+## down: stop the demo Compose stack and remove its containers.
 down:
 	$(COMPOSE) down
 
-## logs: follow the stack's combined logs.
+## logs: follow the demo Compose stack's combined logs.
 logs:
 	$(COMPOSE) logs -f
 
@@ -56,7 +86,7 @@ test:
 ## prewarm: run all four presets end-to-end on the deployed gateway and refresh
 ## the stored runs so a preset click serves the newest ready stored run
 ## (PLAN.md sections 13 and 37). Requires the gateway's prewarm endpoint and a
-## deployed GATEWAY_URL; safe to run against local Compose once the gateway
+## deployed GATEWAY_URL; safe to run against the laptop gateway once it
 ## implements the prewarm RPC.
 prewarm:
 	@echo "Prewarming the four presets on ${GATEWAY_URL:-http://localhost:8080} ..."
