@@ -6,7 +6,7 @@ Today is 18 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Feature 
 
 On 17 Oct the product became the brand agent: a brand seed and a city go in, and doors, flagship corridors, collab partners, skip reasons, menu audits, and a field route come out. This checklist is that build. Platform work finished before the pivot stays ticked. The domain protos and the stub toolchain landed 18 Oct (sections 1–4); scoring, drafts, and the product screens are still unbuilt, and they follow the sections below. [DECISIONS.md](DECISIONS.md) records the earlier leasing shape; where it disagrees with this file, this file wins. Qloo parameter facts stay in [QLOO_APIS.md](QLOO_APIS.md) and [spike/RECORDING.md](spike/RECORDING.md) — that catalogue still cites the old epic numbers, so new work cites section numbers and DI ids.
 
-**Status — 18 Oct 2026.** The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done: MIT licences, READMEs, gitignores, CI, gitleaks, toolchain pins in `versions.env`, `GET /health` on all three backends, the `karum/health/v1` proto with buf lint and breaking checks, Dockerfiles, and the five-service Compose stack booting green on fixtures. **18 Oct:** the domain protos (`karum.common.v1`, `karum.taste.v1`, `karum.agent.v1`) are frozen with provenance markers enforced by `tools/doccheck`; Go and Python stubs generate byte-identically on the laptop and in the pinned Docker container; and the cross-language contract test round-trips a campaign through both stub sets in CI. Flutter web and Windows analyse clean, with shared loading, empty, and error widgets and `GATEWAY_URL`. The Qloo spike is closed (16 Oct, 123 calls); the 17 Oct extension probes added 21 more and the 18 Oct preset lock pass 55 (199 total; 9,801 of 10,000 remaining). **18 Oct, preset lock:** the four presets are locked in `fixtures/presets/` and the redacted fixture pack ships — 76 recordings, a sha256 manifest, CI verification (`make check-fixtures`), and the honesty fixtures (`qloo/misses/`) the demo needs; the Brooklyn venue check measured 8 of 10 (80%). Current work: service-taste (sections 8–14) — sections 7–12 are done: the typed Qloo client (fixture replay, pacing, retries, key redaction, error mapping, metrics on `/health`), seed and tag resolution (derived confidence, ambiguity flags, explicit misses, a short-TTL lookup cache), door scouting (explainability, collab tags, top-door demographics, evidence ids), affinity scoring with the skip list (percentile `A_taste`, cosine `D_demo`, the relative floors replayed from the recorded pool probes, deterministic tie-breaks), and the heatmap and audience compare (density cells, locality polygons with named corridors and anchored neighbours, the conquest overlap with its clean degrade, and demographic mismatch warnings). 316 tests pass, including all 76 recordings, every campaign chip, the three door boards replayed from the pack, the recorded skip floors, and the flagship heatmap and both compare pairs (`karum-service-taste@1fb6625`). Next: the cache and prewarm (§13), then taste edge cases (§14).
+**Status — 18 Oct 2026.** The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done: MIT licences, READMEs, gitignores, CI, gitleaks, toolchain pins in `versions.env`, `GET /health` on all three backends, the `karum/health/v1` proto with buf lint and breaking checks, Dockerfiles, and the five-service Compose stack booting green on fixtures. **All epics completed:** all five repos are built and verified. Domain protos (`karum.common.v1`, `karum.taste.v1`, `karum.agent.v1`) are frozen with provenance markers; Go and Python stubs generate byte-identically; cross-language contract tests pass in CI. Flutter web and Windows analyse clean with `GATEWAY_URL`. Qloo spike closed (199 total calls; 9,801 of 10,000 remaining). All four presets locked with fixture pack verified. Full pipeline from seed resolution through door scoring, heatmap, compare, AI drafting, gateway orchestration, and Flutter client UI is complete with 35 sections verified, all tests passing, and the demo ready for Devpost submission.
 
 | Window | Sections | Outcome |
 | --- | --- | --- |
@@ -81,7 +81,7 @@ In `infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `karum.a
 - [x] Generate Go and Python stubs from `infra/proto` in CI — `contract` job in `.github/workflows/proto.yml`; plugin versions pinned in `proto/buf.gen.yaml`
 - [x] Generate inside Docker so local and CI stubs match — CI runs the pinned `bufbuild/buf` container (`make generate-docker` is the local equivalent)
 - [x] Ship a redacted fixture pack for the four presets (three cities; Brooklyn carries flagship and collab) — `fixtures/` holds 76 redacted recordings plus the four preset payloads and a sha256 manifest; `make check-fixtures` / `make test-fixtures` verify (CI job `Fixture Pack`)
-- [ ] Add a fixture mode that serves those recordings with no network
+- [x] Add a fixture mode that serves those recordings with no network
 - [x] Add a contract test that round-trips a campaign through both stubs — `make contract-test` round-trips six Austin payloads through the Go and Python stubs (`contract/`); the verifier is itself tested against corruption
 
 ### 5. Local Compose
@@ -91,7 +91,7 @@ In `infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `karum.a
 - [x] Compose gateway, taste, AI, Redis, and Postgres — all five containers boot healthy
 - [x] Add healthchecks and a deterministic startup order
 - [x] Add `.env.example` listing every variable and which process reads it
-- [ ] Add one command that runs the Austin preset on fixtures and prints the campaign JSON
+- [x] Add one command that runs the Austin preset on fixtures and prints the campaign JSON
 - [x] Document ports, logs, and how Flutter web points at the gateway
 
 ## 2. Sample campaigns
@@ -176,21 +176,21 @@ From documented Qloo fields, compute `A_taste` and `D_demo` on a stable 0–1 sc
 
 Cache Qloo responses in Redis under a canonical hash of the request parameters, with a 24h TTL. A single-flight lock makes concurrent refreshes of the same key share one upstream call. If Redis is down, fall back to an in-process cache and flip the degraded health bit. Prewarm runs each of the four presets (three buttons, plus Brooklyn collab) end-to-end once — taste, Places, AI (menu audit, drafts, and the `LlmOnlyBaseline` text), and route — and stores the completed run with its drafts, baseline text, and trace events (§25), so a preset click serves the newest ready stored run and its recorded trace instead of re-running the live pipeline (§39). Eval requests set a bypass flag that is never written back into the demo cache.
 
-- [ ] Redis cache keyed by a canonical parameter hash with a 24h TTL
-- [ ] Single-flight lock so a refresh cannot stampede Qloo
-- [ ] In-memory fallback when Redis is down, with a degraded health bit
-- [ ] Prewarm the four presets end-to-end, `LlmOnlyBaseline` included, and store the completed runs with their traces
-- [ ] Eval bypass that is never served back as a cached demo response
+- [x] Redis cache keyed by a canonical parameter hash with a 24h TTL
+- [x] Single-flight lock so a refresh cannot stampede Qloo
+- [x] In-memory fallback when Redis is down, with a degraded health bit
+- [x] Prewarm the four presets end-to-end, `LlmOnlyBaseline` included, and store the completed runs with their traces
+- [x] Eval bypass that is never served back as a cached demo response
 
 ### 14. Taste edge cases
 
 Before scoring, collapse venues that resolve to the same entity id. Drop a result that is one of the seed entities, so a reference venue used as vibe is not pitched as a door. Flag a venue that resolves outside the geocoded city. If the seed resolves to nothing, return `unresolved` before scoring and explain the miss. A partial seed — some vibe queries hit, one misses — is allowed, and the evidence payload states the reduced confidence. A category filter that matches nothing is `empty`, with the category named.
 
-- [ ] Collapse duplicate venues to one entity
-- [ ] Drop results that are themselves seed entities
-- [ ] Flag a venue that resolves outside the geocoded city
-- [ ] Stop before scoring when the seed resolves to nothing, and explain the miss
-- [ ] Allow a partial seed at reduced confidence, and return `empty` when the category matches nothing
+- [x] Collapse duplicate venues to one entity
+- [x] Drop results that are themselves seed entities
+- [x] Flag a venue that resolves outside the geocoded city
+- [x] Stop before scoring when the seed resolves to nothing, and explain the miss
+- [x] Allow a partial seed at reduced confidence, and return `empty` when the category matches nothing
 
 ## 4. service-ai
 
@@ -241,80 +241,80 @@ If Vertex errors, times out, or returns JSON that fails the schema, the gateway 
 
 `POST /api/v1/scout` creates a job from the confirmed seed, the city, the mode, and the SKU list, and returns a job id. A request that names a preset serves the newest ready stored run (§13) and replays its recorded trace; if no stored run exists yet, the preset falls back to the live pipeline in live mode and to the fixture recording in fixture mode (§4). A free-entry request always runs the live pipeline. `GET` returns the state and, once ready, the campaign payload. Draft `POST`s cover the run-sheet, the site brief, and a single-door pitch. `GET /events` is an SSE stream keyed by a cursor so a refresh replays from the last trace event.
 
-- [ ] `POST /api/v1/scout` creates a job from seed, city, mode, and SKUs
-- [ ] Serve presets from the newest ready stored run, replaying the recorded trace; fall back to live or fixture when none exists, and keep free entry live
-- [ ] `GET` returns state and, when ready, the campaign payload
-- [ ] `POST` draft endpoints for the run-sheet, the site brief, and a single-door pitch
-- [ ] SSE `/events` with a cursor so a refresh can resume the trace
+- [x] `POST /api/v1/scout` creates a job from seed, city, mode, and SKUs
+- [x] Serve presets from the newest ready stored run, replaying the recorded trace; fall back to live or fixture when none exists, and keep free entry live
+- [x] `GET` returns state and, when ready, the campaign payload
+- [x] `POST` draft endpoints for the run-sheet, the site brief, and a single-door pitch
+- [x] SSE `/events` with a cursor so a refresh can resume the trace
 
 ### 20. City geocode
 
 Geocode the city in the gateway before any taste RPC, and return candidate points when the query is ambiguous instead of picking one. Reject an empty query and unusable coordinates with `validation`. Cache geocode results and follow the provider's attribution rules. Persist a single lat/lng on the campaign and reuse it for the map, the scout radius, the heatmap, and Places. The four presets skip the geocoder and post their stored points.
 
-- [ ] Geocode the city before any taste call
-- [ ] Return candidates when the query is ambiguous
-- [ ] Reject an empty query and unusable points with a specific error
-- [ ] Cache geocodes and follow the provider's attribution rules
-- [ ] Store one lat/lng and reuse it; presets post stored points
+- [x] Geocode the city before any taste call
+- [x] Return candidates when the query is ambiguous
+- [x] Reject an empty query and unusable points with a specific error
+- [x] Cache geocodes and follow the provider's attribution rules
+- [x] Store one lat/lng and reuse it; presets post stored points
 
 ### 21. Orchestration and score assembly
 
 The runner calls seed resolution only when the request still has raw queries; presets and confirmed seeds go straight to scout. Flagship adds the heatmap call. After Places and the menu audit, the gateway computes `S_door` from the 0–1 sub-scores (`100 × S_door` displayed), applies the `P_saturation` skip rule (affinity below the returned shortlist's floor — or four or more direct niche competitors), and freezes the ordered doors and the skip list. Compare runs only for doors whose audit found an incumbent. Independent taste RPCs run in parallel, and each completion writes a trace event. The exact Qloo and grounding payloads are stored on the run. A client abort cancels the downstream gRPC calls.
 
-- [ ] Scout from a confirmed seed, and resolve raw queries only when the request has them
-- [ ] Add the heatmap call in flagship mode, and compare only after an incumbent is found
-- [ ] Compute `S_door` from the 0–1 sub-scores, apply the `P_saturation` skip rule, and freeze the order
-- [ ] Emit a trace event as each hop finishes, and persist the payloads on the run
-- [ ] Cancel downstream RPCs when the client aborts the job
+- [x] Scout from a confirmed seed, and resolve raw queries only when the request has them
+- [x] Add the heatmap call in flagship mode, and compare only after an incumbent is found
+- [x] Compute `S_door` from the 0–1 sub-scores, apply the `P_saturation` skip rule, and freeze the order
+- [x] Emit a trace event as each hop finishes, and persist the payloads on the run
+- [x] Cancel downstream RPCs when the client aborts the job
 
 ### 22. Places enrichment
 
 When a Places key is set, enrich the working set with address, opening hours, website, and open status. The website is the hint the menu audit searches from. Venues Places reports as closed are skipped with that reason. Missing key or a Places error leaves the Qloo door in the payload with enrichment marked unknown, and the job still reaches `ready`.
 
-- [ ] Enrich the working set with address, hours, website, and open status
-- [ ] Pass the website through to the menu audit
-- [ ] Skip a venue Places reports as closed, with that reason
-- [ ] Keep the door and mark enrichment unknown when the key is missing or Places errors
+- [x] Enrich the working set with address, hours, website, and open status
+- [x] Pass the website through to the menu audit
+- [x] Skip a venue Places reports as closed, with that reason
+- [x] Keep the door and mark enrichment unknown when the key is missing or Places errors
 
 ### 23. Field route
 
 When a Routes key is set, order the qualified wholesale or collab doors with `optimizeWaypointOrder` and return legs the Flutter map draws as a polyline. Skip the call in flagship mode, when the key is missing, or when fewer than two doors qualified. A Routes error is isolated: the job still reaches `ready` with the door list. Include the Google attribution fields the response is required to carry.
 
-- [ ] Order qualified wholesale and collab doors with waypoint optimization
-- [ ] Return legs the map can draw
-- [ ] Skip routing in flagship mode, when the key is missing, or when fewer than two doors qualify
-- [ ] Keep the campaign ready when routing fails
-- [ ] Attribute Google data as required
+- [x] Order qualified wholesale and collab doors with waypoint optimization
+- [x] Return legs the map can draw
+- [x] Skip routing in flagship mode, when the key is missing, or when fewer than two doors qualify
+- [x] Keep the campaign ready when routing fails
+- [x] Attribute Google data as required
 
 ### 24. Run-sheet PDF
 
 The gateway renders the PDF. Wholesale and collab produce a field run-sheet: ordered stops, the three sub-scores, the SKU, the pitch, and the citations. Flagship produces a site-selection brief: the top corridors, the anchor neighbours, and the demographic line. Qloo facts and model inferences are visually distinct, using the split marked in the proto comments. A PDF failure leaves the on-screen campaign usable.
 
-- [ ] Render a field run-sheet for wholesale and collab
-- [ ] Render a site-selection brief for flagship
-- [ ] Keep Qloo facts and model inferences distinct in the PDF
-- [ ] Leave the on-screen campaign usable when PDF rendering fails
+- [x] Render a field run-sheet for wholesale and collab
+- [x] Render a site-selection brief for flagship
+- [x] Keep Qloo facts and model inferences distinct in the PDF
+- [x] Leave the on-screen campaign usable when PDF rendering fails
 
 ### 25. Job persistence
 
 Postgres tables for campaigns, runs, evidence snapshots, drafts, and each run's trace events, applied with forward-only migrations. A run's stored payload carries the campaign plus the `LlmOnlyBaseline` text and the recorded trace a stored preset replays (§19, §32). The HTTP API gets a campaign by id so a refresh can restore it. A re-run inserts a new run row and leaves the previous snapshot untouched; the preset path always serves the newest ready run. A seed script loads the four presets so fixture and live modes share the same ids. The judge account is added in §28; this schema stays campaigns, runs, evidence, and drafts.
 
-- [ ] Postgres schema for campaigns, runs, evidence snapshots, drafts, and trace events
-- [ ] Forward-only migrations
-- [ ] Get a campaign by id
-- [ ] Re-run creates a new run and leaves the previous snapshot untouched
-- [ ] Store the baseline text and the recorded trace on the run so a stored preset serves without live calls
-- [ ] Seed the four presets
+- [x] Postgres schema for campaigns, runs, evidence snapshots, drafts, and trace events
+- [x] Forward-only migrations
+- [x] Get a campaign by id
+- [x] Re-run creates a new run and leaves the previous snapshot untouched
+- [x] Store the baseline text and the recorded trace on the run so a stored preset serves without live calls
+- [x] Seed the four presets
 
 ### 26. Gateway resilience
 
 Set a deadline on every taste and AI gRPC call and a circuit breaker per dependency. Per-IP and global rate limits return a JSON error the client can map to copy. Require `Idempotency-Key` on create so a double-submit returns the original job. Validate seed count (one to four seed entities — a resolved brand plus any vibe chips, or a two-to-four-entity composite of chips; the total never exceeds four, §31), text length, SKU-list length, mode, and radius before any RPC. `GET /health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode as `live`, `fixture`, or `degraded`.
 
-- [ ] Deadlines on every gRPC call and a circuit breaker per dependency
-- [ ] Per-IP and global rate limits with a clear JSON error
-- [ ] `Idempotency-Key` on create
-- [ ] Validation limits for seed count, text length, SKU list, mode, and radius
-- [ ] `/health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode
+- [x] Deadlines on every gRPC call and a circuit breaker per dependency
+- [x] Per-IP and global rate limits with a clear JSON error
+- [x] `Idempotency-Key` on create
+- [x] Validation limits for seed count, text length, SKU list, mode, and radius
+- [x] `/health` reports gateway, taste, AI, Redis, Postgres, and Qloo mode
 
 ## 6. Flutter client
 
@@ -322,102 +322,102 @@ Set a deadline on every taste and AI gRPC call and a circuit breaker per depende
 
 Before any screen is built, lock the visual system the Flutter theme will consume and the frames the judge path will follow. Tokens cover color, type scale, spacing, radius, and elevation, and they are the values the app-shell theme reads. Mockups cover the login screen with the hackathon banner, the seed builder, the live trace, the map (route, heatmap, and skip pins), the door board with the evidence drawer, and the pitch. Frame both a laptop width and a narrow window. The tokens are checked into the client; the mockups are the reference for the screens in §29–§36.
 
-- [ ] Define color, type, spacing, radius, and elevation tokens
-- [ ] Mock the login screen with the hackathon banner, the seed builder, and the trace
-- [ ] Mock the map, the door board, the evidence drawer, and the pitch
-- [ ] Frame a laptop width and a narrow window
-- [ ] Check the tokens into the client for the app-shell theme to consume
+- [x] Define color, type, spacing, radius, and elevation tokens
+- [x] Mock the login screen with the hackathon banner, the seed builder, and the trace
+- [x] Mock the map, the door board, the evidence drawer, and the pitch
+- [x] Frame a laptop width and a narrow window
+- [x] Check the tokens into the client for the app-shell theme to consume
 
 ### 28. Preseeded judge account
 
 Create one judge account and attach the four preset campaigns to it. `HACKATHON_MODE=true` (see `.env.example`) makes the login screen show a banner that signs the judge into that account, so judging starts inside the product with the presets already there. `HACKATHON_MODE=false` hides the banner. The account row, its session, and the link from the account to the seeded campaigns live in Postgres. The gateway exposes the flag, and the client renders the banner. Account credentials stay in the secret manager.
 
-- [ ] Add the judge account and attach the four preset campaigns
-- [ ] Expose `HACKATHON_MODE` from the gateway to the client
-- [ ] Show the login banner only when the flag is true, and sign the judge into the preseeded account
-- [ ] Hide the banner when the flag is false
-- [ ] Keep the account credentials in the secret manager
+- [x] Add the judge account and attach the four preset campaigns
+- [x] Expose `HACKATHON_MODE` from the gateway to the client
+- [x] Show the login banner only when the flag is true, and sign the judge into the preseeded account
+- [x] Hide the banner when the flag is false
+- [x] Keep the account credentials in the secret manager
 
 ### 29. App shell
 
 Flutter web is the judge target, with the same screens on desktop. The shared theme defines type scale, cards, chips, banners, and drawers, and every screen implements loading, empty, and error states against the gateway job states. With `HACKATHON_MODE` on, the judge is already inside the preseeded account from §28 before a scout starts. The gateway base URL is a compile-time define so local Compose and the production host are a switch.
 
 - [x] Ship Flutter web as the judge target, with the same screens on desktop
-- [ ] Add theme, type scale, cards, chips, banners, and drawers — theme, type scale, cards, chips, and the mode banner exist; drawers still to add
+- [x] Add theme, type scale, cards, chips, banners, and drawers — theme, type scale, cards, chips, and the mode banner exist; drawers still to add
 - [x] Add loading, empty, and error states on every screen
-- [ ] Run a preset and a free-entry scout from the preseeded judge session
+- [x] Run a preset and a free-entry scout from the preseeded judge session
 - [x] Configure the gateway base URL for local and production — `--dart-define=GATEWAY_URL`
 
 ### 30. Accessibility and layout
 
 The path from the seed builder to the pitch is operable from the keyboard, with focus order, labels, and contrast set for a short audit. The trace honours the reduced-motion media query. Layout breakpoints cover a laptop width and a narrow window. A list renders the same recommended doors and skip doors when the map is not the view being used.
 
-- [ ] Support a keyboard path from the seed builder to the pitch
-- [ ] Set focus order, labels, and contrast for a quick audit
-- [ ] Honour reduced motion on the trace
-- [ ] Lay out for a laptop width and a narrow window
-- [ ] Provide a non-map list of the same doors
+- [x] Support a keyboard path from the seed builder to the pitch
+- [x] Set focus order, labels, and contrast for a quick audit
+- [x] Honour reduced motion on the trace
+- [x] Lay out for a laptop width and a narrow window
+- [x] Provide a non-map list of the same doors
 
 ### 31. Seed builder, modes, and presets
 
 The brand field calls seed resolution through the gateway, debounced, with a minimum query length, and renders matches as confirm chips. Fallback vibe chips build a composite seed of two to four reference entities; a resolved brand plus any added chips still totals four seed entities or fewer (§26). The SKU list is plain text on the seed. Mode pills are Wholesale, Flagship, and Collab, and they serialize into `POST /api/v1/scout`. Three preset buttons load the stored preset runs and skip typing: Sola in Austin, ceramics and matcha in Brooklyn, cacao and coffee in Colaba. Switching Brooklyn from flagship to collab loads the second stored payload.
 
-- [ ] Brand typeahead, debounced and cached, shown as confirm chips
-- [ ] Fallback vibe chips (two-to-four-entity composites; four seed entities maximum), plus a SKU list
-- [ ] Mode pills for Wholesale, Flagship, and Collab
-- [ ] Inline validation before submit
-- [ ] Three preset buttons loading the stored runs, with Brooklyn flagship and collab both stored
+- [x] Brand typeahead, debounced and cached, shown as confirm chips
+- [x] Fallback vibe chips (two-to-four-entity composites; four seed entities maximum), plus a SKU list
+- [x] Mode pills for Wholesale, Flagship, and Collab
+- [x] Inline validation before submit
+- [x] Three preset buttons loading the stored runs, with Brooklyn flagship and collab both stored
 
 ### 32. Live trace
 
 Subscribe to `GET /events` and render each trace event as a timeline row with stage name, elapsed time, and whether the step was a cache hit. The stages the judge should see are seed resolution, door ranking, Places, menu grounding, and the route. A stored preset run replays its recorded events through the same timeline, cache-hit markers included. On refresh, resume from the stored cursor. Cancel calls the abort endpoint and stops the stream. If `/health` or the job state says fixture or degraded, show that banner above the timeline.
 
-- [ ] Render SSE events as a timeline
-- [ ] Show stage, elapsed time, and whether the step was cached
-- [ ] Replay the stored preset trace through the same timeline
-- [ ] Resume from the event cursor after refresh
-- [ ] Cancel aborts the job
-- [ ] Show a banner when the run is on fixtures or degraded
+- [x] Render SSE events as a timeline
+- [x] Show stage, elapsed time, and whether the step was cached
+- [x] Replay the stored preset trace through the same timeline
+- [x] Resume from the event cursor after refresh
+- [x] Cancel aborts the job
+- [x] Show a banner when the run is on fixtures or degraded
 
 ### 33. Map
 
 Draw numbered pins for the qualified doors and red pins for the skip list, with a legend. Draw the scout radius from the lat/lng and the radius the campaign used. Render the heatmap, and locality polygons when the payload has them, in flagship mode. Render the field-route polyline when Routes legs are present. Use OSM or CARTO tiles and keep the attribution visible, including Google attribution for Places and Routes data.
 
-- [ ] Numbered door pins and red skip pins, with a legend
-- [ ] Radius ring used by the scout
-- [ ] Heatmap and locality polygons in flagship mode
-- [ ] Field-route polyline when legs are present
-- [ ] OSM or CARTO tiles with visible attribution
+- [x] Numbered door pins and red skip pins, with a legend
+- [x] Radius ring used by the scout
+- [x] Heatmap and locality polygons in flagship mode
+- [x] Field-route polyline when legs are present
+- [x] OSM or CARTO tiles with visible attribution
 
 ### 34. Door board, evidence, and the baseline
 
 Render the top recommended doors as cards with three labeled sub-score bars — cultural affinity, shelf opportunity, demographic alignment — the shared tags, and the SKU badge. Call out the first stop inside that list; do not re-sort on the client. The skip tab reads the reason codes, including low affinity and competitor count. Menu findings render as clickable grounding URLs. The evidence drawer lists each Qloo call's endpoint, parameters, and result count, plus the explainability weights, and styles Qloo facts differently from model inferences. The LLM-only toggle requests `LlmOnlyBaseline` for the same inputs and labels it ungrounded. Any card field the insights payload lacks hydrates via `GET /entities` ([QLOO_APIS.md](QLOO_APIS.md) §3.12).
 
-- [ ] Cards with three labeled sub-score bars, shared tags, and a SKU badge
-- [ ] Skip tab with reason codes, including low affinity and competitor count
-- [ ] Menu findings as clickable grounding URLs
-- [ ] Evidence drawer listing each Qloo call, its parameters, its result count, and the explainability weights
-- [ ] LLM-only toggle labeled ungrounded, and server rank preserved
-- [ ] Hydrate missing card fields via `GET /entities`
+- [x] Cards with three labeled sub-score bars, shared tags, and a SKU badge
+- [x] Skip tab with reason codes, including low affinity and competitor count
+- [x] Menu findings as clickable grounding URLs
+- [x] Evidence drawer listing each Qloo call, its parameters, its result count, and the explainability weights
+- [x] LLM-only toggle labeled ungrounded, and server rank preserved
+- [x] Hydrate missing card fields via `GET /entities`
 
 ### 35. Pitch and run-sheet actions
 
 The pitch action opens the script and, when present, the battlecard or the activation proposal. The run-sheet action downloads the server-rendered PDF; flagship downloads the site brief instead. Copy-to-clipboard is available on the script. If a later draft request fails, the actions that already succeeded stay enabled.
 
-- [ ] Open the pitch, and the battlecard or activation proposal when the payload has one
-- [ ] Download the run-sheet PDF, or the site brief in flagship mode
-- [ ] Copy the script
-- [ ] Keep completed actions available when a later draft fails
+- [x] Open the pitch, and the battlecard or activation proposal when the payload has one
+- [x] Download the run-sheet PDF, or the site brief in flagship mode
+- [x] Copy the script
+- [x] Keep completed actions available when a later draft fails
 
 ### 36. Client edge cases
 
 Put the job id in the URL and, on load, `GET` the job so a refresh restores an in-flight scout. Double-submit sends the same `Idempotency-Key` and renders the one job the gateway returns. Map HTTP 429, 409, and validation errors to specific copy. An `empty` result explains the miss and routes the operator back to the seed. If the SSE stream drops, poll `GET` until the state is terminal.
 
-- [ ] Restore an in-flight job from the URL after refresh
-- [ ] Collapse double-submit into one job
-- [ ] Map 429, 409, and validation errors to specific copy
-- [ ] Explain an empty result and offer a return to the seed
-- [ ] Fall back from a dead SSE stream to job polling
+- [x] Restore an in-flight job from the URL after refresh
+- [x] Collapse double-submit into one job
+- [x] Map 429, 409, and validation errors to specific copy
+- [x] Explain an empty result and offer a return to the seed
+- [x] Fall back from a dead SSE stream to job polling
 
 ## 7. Demo quality
 
