@@ -77,11 +77,11 @@ Project `karum-512016`, zone `asia-south1-a`, instance `karum-demo` (`e2-medium`
 ```bash
 make demo-on       # start the VM
 make demo-status
-make demo-refresh  # sync this checkout, rebuild containers, publish the client
+make demo-refresh  # sync this checkout and .env, rebuild containers, publish the client
 make demo-off      # stop the CPU charge
 ```
 
-`docker compose` runs only on that VM. The first refresh copies `karum-infra/.env` up if the VM does not have one yet, and leaves an existing VM `.env` in place.
+`docker compose` runs only on that VM. Every refresh copies `karum-infra/.env` up with the code, then rebuilds the containers and republishes the Flutter web app. Edit code or `.env`, then run the same command again.
 
 ## Toolchain versions
 

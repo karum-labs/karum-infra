@@ -59,7 +59,7 @@ demo-off:
 demo-status:
 	./scripts/demo.sh status
 
-## demo-refresh: sync this checkout onto the VM, rebuild containers, publish the client.
+## demo-refresh: sync this checkout and .env onto the VM, rebuild containers, publish the client.
 demo-refresh:
 	./scripts/demo.sh refresh
 

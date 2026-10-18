@@ -55,6 +55,31 @@ deploy_client() {
   echo "API    https://${host}"
 }
 
+require_env() {
+  python3 - "$1" << 'PY'
+import sys
+from pathlib import Path
+
+needed = [
+    "POSTGRES_DSN",
+    "GOOGLE_PLACES_API_KEY",
+    "GOOGLE_ROUTES_API_KEY",
+    "TASTE_QLOO_API_KEY",
+    "GEMINI_API_KEY",
+]
+vals = {}
+for line in Path(sys.argv[1]).read_text().splitlines():
+    if not line.strip() or line.strip().startswith("#") or "=" not in line:
+        continue
+    key, value = line.split("=", 1)
+    vals[key.strip()] = value.strip().strip("\"'")
+missing = [key for key in needed if not vals.get(key)]
+if missing:
+    print("Fill these in karum-infra/.env before refresh: " + ", ".join(missing), file=sys.stderr)
+    sys.exit(1)
+PY
+}
+
 ensure_running() {
   local status
   status="$(gcloud compute instances describe "$INSTANCE" --zone="$ZONE" --project="$PROJECT" --format='value(status)')"
@@ -92,6 +117,19 @@ case "${1:-}" in
     remote_root="${KARUM_ROOT:-/opt/karum}"
     local_root="$(cd "$(dirname "$0")/../.." && pwd)"
     host="$(api_host)"
+    if [[ ! -f "$local_root/karum-infra/.env" ]]; then
+      echo "Missing $local_root/karum-infra/.env" >&2
+      exit 1
+    fi
+    require_env "$local_root/karum-infra/.env"
+    if [[ ! -x "$HOME/snap/flutter/common/flutter/bin/flutter" ]] && ! command -v flutter >/dev/null 2>&1; then
+      echo "flutter is not on PATH" >&2
+      exit 1
+    fi
+    if ! command -v firebase >/dev/null 2>&1 && ! command -v npx >/dev/null 2>&1; then
+      echo "firebase CLI is not on PATH" >&2
+      exit 1
+    fi
     sync_tree() {
       local name="$1"
       local src="$local_root/$name"
@@ -126,15 +164,9 @@ EOF
       sync_tree "$name"
     done
     remote_env="$remote_root/karum-infra/.env"
-    if ! gcloud compute ssh "$INSTANCE" --zone="$ZONE" --project="$PROJECT" --command="sudo test -f $(printf '%q' "$remote_env")"; then
-      if [[ ! -f "$local_root/karum-infra/.env" ]]; then
-        echo "VM has no .env and $local_root/karum-infra/.env is missing." >&2
-        exit 1
-      fi
-      echo "copy .env to the VM (first refresh only)"
-      gcloud compute scp "$local_root/karum-infra/.env" "$INSTANCE:/tmp/karum.env" --zone="$ZONE" --project="$PROJECT"
-      gcloud compute ssh "$INSTANCE" --zone="$ZONE" --project="$PROJECT" --command="sudo mv /tmp/karum.env $(printf '%q' "$remote_env") && sudo chmod 600 $(printf '%q' "$remote_env")"
-    fi
+    echo "copy .env to the VM"
+    gcloud compute scp "$local_root/karum-infra/.env" "$INSTANCE:/tmp/karum.env" --zone="$ZONE" --project="$PROJECT"
+    gcloud compute ssh "$INSTANCE" --zone="$ZONE" --project="$PROJECT" --command="sudo mv /tmp/karum.env $(printf '%q' "$remote_env") && sudo chmod 600 $(printf '%q' "$remote_env")"
     gcloud compute ssh "$INSTANCE" --zone="$ZONE" --project="$PROJECT" --command="$(cat <<EOF
 set -euo pipefail
 envfile=$(printf '%q' "$remote_env")
@@ -149,9 +181,22 @@ kept.append(f"KARUM_API_HOST={host}")
 Path(path).write_text("\n".join(kept) + "\n")
 PY
 cd $(printf '%q' "$remote_root/karum-infra")
-sudo docker compose up -d --build
+sudo docker compose up -d --build --force-recreate --wait --wait-timeout 600
 EOF
 )"
+    echo "waiting for https://${host}/health"
+    ready=0
+    for _ in $(seq 1 36); do
+      if curl -fsS -m 10 "https://${host}/health" >/dev/null; then
+        ready=1
+        break
+      fi
+      sleep 5
+    done
+    if [[ "$ready" != 1 ]]; then
+      echo "API did not become healthy at https://${host}/health" >&2
+      exit 1
+    fi
     echo "API    https://${host}"
     deploy_client
     ;;

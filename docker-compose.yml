@@ -39,12 +39,15 @@ services:
     build:
       context: ../karum-service-taste
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       # Fixture mode makes no outbound Qloo calls; set TASTE_QLOO_API_KEY and
       # TASTE_MODE=live to hit the real API. The key stays server-side only.
+      # These override .env so the container dials compose service names.
       TASTE_PORT: "8081"
       TASTE_MODE: ${TASTE_MODE:-fixture}
-      TASTE_QLOO_API_KEY: ${TASTE_QLOO_API_KEY:-}
+      TASTE_QLOO_API_KEY: ${TASTE_QLOO_API_KEY:?set TASTE_QLOO_API_KEY in .env}
       TASTE_QLOO_BASE_URL: ${TASTE_QLOO_BASE_URL:-https://hackathon.api.qloo.com}
       TASTE_REDIS_ADDR: redis:6379
       TASTE_LOG_LEVEL: ${TASTE_LOG_LEVEL:-INFO}
@@ -70,10 +73,12 @@ services:
     build:
       context: ../karum-service-ai
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       AI_PORT: "8082"
       AI_MODE: ${AI_MODE:-fixture}
-      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY in .env}
       AI_GCP_PROJECT_ID: ${AI_GCP_PROJECT_ID:-}
       AI_GCP_LOCATION: ${AI_GCP_LOCATION:-us-central1}
       AI_GEMINI_MODEL: ${AI_GEMINI_MODEL:-gemini-2.5-flash}
@@ -96,6 +101,8 @@ services:
     build:
       context: ../karum-server
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       GATEWAY_PORT: "8080"
       GATEWAY_MODE: ${GATEWAY_MODE:-fixture}
@@ -107,6 +114,8 @@ services:
       AI_ADDR: service-ai:8082
       REDIS_ADDR: redis:6379
       POSTGRES_DSN: ${POSTGRES_DSN:?set POSTGRES_DSN in .env}
+      GOOGLE_PLACES_API_KEY: ${GOOGLE_PLACES_API_KEY:?set GOOGLE_PLACES_API_KEY in .env}
+      GOOGLE_ROUTES_API_KEY: ${GOOGLE_ROUTES_API_KEY:?set GOOGLE_ROUTES_API_KEY in .env}
     depends_on:
       service-taste:
         condition: service_healthy
