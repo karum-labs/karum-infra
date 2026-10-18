@@ -198,42 +198,42 @@ Before scoring, collapse venues that resolve to the same entity id. Drop a resul
 
 Call Gemini 2.5 Flash through `google-genai` with `vertexai=True`, and one Pydantic response model per RPC, so invalid JSON fails closed. Set a timeout, a max output token cap, and a single retry when schema validation fails. Logs include model, region, and prompt version, and never the credentials. Failures return a typed error the gateway maps onto `degraded`. Replay tests inject a fake model that returns the fixture schemas.
 
-- [ ] Pin Gemini 2.5 Flash through `google-genai` on Vertex, with a Pydantic schema per RPC
-- [ ] Set timeouts, max output tokens, and one retry on invalid JSON
-- [ ] Log model, region, and prompt version, and keep credentials out of logs
-- [ ] Return a typed error the gateway can degrade on
-- [ ] Replay tests with a fake model that returns the fixture schemas
+- [x] Pin Gemini 2.5 Flash through `google-genai` on Vertex, with a Pydantic schema per RPC
+- [x] Set timeouts, max output tokens, and one retry on invalid JSON
+- [x] Log model, region, and prompt version, and keep credentials out of logs
+- [x] Return a typed error the gateway can degrade on
+- [x] Replay tests with a fake model that returns the fixture schemas
 
 ### 16. Menu audit
 
 `AuditMenu` uses Google Search grounding to read the venue website, menu, or delivery listing. It reports whether the audit succeeded, which incumbents are stocked, a short menu summary, the `O_shelf` inputs, and the source URLs. Online-only or unverifiable venues keep their Qloo rank, set shelf opportunity to unknown, and the composite renormalizes over affinity and demographics (§11). Grounding is capped to the working shortlist (the doors that can appear on the board, plus skip candidates the skip rule might cite), not the full `take=25`. Grounded prose names a competitor only when that name is in the grounding sources or the Qloo payload.
 
-- [ ] Audit the live menu or shelf with Google Search grounding
-- [ ] Return incumbents, a menu summary, shelf inputs, and source URLs
-- [ ] When grounding is unavailable, keep the Qloo rank and label the shelf unknown
-- [ ] Cap grounding calls to the working shortlist
-- [ ] Name a competitor in prose only when a grounding source or the Qloo payload contains it
+- [x] Audit the live menu or shelf with Google Search grounding
+- [x] Return incumbents, a menu summary, shelf inputs, and source URLs
+- [x] When grounding is unavailable, keep the Qloo rank and label the shelf unknown
+- [x] Cap grounding calls to the working shortlist
+- [x] Name a competitor in prose only when a grounding source or the Qloo payload contains it
 
 ### 17. Pitches, SKUs, and briefs
 
 `DraftDoorPitch` returns the shopkeeper script, and every number cites an evidence id. When the audit found an incumbent, it also returns the displacement battlecard, using the compare tags when they exist and the affinity plus menu finding when they do not. The recommended SKU is chosen from the brand's own SKU list by the door's taste tags. Flagship mode adds the site-brief paragraph for the top corridors. Collab mode adds the activation proposal. `LlmOnlyBaseline` is stored beside the Qloo result and labeled ungrounded. Its venue names source the free-entry skip candidates (§11); unresolved names are recorded as misses, never scored. Length caps keep each text short enough that a non-technical judge can finish it.
 
-- [ ] Shopkeeper script that cites an evidence id for every number
-- [ ] Displacement battlecard when an incumbent is present
-- [ ] One recommended SKU from the brand's list, chosen with the door's taste tags
-- [ ] Site-brief paragraph in flagship mode, and an activation proposal in collab mode
-- [ ] LLM-only baseline stored beside the Qloo result and labeled ungrounded
-- [ ] Feed the baseline's venue names into the free-entry skip list, recording unresolved names as misses
+- [x] Shopkeeper script that cites an evidence id for every number
+- [x] Displacement battlecard when an incumbent is present
+- [x] One recommended SKU from the brand's list, chosen with the door's taste tags
+- [x] Site-brief paragraph in flagship mode, and an activation proposal in collab mode
+- [x] LLM-only baseline stored beside the Qloo result and labeled ungrounded
+- [x] Feed the baseline's venue names into the free-entry skip list, recording unresolved names as misses
 
 ### 18. Draft resilience
 
 If Vertex errors, times out, or returns JSON that fails the schema, the gateway still returns the taste ranking and the affinity skip list. The run is marked `degraded`, and template sentences interpolate evidence fields only. Venue and brand names enter the prompt as delimited data, so an instruction-shaped name cannot change the schema. A sentence whose cited evidence id is missing is dropped. Regenerating one pitch calls only that draft RPC and does not rerun Qloo. If a draft RPC fails, the door list is still returned and the failed draft is the only error. The test stops the AI process and asserts the gateway still returns doors.
 
-- [ ] Return the taste ranking and the affinity skip list when Vertex fails
-- [ ] Mark the run degraded and use template sentences that only interpolate evidence fields
-- [ ] Treat venue and brand names as data so instruction-shaped names cannot change the schema
-- [ ] Drop a sentence whose evidence id is missing, and regenerate one pitch without rerunning Qloo
-- [ ] Test with the AI process stopped, and leave the door list available when a draft fails
+- [x] Return the taste ranking and the affinity skip list when Vertex fails
+- [x] Mark the run degraded and use template sentences that only interpolate evidence fields
+- [x] Treat venue and brand names as data so instruction-shaped names cannot change the schema
+- [x] Drop a sentence whose evidence id is missing, and regenerate one pitch without rerunning Qloo
+- [x] Test with the AI process stopped, and leave the door list available when a draft fails
 
 ## 5. Gateway
 
