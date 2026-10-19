@@ -120,6 +120,9 @@ services:
       POSTGRES_DSN: ${POSTGRES_DSN:?set POSTGRES_DSN in .env}
       GOOGLE_PLACES_API_KEY: ${GOOGLE_PLACES_API_KEY:?set GOOGLE_PLACES_API_KEY in .env}
       GOOGLE_ROUTES_API_KEY: ${GOOGLE_ROUTES_API_KEY:?set GOOGLE_ROUTES_API_KEY in .env}
+      # Browser CORS allow-list. `make demo-refresh` writes the published
+      # Firebase origin here; empty keeps the gateway's loopback dev fallback.
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-}
     depends_on:
       service-taste:
         condition: service_healthy

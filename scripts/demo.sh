@@ -171,13 +171,20 @@ EOF
 set -euo pipefail
 envfile=$(printf '%q' "$remote_env")
 host=$(printf '%q' "$host")
-sudo python3 - "\$envfile" "\$host" << 'PY'
+client_url=$(printf '%q' "$CLIENT_URL")
+sudo python3 - "\$envfile" "\$host" "\$client_url" << 'PY'
 import sys
 from pathlib import Path
-path, host = sys.argv[1:]
+path, host, client_url = sys.argv[1:]
 lines = Path(path).read_text().splitlines()
-kept = [line for line in lines if not line.startswith("KARUM_API_HOST=")]
+kept = [
+    line
+    for line in lines
+    if not line.startswith("KARUM_API_HOST=")
+    and not line.startswith("CLIENT_ORIGIN=")
+]
 kept.append(f"KARUM_API_HOST={host}")
+kept.append(f"CLIENT_ORIGIN={client_url}")
 Path(path).write_text("\n".join(kept) + "\n")
 PY
 cd $(printf '%q' "$remote_root/karum-infra")
