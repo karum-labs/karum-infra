@@ -8,24 +8,25 @@ Given a brand's identity (or composite cultural vibe) and a target city, Karum q
 
 ## TL;DR — Executive Summary
 
-- **What We Are Building:** **Karum**, a multi-mode physical expansion agent for brands. It combines Qloo's cross-domain entity correlation (`Brand` $\rightarrow$ `Places`), locality heatmaps (`urn:heatmap`), taste tags (`urn:tag`), and explainability signals (`feature.explainability=true`) with live web menu verification (Vertex AI Google Search Grounding) and spatial route optimization (Google Maps Platform).
+- **What We Are Building:** **Karum**, a multi-mode physical expansion agent for brands. It combines Qloo's cross-domain entity correlation (`Brand` → `Places`), locality heatmaps (`urn:heatmap`), taste tags (`urn:tag`), and explainability signals (`feature.explainability=true`) with live web menu verification (Vertex AI Google Search Grounding) and spatial route optimization (Google Maps Platform).
 - **Who Operates the Platform:** Emerging and growth-stage brands, field sales reps, wholesale account executives, and retail expansion directors.
-- **Why We Pivoted from Landlord-Only to Brand-Operated:** Qloo's strongest, battle-tested primitive is mapping a **Brand or Composite Entity Signal $\rightarrow$ Ranked Physical Places & Locality Heatmaps** within a city. Building for the brand unlocks both **Wholesale Door Scouting** (selling into existing shops/bars) and **Flagship/Pop-Up Site Scouting** (opening the brand's own storefront) with low technical risk and immediate B2B revenue impact.
+- **Why We Pivoted from Landlord-Only to Brand-Operated:** Qloo's strongest, battle-tested primitive is mapping a **Brand or Composite Entity Signal → Ranked Physical Places & Locality Heatmaps** within a city. Building for the brand unlocks both **Wholesale Door Scouting** (selling into existing shops/bars) and **Flagship/Pop-Up Site Scouting** (opening the brand's own storefront) with low technical risk and immediate B2B revenue impact.
 - **Hackathon Moat & Positioning:** 
-  - **Qloo Indispensability:** $10/10$ (Without Qloo, an LLM simply lists popular Yelp bars or generic commercial streets without knowing whether the venue's patrons culturally align with the brand).
+  - **Qloo Indispensability:** 10/10 (Without Qloo, an LLM simply lists popular Yelp bars or generic commercial streets without knowing whether the venue's patrons culturally align with the brand).
   - **2026 Field Differentiation:** Avoids crowded 2026 hackathon lanes like live-music venue booking (*Booker*, *Advance*, *Undercard*), synthetic focus groups (*Quorum*), creator sponsorships (*Cold-Open*, *Deal Desk*), and consumer relocation (*TasteBridge*, *Home2Here*).
-  - **Zero Out-of-Pocket Cost:** Runs entirely on the hackathon's Qloo API key ($10,000$ requests/month quota) and the **$300 Google Cloud Trial Credit** (covering serverless Vertex AI Gemini 2.5 Flash, Google Search Grounding, Google Places API, Google Routes API, and Cloud Run hosting).
+  - **Zero Out-of-Pocket Cost:** Runs entirely on the hackathon's Qloo API key (\$10,000 requests/month quota) and the **\$300 Google Cloud Trial Credit** (covering serverless Vertex AI Gemini 2.5 Flash, Google Search Grounding, Google Places API, Google Routes API, and Cloud Run hosting).
 
 ---
 
 ## 1. Hackathon Strategy, Rules & Judge Fit
 
 ### 1.1 Verified Hackathon Rules & Constraints
+
 | Dimension | Verified Constraint | Karum Compliance Strategy |
 | :--- | :--- | :--- |
 | **Submission Deadline** | Oct 30, 2026 @ 11:45pm EDT | Freeze features by Oct 27; deploy public no-login Flutter Web build by Oct 28. |
-| **Judging Window** | Nov 2, 2026 $\rightarrow$ Nov 16, 2026 | Cloud Run services and pre-warmed cache stay live through Nov 23. |
-| **Prizes** | $\$25,000$ total ($1\text{st}: \$15,000$, $2\text{nd}: \$6,000$, $3\text{rd}: \$4,000$) | Positioned as a venture-ready B2B SaaS product, not a toy consumer chatbot. |
+| **Judging Window** | Nov 2, 2026 → Nov 16, 2026 | Cloud Run services and pre-warmed cache stay live through Nov 23. |
+| **Prizes** | \$25,000 total (1st: \$15,000, 2nd: \$6,000, 3rd: \$4,000) | Positioned as a venture-ready B2B SaaS product, not a toy consumer chatbot. |
 | **Live Demo Mandate** | Judges test the hosted app directly; demo videos are optional | Instant 1-click pre-warmed brand scenarios on the landing screen; zero login wall. |
 | **Qloo API Environment** | `https://hackathon.api.qloo.com` via `X-Api-Key` header | Strict server-side key isolation inside `service-taste` with persistent response caching. |
 | **Open Source Requirement** | Public repositories with visible OSS license in GitHub About | MIT License across all 5 repositories (`infra`, `client`, `server`, `service-taste`, `service-ai`). |
@@ -38,7 +39,7 @@ Only one judge is a Qloo engineer; the rest are investors, entertainment executi
 - **Nicole Seligman (OpenAI Board):** Looks for grounded, non-hallucinated agentic workflows where every LLM claim is backed by traceable cultural data and live web citations.
 
 ### 1.3 Lessons Applied from 2025 Winners
-1. **Put Qloo inside a high-stakes B2B revenue decision** (*GeoTaste*, *Alloy*, *Resonance AI*): Landing 30 wholesale retail accounts or signing a pop-up lease is worth $\$50,000+$ in annual recurring revenue for an emerging brand.
+1. **Put Qloo inside a high-stakes B2B revenue decision** (*GeoTaste*, *Alloy*, *Resonance AI*): Landing 30 wholesale retail accounts or signing a pop-up lease is worth \$50,000+ in annual recurring revenue for an emerging brand.
 2. **Make Negative Space a first-class feature** (*Zesty*): Tell the brand **"Doors to Skip / Do Not Pitch"**—stores that look trendy on paper but whose patrons have low cultural affinity or whose shelves are already locked into competing craft contracts.
 3. **Include an "LLM-Only vs. Karum" Counterfactual Toggle** (*Advance 2026 pattern*): Prove on-screen that a standard LLM gives generic tourist traps while Karum surfaces high-converting neighborhood stockists.
 
@@ -46,14 +47,14 @@ Only one judge is a Qloo engineer; the rest are investors, entertainment executi
 
 ## 2. Product Vision & The 5 Core Brand Use Cases
 
-In Karum, **the Brand operates the platform**. When a brand logs into Karum, it defines its identity either by resolving its existing Qloo Brand Entity or—if it is a brand-new startup not yet in Qloo's graph—by constructing a **Composite Cultural Seed** (combining $2\text{–}4$ reference brands, genres, or lifestyle tags that represent its target customer, e.g., *"Oatly" + "Aesop" + "Indie Rock" + "Natural Wine"*).
+In Karum, **the Brand operates the platform**. When a brand logs into Karum, it defines its identity either by resolving its existing Qloo Brand Entity or—if it is a brand-new startup not yet in Qloo's graph—by constructing a **Composite Cultural Seed** (combining 2–4 reference brands, genres, or lifestyle tags that represent its target customer, e.g., *"Oatly" + "Aesop" + "Indie Rock" + "Natural Wine"*).
 
 Karum then executes five high-value commercial workflows:
 
 ### Use Case 1: Wholesale Stockist & "Door Scouting" (Primary Mode)
-- **The Problem:** An emerging craft beverage, specialty food, or CPG brand wants to get stocked in independent bars, cafes, restaurants, or specialty boutiques in a new city. Field sales reps waste $70\%$ of their time walking into doors whose clientele doesn't match the product.
+- **The Problem:** An emerging craft beverage, specialty food, or CPG brand wants to get stocked in independent bars, cafes, restaurants, or specialty boutiques in a new city. Field sales reps waste 70% of their time walking into doors whose clientele doesn't match the product.
 - **How Karum Works:**
-  1. Queries Qloo `/v2/insights` (`Brand/Seed` $\rightarrow$ `urn:entity:place`) within the target city's coordinates to rank venues whose patrons share the highest behavioral affinity with the brand.
+  1. Queries Qloo `/v2/insights` (`Brand/Seed` → `urn:entity:place`) within the target city's coordinates to rank venues whose patrons share the highest behavioral affinity with the brand.
   2. Resolves operational data (address, opening hours, website) via **Google Places API**.
   3. Uses **Vertex AI with Google Search Grounding** to inspect the venue's live online menu, delivery listings, and social footprint to check if they already carry the brand or a direct competitor.
   4. Generates a turn-by-turn field sales route via **Google Routes API** and writes a tailored pitch for the shopkeeper/beverage director citing Qloo's shared cultural tags.
@@ -63,7 +64,7 @@ Karum then executes five high-value commercial workflows:
 - **How Karum Works:**
   1. Queries Qloo's Locality Heatmap (`filter.type=urn:heatmap`) using the brand's entity/tag signals across the target city.
   2. Identifies the top 3 high-affinity spatial clusters (hex grids / blocks).
-  3. Pulls the "Anchor Neighbors" in those clusters via Qloo to explain the block's persona (e.g., *"This 3-block corridor in Silver Lake over-indexes by $94\%$ on your brand profile due to adjacent patrons of Venue A, B, and C"*).
+  3. Pulls the "Anchor Neighbors" in those clusters via Qloo to explain the block's persona (e.g., *"This 3-block corridor in Silver Lake over-indexes by 94% on your brand profile due to adjacent patrons of Venue A, B, and C"*).
   4. Outputs a **Site Selection Brief** comparing foot-traffic taste fit and demographic skew across candidate neighborhoods.
 
 ### Use Case 3: Competitor "Conquesting" (Shelf Displacement)
@@ -150,8 +151,8 @@ To keep the architecture modular, scalable, and clean for multi-person parallel 
 - **Framework:** **Python 3.11+** running a **gRPC Server** (`grpcio`) alongside **FastAPI** (for `/health`, Swagger inspection, and direct debugging).
 - **Role:** Dedicated abstraction layer for all Qloo Taste Graph operations.
   - Resolves brand names, neighbor venues, and lifestyle tags into canonical Qloo URNs.
-  - Executes cross-domain `Brand` $\rightarrow$ `Places` queries, `urn:heatmap` spatial grids, `urn:demographics` checks, and `/v2/analysis/compare` overlap calculations.
-  - Normalizes scores and caches responses in Redis by parameter hash, with an in-process fallback, so prewarmed and repeated runs never exhaust the $10,000\text{ req/mo}$ hackathon quota.
+  - Executes cross-domain `Brand` → `Places` queries, `urn:heatmap` spatial grids, `urn:demographics` checks, and `/v2/analysis/compare` overlap calculations.
+  - Normalizes scores and caches responses in Redis by parameter hash, with an in-process fallback, so prewarmed and repeated runs never exhaust the 10,000 req/mo hackathon quota.
 - **Key Libraries:** `httpx` (async REST calls to Qloo), `pydantic`, `grpcio`, `grpcio-tools`.
 
 #### 5. `service-ai` (Vertex AI & Live Web Grounding Microservice)
@@ -332,19 +333,19 @@ message BaselineResponse {
 
 ---
 
-### 4.5 Cloud & Billing Budget ($300 GCP Trial Credit)
+### 4.5 Cloud & Billing Budget (\$300 GCP Trial Credit)
 
-Every paid cloud dependency runs inside a single Google Cloud Project linked to the **$300 Free Trial Billing Account**:
+Every paid cloud dependency runs inside a single Google Cloud Project linked to the **\$300 Free Trial Billing Account**:
 
 | Service | GCP / External Product | Authentication Method | Estimated Hackathon Spend |
 | :--- | :--- | :--- | :--- |
-| **Cultural Graph** | Qloo Hackathon API | `X-Api-Key` header (`10,000` req/mo quota) | **$0.00** (Free Hackathon Key) |
-| **Agent Brain** | Vertex AI (`gemini-2.5-flash`) | Application Default Credentials (ADC) / Service Account | **$\approx \$1.50$** (Serverless token billing) |
-| **Live Web Scraping** | Vertex AI Search Grounding | Native `google_search` tool in `google-genai` | **$\approx \$2.00$** (Covered by Free Tier / Trial Credit) |
-| **Venue Metadata** | Google Maps Places API (New) | GCP Maps API Key | **$\approx \$3.00$** (Covered by Maps Credit / Trial Credit) |
-| **Route Optimization** | Google Maps Routes API | GCP Maps API Key | **$\approx \$1.50$** (Covered by Trial Credit) |
-| **Container Hosting** | Google Cloud Run | GCP IAM | **$\approx \$0.00$** (Within 2M free monthly requests) |
-| **Total Out-of-Pocket** | — | — | **$\$0.00$** (Uses $< \$10$ of the $\$300$ GCP Trial) |
+| **Cultural Graph** | Qloo Hackathon API | `X-Api-Key` header (`10,000` req/mo quota) | **\$0.00** (Free Hackathon Key) |
+| **Agent Brain** | Vertex AI (`gemini-2.5-flash`) | Application Default Credentials (ADC) / Service Account | **≈ \$1.50** (Serverless token billing) |
+| **Live Web Scraping** | Vertex AI Search Grounding | Native `google_search` tool in `google-genai` | **≈ \$2.00** (Covered by Free Tier / Trial Credit) |
+| **Venue Metadata** | Google Maps Places API (New) | GCP Maps API Key | **≈ \$3.00** (Covered by Maps Credit / Trial Credit) |
+| **Route Optimization** | Google Maps Routes API | GCP Maps API Key | **≈ \$1.50** (Covered by Trial Credit) |
+| **Container Hosting** | Google Cloud Run | GCP IAM | **≈ \$0.00** (Within 2M free monthly requests) |
+| **Total Out-of-Pocket** | — | — | **\$0.00** (Uses under \$10 of the \$300 GCP Trial) |
 
 ---
 
@@ -381,12 +382,12 @@ All requests target `https://hackathon.api.qloo.com` with `X-Api-Key`:
 ### 5.2 The 3-Part Karum Door Score
 Rather than showing an opaque number, Karum computes a transparent composite from three 0–1 sub-scores, shown as a 0–100 number and broken into three sub-bars on every card:
 
-$$S_{\text{door}} = 0.50 \cdot A_{\text{taste}} + 0.30 \cdot O_{\text{shelf}} + 0.20 \cdot D_{\text{demo}}$$ *(sub-scores 0–1; the card displays $100 \times S_{\text{door}}$)*
+**S<sub>door</sub> = 0.50 · A<sub>taste</sub> + 0.30 · O<sub>shelf</sub> + 0.20 · D<sub>demo</sub>** *(sub-scores 0–1; the card displays 100 × S<sub>door</sub>)*
 
-1. **Cultural Affinity Fit ($A_{\text{taste}}$):** Qloo affinity score between the Brand Seed and the Venue entity, shown as a percentile inside the returned shortlist (raw affinity bands move with the seed and the city — 0.85–0.98 across the 17 Oct probes — so raw values are not comparable across campaigns), with `feature.explainability` signal weights attached.
-2. **Shelf / Menu Opportunity ($O_{\text{shelf}}$):** Derived from Vertex AI Search Grounding. Full strength when the venue carries complementary categories (e.g., craft cocktails, small-batch goods) without an exclusive lock from a direct craft twin; each direct niche competitor found on the live menu takes a quarter off (1.0 → 0.25), and an incumbent found live produces the displacement battlecard. When grounding is unavailable the term is unknown, the composite renormalizes over cultural affinity and demographic alignment, and the card says the menu was not verified.
-3. **Demographic & Locality Alignment ($D_{\text{demo}}$):** Alignment between the venue's `urn:demographics` age buckets and the brand's target cohort, plus neighborhood heatmap intensity, mapped onto 0–1.
-4. **Skip rule ($P_{\text{saturation}}$):** A gate applied after scoring, not a term in the composite. It pushes a venue into the **"Doors to Skip"** column when its Qloo affinity falls below the returned shortlist's floor (computed per campaign — an absolute cutoff never fires, 17 Oct evidence) or when live menu verification shows the venue already stocks $4+$ direct niche competitors. Skipped venues keep their sub-scores and reason code in the evidence.
+1. **Cultural Affinity Fit (A<sub>taste</sub>):** Qloo affinity score between the Brand Seed and the Venue entity, shown as a percentile inside the returned shortlist (raw affinity bands move with the seed and the city — 0.85–0.98 across the 17 Oct probes — so raw values are not comparable across campaigns), with `feature.explainability` signal weights attached.
+2. **Shelf / Menu Opportunity (O<sub>shelf</sub>):** Derived from Vertex AI Search Grounding. Full strength when the venue carries complementary categories (e.g., craft cocktails, small-batch goods) without an exclusive lock from a direct craft twin; each direct niche competitor found on the live menu takes a quarter off (1.0 → 0.25), and an incumbent found live produces the displacement battlecard. When grounding is unavailable the term is unknown, the composite renormalizes over cultural affinity and demographic alignment, and the card says the menu was not verified.
+3. **Demographic & Locality Alignment (D<sub>demo</sub>):** Alignment between the venue's `urn:demographics` age buckets and the brand's target cohort, plus neighborhood heatmap intensity, mapped onto 0–1.
+4. **Skip rule (P<sub>saturation</sub>):** A gate applied after scoring, not a term in the composite. It pushes a venue into the **"Doors to Skip"** column when its Qloo affinity falls below the returned shortlist's floor (computed per campaign — an absolute cutoff never fires, 17 Oct evidence) or when live menu verification shows the venue already stocks 4+ direct niche competitors. Skipped venues keep their sub-scores and reason code in the evidence.
 
 ---
 
@@ -426,7 +427,7 @@ $$S_{\text{door}} = 0.50 \cdot A_{\text{taste}} + 0.30 \cdot O_{\text{shelf}} + 
   - Show the composite cultural seed (*Aesop + Ilegal Mezcal + Khruangbin* — the 17 Oct probe's Qloo-verified seed; Madre Mezcal is absent from Qloo coverage) and 3 SKUs.
   - Watch the live trace stream across `service-taste` (Qloo), `server` (Google Places/Routes), and `service-ai` (Vertex AI Search Grounding).
 - **0:55 – 1:40 (The Magic Moment — Door Cards + Menu Grounding + Negative Space):**
-  - Click **Door #1** (top of the locked preset's bar list — Mezcalería Tobalá in the 17 Oct probe, $86\%$ Qloo affinity). Open the **Evidence Drawer**: show the Qloo cultural affinity, the shared tags (`craft_cocktails`, `indie_rock`, `sustainable_design`), and the live menu verification with real web URLs confirming their Oaxacan cocktail focus and recommends pitching *SKU #2 (Yuzu Blanco)*.
+  - Click **Door #1** (top of the locked preset's bar list — Mezcalería Tobalá in the 17 Oct probe, 86% Qloo affinity). Open the **Evidence Drawer**: show the Qloo cultural affinity, the shared tags (`craft_cocktails`, `indie_rock`, `sustainable_design`), and the live menu verification with real web URLs confirming their Oaxacan cocktail focus and recommends pitching *SKU #2 (Yuzu Blanco)*.
   - Click the **"Doors to Skip"** tab: show the famous Sixth Street venues a plain LLM recommended (The Blind Pig Pub, Maggie Mae's in the 17 Oct probe — both score below every returned door), flagged in red by Karum because Qloo shows low relative affinity and Search Grounding shows a locked corporate distributor menu.
 - **1:40 – 2:15 (Counterfactual & Sales Action):**
   - Toggle **"Compare with Plain LLM"** to show the generic tourist list side-by-side against Karum's culturally grounded route.
@@ -440,7 +441,7 @@ $$S_{\text{door}} = 0.50 \cdot A_{\text{taste}} + 0.30 \cdot O_{\text{shelf}} + 
 
 ---
 
-## 7. Implementation Roadmap & Team Split (Oct 17 $\rightarrow$ Oct 30, 2026)
+## 7. Implementation Roadmap & Team Split (Oct 17 → Oct 30, 2026)
 
 | Phase | Dates | Owner / Repo | Key Deliverables |
 | :--- | :--- | :--- | :--- |
@@ -450,4 +451,4 @@ $$S_{\text{door}} = 0.50 \cdot A_{\text{taste}} + 0.30 \cdot O_{\text{shelf}} + 
 | **Phase 4: Go Gateway & Maps** | Oct 21 – Oct 23 | Backend (`server`) | Build Gin REST API, wire gRPC clients to `service-taste` and `service-ai`, integrate Google Places API (New) and Google Routes API waypoint optimization. |
 | **Phase 5: Flutter Web UI** | Oct 21 – Oct 26 | Frontend (`client`) | Build brand seed selector, streaming trace log, interactive map (route polylines + heatmap), door cards with 3 sub-score bars, evidence drawer, "Doors to Skip", and LLM comparison toggle. |
 | **Phase 6: Pre-Warm & Cloud Run** | Oct 26 – Oct 28 | Both (`infra` / all) | Prewarm the four preset runs (Austin, Brooklyn flagship + collab, Mumbai Colaba) end-to-end and store them; deploy `server`, `service-taste`, `service-ai`, and `client` to Google Cloud Run; verify MIT licenses on all 5 GitHub repos. |
-| **Phase 7: Polish & Submit** | Oct 28 – Oct 29 | Both | Final end-to-end latency check ($<8\text{s}$ live, $<1\text{s}$ stored presets), write Devpost submission mapped to the 4 judging criteria, submit 24 hours ahead of deadline. |
+| **Phase 7: Polish & Submit** | Oct 28 – Oct 29 | Both | Final end-to-end latency check (< 8s live, < 1s for stored presets), write Devpost submission mapped to the 4 judging criteria, submit 24 hours ahead of deadline. |
