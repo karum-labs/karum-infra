@@ -87,6 +87,32 @@ enum ErrorCode {
   ERROR_CODE_VALIDATION = 5;
 }
 
+// PlaceFacts is the place record Qloo publishes beside a venue row. It is
+// recorded data carried forward so the door card can fill address, website,
+// hours, phone, and coordinates when the Places read is unavailable; it is not
+// a live `/entities` lookup (PLAN.md §34).
+message PlaceFacts {
+  // Qloo fact: the street address from `properties.address`.
+  string address = 1;
+
+  // Qloo fact: the website from `properties.website`.
+  string website = 2;
+
+  // Qloo fact: the phone number from `properties.phone`.
+  string phone = 3;
+
+  // Qloo fact: display hours folded from `properties.hours`; intervals stay
+  // at the precision Qloo returned them.
+  string hours = 4;
+
+  // Qloo fact: `properties.is_closed`, true when Qloo reports the venue
+  // closed.
+  bool is_closed = 5;
+
+  // Qloo fact: the venue's WGS-84 point from the insights row.
+  karum.common.v1.GeoPoint location = 6;
+}
+
 // EntityRef identifies one resolved entity: a venue, brand, or artist row the
 // seed builder confirms before POST.
 message EntityRef {
@@ -106,6 +132,10 @@ message EntityRef {
   // Perry's resolves to San Antonio, Uchi to London, Blind Pig to Kharkiv
   // (RECORDING.md trap 16).
   string city = 4;
+
+  // Qloo fact: the recorded place record for a venue row, when Qloo returned
+  // one. Brand and artist refs leave it unset.
+  PlaceFacts place = 5;
 }
 
 // Tag is one resolved tag URN.

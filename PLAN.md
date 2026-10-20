@@ -6,7 +6,7 @@ Today is 18 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Feature 
 
 On 17 Oct the product became the brand agent: a brand seed and a city go in, and doors, flagship corridors, collab partners, skip reasons, menu audits, and a field route come out. This checklist is that build. Platform work finished before the pivot stays ticked. The domain protos and the stub toolchain landed 18 Oct (sections 1–4); service-taste now resolves seeds, tags, doors, scores, heatmaps, and compare, while the gateway, the AI service's transport, and the product screens remain unbuilt, and they follow the sections below. [DECISIONS.md](DECISIONS.md) records the earlier leasing shape; where it disagrees with this file, this file wins. Qloo parameter facts stay in [QLOO_APIS.md](QLOO_APIS.md) and [spike/RECORDING.md](spike/RECORDING.md) — that catalogue still cites the old epic numbers, so new work cites section numbers and DI ids.
 
-**Status — 19 Oct 2026.** The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done for all five: MIT licences, READMEs, gitignores, CI, gitleaks, toolchain pins in `versions.env`, `GET /health` on the three backends, and Dockerfiles. Compose is gateway, taste, AI, and Redis; Postgres is the required `POSTGRES_DSN` URI, not a container. **Verified complete:** infra sections 1–3 and 6, plus the stub and fixture tooling in §4 except the AI fixture replay; taste sections 7–12; service-ai §15–§18; gateway §19–§26 — scout jobs, geocoding, score assembly, Places, Routes, PDFs, Postgres snapshots, and the resilience controls. Taste and AI serve those RPCs over gRPC beside their HTTP health ports. **Still open on purpose:** §4 AI fixture replay, §5 `make test`, §13 prewarm, §14 the seed-entity filter, and the product work from §27 onward except the `GATEWAY_URL` define, the brand foundation and design tokens in §27, the Dockerfiles, and the README and rules notes already ticked. `karum-client` is the health-screen scaffold on the official brand foundation — assets, tokens, and light/dark themes are in; the product screens are not. Nothing has been pushed.
+**Status — 20 Oct 2026.** The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done for all five: MIT licences, READMEs, gitignores, CI, gitleaks, toolchain pins in `versions.env`, `GET /health` on the three backends, and Dockerfiles. Compose is gateway, taste, AI, and Redis; Postgres is the required `POSTGRES_DSN` URI, not a container. **Verified complete:** infra sections 1–3 and 6, plus the stub and fixture tooling in §4 except the AI fixture replay; taste sections 7–12 and 14; service-ai §15–§18; gateway §19–§26 — scout jobs, geocoding, score assembly, Places, Routes, PDFs, Postgres snapshots, the resilience controls, the judge account with its sessions, and the prewarm target. Taste and AI serve those RPCs over gRPC beside their HTTP health ports. The client carries the official brand foundation, the judge sign-in flow, the seed builder, the live trace, the map, the door board with its evidence drawer, the pitch, and the run-sheet actions (§27–§38, minus the items still listed below). **Still open on purpose:** §4 AI fixture replay, §5 `make test`, §13 the end-to-end prewarm run, §27 the screen mockups, §33 the red skip pins and the locality polygons, §34 the `GET /entities` hydration, §38 the read-throughs, §39 the deploy-time prewarm and the latency numbers, §40 the Compose smoke script, §41 the failure drills, §42 the honesty audit, and the ship work in §43–§47. The protos, the Go and Python stubs, and both Python services are now generated from one pinned `buf` plugin set, and the `protobuf` runtime is pinned to match the generated code. Every repo's own CI gate is green: `buf lint`, `buf breaking`, the contract round-trip, the fixture pack, `go test ./...`, 342 taste tests, 37 AI tests, and 42 Flutter tests. The five repos are committed on `main`; nothing has been pushed.
 
 | Window | Sections | Outcome |
 | --- | --- | --- |
@@ -53,7 +53,7 @@ In `infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `karum.a
 - [x] Define job states: resolving, running, ready, degraded, failed — `JobState` in `karum.agent.v1`; the seed builder confirms ids before `POST`, so no confirmation pause
 - [x] Define error codes: unresolved, empty, rate limited, upstream, validation — `ErrorCode` in `karum.common.v1`; every response that can miss carries one
 - [x] Version the proto packages and enforce buf breaking against main — `buf breaking` runs in CI against `main`; covers `karum.common.v1`, `karum.taste.v1`, and `karum.agent.v1`
-- [x] Mark each field as a Qloo fact or a model inference in the proto comments — four-marker convention (Qloo fact / Google fact / model inference / Input) enforced by `make check-proto-docs` across 209 fields
+- [x] Mark each field as a Qloo fact or a model inference in the proto comments — four-marker convention (Qloo fact / Google fact / model inference / Input) enforced by `make check-proto-docs` across 216 fields
 
 ### 2. Taste RPCs
 
@@ -80,6 +80,7 @@ In `infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `karum.a
 
 - [x] Generate Go and Python stubs from `infra/proto` in CI — `contract` job in `.github/workflows/proto.yml`; plugin versions pinned in `proto/buf.gen.yaml`
 - [x] Generate inside Docker so local and CI stubs match — CI runs the pinned `bufbuild/buf` container (`make generate-docker` is the local equivalent)
+- [x] Pin the `protobuf` runtime to the generator, so the generated code and the runtime cannot drift — the `protocolbuffers/python:v36.2` plugin emits gencode 7.36.2, which refuses to load on an older runtime; both Python services now declare `protobuf==7.36.2` in `pyproject.toml` and lock it in `uv.lock`, matching `contract/pyrelay/requirements.txt`
 - [x] Ship a redacted fixture pack for the four presets (three cities; Brooklyn carries flagship and collab) — `fixtures/` holds 76 redacted recordings plus the four preset payloads and a sha256 manifest; `make check-fixtures` / `make test-fixtures` verify (CI job `Fixture Pack`)
 - [ ] Add a fixture mode that serves those recordings with no network — service-taste replays the pack; service-ai reports `fixture` mode but has no replay, so the stack cannot yet serve `AuditMenu` or a draft offline
 - [x] Add a contract test that round-trips a campaign through both stubs — `make contract-test` round-trips six Austin payloads through the Go and Python stubs (`contract/`); the verifier is itself tested against corruption
@@ -179,7 +180,7 @@ Cache Qloo responses in Redis under a canonical hash of the request parameters, 
 - [x] Redis cache keyed by a canonical parameter hash with a 24h TTL
 - [x] Single-flight lock so a refresh cannot stampede Qloo
 - [x] In-memory fallback when Redis is down, with a degraded health bit
-- [ ] Prewarm the four presets end-to-end, `LlmOnlyBaseline` included, and store the completed runs with their traces — `make prewarm` posts to `/api/v1/prewarm`, which the gateway does not implement; no prewarm code exists in any repo
+- [ ] Prewarm the four presets end-to-end, `LlmOnlyBaseline` included, and store the completed runs with their traces — the gateway now implements `POST /api/v1/prewarm` (`internal/httpapi/prewarm.go`, a judge session is required, `refresh=true` re-runs) and `make prewarm` posts to it with a bearer token; the four presets have not yet been run through it, so the stored runs and their traces are not yet refreshed
 - [x] Eval bypass that is never served back as a cached demo response
 
 ### 14. Taste edge cases
@@ -187,7 +188,7 @@ Cache Qloo responses in Redis under a canonical hash of the request parameters, 
 Before scoring, collapse venues that resolve to the same entity id. Drop a result that is one of the seed entities, so a reference venue used as vibe is not pitched as a door. Flag a venue that resolves outside the geocoded city. If the seed resolves to nothing, return `unresolved` before scoring and explain the miss. A partial seed — some vibe queries hit, one misses — is allowed, and the evidence payload states the reduced confidence. A category filter that matches nothing is `empty`, with the category named.
 
 - [x] Collapse duplicate venues to one entity
-- [ ] Drop results that are themselves seed entities — no such filter in `taste/doors.py`; dedupe only collapses repeated candidate ids during seed resolution
+- [x] Drop results that are themselves seed entities — `taste/doors.py` drops any ranked row whose entity id is one of the seed entities before the board is scored, so a reference venue used as a vibe is never pitched as a door; `tests/test_taste_doors.py` pins it
 - [x] Flag a venue that resolves outside the geocoded city
 - [x] Stop before scoring when the seed resolves to nothing, and explain the miss
 - [x] Allow a partial seed at reduced confidence, and return `empty` when the category matches nothing
@@ -353,13 +354,13 @@ Evidence: the values are transcribed from the guide with their source labels in 
 
 Create one judge account and attach the four preset campaigns to it. `HACKATHON_MODE=true` (see `.env.example`) makes the login screen show a banner that signs the judge into that account, so judging starts inside the product with the presets already there. `HACKATHON_MODE=false` hides the banner. The account row, its session, and the link from the account to the seeded campaigns live in Postgres. The gateway exposes the flag, and the client renders the banner. Account credentials stay in the secret manager.
 
-- [ ] Add the judge account and attach the four preset campaigns
-- [ ] Expose `HACKATHON_MODE` from the gateway to the client
-- [ ] Show the login banner only when the flag is true, and sign the judge into the preseeded account
-- [ ] Hide the banner when the flag is false
-- [ ] Keep the account credentials in the secret manager
+- [x] Add the judge account and attach the four preset campaigns
+- [x] Expose `HACKATHON_MODE` from the gateway to the client
+- [x] Show the login banner only when the flag is true, and sign the judge into the preseeded account
+- [x] Hide the banner when the flag is false
+- [ ] Keep the account credentials in the secret manager — local `.env` and bcrypt-only Postgres are working; creating the production secret is blocked by the active gcloud account's IAM on `karum-512016`, so the exact operator commands are recorded in `SECRETS.md`
 
-Evidence: `HACKATHON_MODE` is written in Compose and `.env.example` but `internal/config/config.go` never reads it; there is no account, session, auth, or banner. The client's `/login` route is an honest credential-free judge entry and its `HACKATHON_MODE` define hides or shows that entry; it does not sign anyone into a preseeded account.
+Evidence (20 Oct): Neon `accounts` holds `acct-judge` (`judge@karum.demo`), the four preset campaigns point at that account, and `/health` returns `"hackathon_mode": true`. `POST /api/v1/auth/judge` issues an opaque session, `/api/v1/auth/login` accepts the password, `/auth/me` validates the bearer token, and logout revokes it; a wrong password returns `401`. The Flutter client auto-signs the judge in only when the flag is true, keeps `/login` available, shows a dismissible signed-in banner, and still lets an anonymous visitor run the demo. `auth_flow_test.dart` covers hackathon on, hackathon off, password login, invalid credentials, and a failed auto-sign-in. The plaintext password is never written to Postgres; only a bcrypt hash is stored.
 
 ### 29. App shell
 
@@ -368,7 +369,9 @@ Flutter web is the judge target, with the same screens on desktop. The shared th
 - [x] Ship Flutter web as the judge target, with the same screens on desktop — one route table serves web and desktop; `flutter build web --release` succeeds
 - [x] Add theme, type scale, cards, chips, banners, and drawers — the evidence drawer is a shared modal sheet; banners cover fixture, degraded, offline, dropped stream, and failed runs
 - [x] Add loading, empty, and error states on every screen — health, workspace, and pitch carry loading/error states; an empty board explains the miss and offers a return to the seed; the landing validates before submit
-- [ ] Run a preset and a free-entry scout from the preseeded judge session — both paths run, but §28's account and session do not exist
+- [ ] Run a preset and a free-entry scout from the preseeded judge session — both paths run, and §28's account, session, and bearer flow now exist, but a preset and a free-entry scout have not yet been driven end-to-end from a judge session against a live stack
+
+Evidence (19 Oct): `lib/main.dart` routes `/`, `/status`, `/login`, `/scout/:jobId`, `/scout/:jobId/doors/:doorId`, `/campaigns/:campaignId`, and `*`; the workspace switches from three panes to trace/map/board tabs below 1200 px. `flutter analyze` is clean, 31 widget/unit tests pass, and the web release build succeeds. Evidence (20 Oct): the blocking half of this section is gone — the gateway carries `internal/auth`, `POST /api/v1/auth/judge`, `POST /api/v1/auth/login`, `GET /auth/me`, and logout, and the client signs the judge in and keeps the session across screens. What is still missing is the live run: the preset and free-entry paths have not been exercised end-to-end from that session against a running stack, so the checkbox stays open.
 - [x] Configure the gateway base URL for local and production — `--dart-define=GATEWAY_URL`
 
 Evidence (19 Oct): `lib/main.dart` routes `/`, `/status`, `/login`, `/scout/:jobId`, `/scout/:jobId/doors/:doorId`, `/campaigns/:campaignId`, and `*`; the workspace switches from three panes to trace/map/board tabs below 1200 px. `flutter analyze` is clean, 31 widget/unit tests pass, and the web release build succeeds. The "preseeded judge session" half of this section is blocked on §28: there is no account, session, or auth layer anywhere in the stack.
@@ -414,13 +417,13 @@ Evidence (19 Oct): the stream uses `http` streaming rather than `EventSource`; o
 
 Draw numbered pins for the qualified doors and red pins for the skip list, with a legend. Draw the scout radius from the lat/lng and the radius the campaign used. Render the heatmap, and locality polygons when the payload has them, in flagship mode. Render the field-route polyline when Routes legs are present. Use OSM or CARTO tiles and keep the attribution visible, including Google attribution for Places and Routes data.
 
-- [ ] Numbered door pins and red skip pins, with a legend — recommended pins, route, and heatmap cells render with a legend, but skip items carry no coordinates in the payload, so no red pins are invented
+- [ ] Numbered door pins and red skip pins, with a legend — recommended pins, route, and heatmap cells render with a legend, but skip items carry no coordinates in the payload, so no red pins are invented; `karum.common.v1.PlaceFacts` now carries the recorded point on the entity ref, which is the raw material for placing a skip pin once the skip rows carry it through
 - [x] Radius ring used by the scout — drawn from the campaign's point and `radius_meters`
 - [ ] Heatmap and locality polygons in flagship mode — heatmap cells render from the new `heatmap.cells` payload; locality polygons are still dropped by `grpcserv.py`
 - [x] Field-route polyline when legs are present — decoded from the route or leg polylines
 - [x] OSM or CARTO tiles with visible attribution — OSM tiles, with "© OpenStreetMap · Map data © Google" when Places or Routes facts are present
 
-Evidence (19 Oct): the map draws only facts in the payload and falls back to an ordered list (with a reason) when the point or door geometry is missing. The gateway payload now carries heatmap cells; skip items still carry no coordinates from any source, so the red-pin half stays unchecked.
+Evidence (20 Oct): the map draws only facts in the payload and falls back to an ordered list (with a reason) when the point or door geometry is missing. The gateway payload now carries heatmap cells; skip items still carry no coordinates from any source, so the red-pin half stays unchecked. Numbered door pins and red skip pins with legend: unchecked - skip items carry no coordinates from any source, so no red pins are invented. Heatmap and locality polygons in flagship mode: locality polygons still dropped by grpcserv.py.
 
 ### 34. Door board, evidence, and the baseline
 
@@ -431,9 +434,9 @@ Render the top recommended doors as cards with three labeled sub-score bars — 
 - [x] Menu findings as clickable grounding URLs — rendered in the card's Menu audit block and again in the evidence drawer
 - [x] Evidence drawer listing each Qloo call, its parameters, its result count, and the explainability weights — plus the formula and each term's source and inputs
 - [x] LLM-only toggle labeled ungrounded, and server rank preserved — the toggle shows the stored baseline; the board never re-sorts
-- [ ] Hydrate missing card fields via `GET /entities` — the gateway has no such route, so missing fields stay explicitly unknown
+- [ ] Hydrate missing card fields via `GET /entities` — the gateway has no such route, so missing fields stay explicitly unknown; the raw material is now in the contract — `karum.common.v1.PlaceFacts` carries the recorded place row (address, website, phone, hours, closed flag, and point) forward on the entity ref, so the client can be hydrated from the Qloo payload first and from a live `/entities` read only as a fallback
 
-Evidence (19 Oct): `DoorBoard` renders recommended/skip/how-we-know tabs; `showEvidenceSheet` lists every recorded call and the score provenance. Baseline copy is labelled "Generic LLM baseline" with an `llm_ungrounded` badge.
+Evidence (20 Oct): `DoorBoard` renders recommended/skip/how-we-know tabs; `showEvidenceSheet` lists every recorded call and the score provenance. Baseline copy is labelled "Generic LLM baseline" with an `llm_ungrounded` badge. Hydrate missing card fields via `GET /entities`: unchecked - the gateway has no such route, so missing fields stay explicitly unknown.
 
 ### 35. Pitch and run-sheet actions
 
@@ -500,9 +503,9 @@ Run the prewarm for all four presets after each deploy: the Make `prewarm` targe
 
 `service-taste` owns the affinity unit tests and the Qloo fixture replay tests. `service-ai` owns the Pydantic schema tests and the fallback tests that run with Vertex stubbed out. The gateway tests dial in-process fakes of taste and AI and assert job state, score assembly, and error mapping. Flutter widget tests cover the seed builder, the trace, the door board, and the error copy. A Compose smoke script posts the Austin preset and asserts a door list, a skip list, and a route.
 
-- [ ] Keep affinity unit tests and taste fixture tests in `service-taste`
-- [ ] Keep AI schema tests and fallback tests in `service-ai`
-- [ ] Add gateway tests with fake taste and AI
+- [x] Keep affinity unit tests and taste fixture tests in `service-taste` — `tests/test_taste_scoring.py` covers the affinity percentile, the `D_demo` mapping, the relative skip floor, and the tie-break; `tests/test_qloo_replay.py` and `tests/test_qloo_fixtures.py` replay the recorded pack with no network
+- [x] Keep AI schema tests and fallback tests in `service-ai` — `tests/test_audit.py` and `tests/test_draft.py` cover the Pydantic schemas, the grounding tool, and citation enforcement; `tests/test_resilience.py` covers the template fallback; `tests/test_vertex_client.py` covers the retry on invalid JSON and the timeout and token caps
+- [x] Add gateway tests with fake taste and AI — `internal/orchestrator/runner_test.go` drives `fakeTaste` and `fakeAgent` in-process and asserts job state, score assembly, and error mapping; `internal/httpapi/scout_test.go` covers the HTTP surface
 - [x] Add Flutter tests for the seed builder, the trace, the board, and errors — model/gateway unit tests plus widget tests for the preset judge path, free-entry validation, SSE fallback, narrow layout, and the board
 - [ ] Add a Compose smoke script for the Austin preset
 

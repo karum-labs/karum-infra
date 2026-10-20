@@ -111,6 +111,10 @@ services:
       GATEWAY_VERSION: ${GATEWAY_VERSION:-local}
       # true shows the judge login banner that signs into the preseeded account.
       HACKATHON_MODE: ${HACKATHON_MODE:-false}
+      JUDGE_EMAIL: ${JUDGE_EMAIL:-}
+      JUDGE_PASSWORD: ${JUDGE_PASSWORD:-}
+      JUDGE_DISPLAY_NAME: ${JUDGE_DISPLAY_NAME:-Karum Judge}
+      SESSION_TTL: ${SESSION_TTL:-168h}
       # Point the gateway at the compose service names, not localhost.
       TASTE_ADDR: service-taste:8081
       AI_ADDR: service-ai:8082

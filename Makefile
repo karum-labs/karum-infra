@@ -85,17 +85,14 @@ test:
 
 ## prewarm: run all four presets end-to-end on the deployed gateway and refresh
 ## the stored runs so a preset click serves the newest ready stored run
-## (PLAN.md sections 13 and 37). Requires the gateway's prewarm endpoint and a
-## deployed GATEWAY_URL; safe to run against the laptop gateway once it
-## implements the prewarm RPC.
+## (PLAN.md sections 13, 37, and 39). Requires PREWARM_TOKEN: a judge session
+## token from POST /api/v1/auth/judge (or /auth/login) on the target gateway.
+## Set GATEWAY_URL for the deployed host; the laptop default is localhost:8080.
 prewarm:
+	@test -n "$(PREWARM_TOKEN)" || { echo "prewarm: set PREWARM_TOKEN to a judge session token"; exit 1; }
 	@echo "Prewarming the four presets on ${GATEWAY_URL:-http://localhost:8080} ..."
-	@for preset in austin-wholesale brooklyn-flagship brooklyn-collab mumbai-colaba-wholesale; do \
-		echo "prewarm: $$preset"; \
-		curl -fsS -X POST "${GATEWAY_URL:-http://localhost:8080}/api/v1/prewarm?preset=$$preset" \
-			-H "Idempotency-Key: prewarm-$$preset-$$(date +%s)" >/dev/null || \
-			{ echo "prewarm: $$preset failed"; exit 1; }; \
-	done
+	@curl -fsS -X POST "${GATEWAY_URL:-http://localhost:8080}/api/v1/prewarm?refresh=true" \
+		-H "Authorization: Bearer $(PREWARM_TOKEN)"
 	@echo "Pre-warm complete; preset clicks serve the newest ready stored run."
 
 ## eval: run the leave-one-out harness across ~20 blocks.
