@@ -42,7 +42,9 @@ deploy_client() {
   mkdir -p "$TMPDIR"
   (
     cd "$client"
-    "${flutter[@]}" build web --dart-define=GATEWAY_URL="https://${host}"
+    "${flutter[@]}" build web \
+      --dart-define=GATEWAY_URL="https://${host}" \
+      --dart-define=SHOW_JUDGES_BANNER=true
     if command -v firebase >/dev/null 2>&1; then
       firebase use "$PROJECT"
       firebase deploy --only hosting --project "$PROJECT"

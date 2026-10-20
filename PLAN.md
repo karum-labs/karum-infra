@@ -353,19 +353,19 @@ Evidence: the values are transcribed from the guide with their source labels in 
 
 ### 28. Preseeded judge account
 
-Create one judge account and attach the four preset campaigns to it. `HACKATHON_MODE=true` (see `.env.example`) makes the login screen show a banner that signs the judge into that account, so judging starts inside the product with the presets already there. `HACKATHON_MODE=false` hides the banner. The account row, its session, and the link from the account to the seeded campaigns live in Postgres. The gateway exposes the flag, and the client renders the banner. Account credentials stay in the secret manager.
+Create one judge account and attach the four preset campaigns to it. The login screen shows a hackathon banner when `SHOW_JUDGES_BANNER` is on (`--dart-define`, default on in debug and off in release). The banner signs the judge into that preseeded account. `HACKATHON_MODE=false` (see `.env.example`) disables that passwordless route. Anyone else can register and sign in with an email and password. The account row, its session, and the link from the judge account to the seeded campaigns live in Postgres. Account credentials stay in the secret manager. The public demo stays anonymous either way.
 
 - [x] Add the judge account and attach the four preset campaigns
 - [x] Expose `HACKATHON_MODE` from the gateway to the client
-- [x] Show the login banner only when the flag is true, and sign the judge into the preseeded account
-- [x] Hide the banner when the flag is false
+- [x] Show the login banner only when `SHOW_JUDGES_BANNER` is on, and sign the judge into the preseeded account
+- [x] Hide the banner when `SHOW_JUDGES_BANNER` is off
 - [ ] Keep the account credentials in the secret manager — local `.env` and bcrypt-only Postgres are working; creating the production secret is blocked by the active gcloud account's IAM on `karum-512016`, so the exact operator commands are recorded in `SECRETS.md`
 
-Evidence (20 Oct): Neon `accounts` holds `acct-judge` (`judge@karum.demo`), the four preset campaigns point at that account, and `/health` returns `"hackathon_mode": true`. `POST /api/v1/auth/judge` issues an opaque session, `/api/v1/auth/login` accepts the password, `/auth/me` validates the bearer token, and logout revokes it; a wrong password returns `401`. The Flutter client auto-signs the judge in only when the flag is true, keeps `/login` available, shows a dismissible signed-in banner, and still lets an anonymous visitor run the demo. `auth_flow_test.dart` covers hackathon on, hackathon off, password login, invalid credentials, and a failed auto-sign-in. The plaintext password is never written to Postgres; only a bcrypt hash is stored.
+Evidence (20 Oct): Neon `accounts` holds `acct-judge` (`judge@karum.demo`), the four preset campaigns point at that account, and `/health` returns `"hackathon_mode": true`. `POST /api/v1/auth/judge` issues an opaque session while `HACKATHON_MODE` is on, `/api/v1/auth/login` and `/api/v1/auth/register` take an email and password, `/auth/me` validates the bearer token, and logout revokes it; a wrong password returns `401`. The login banner is the client flag `SHOW_JUDGES_BANNER` (on in debug, off in release unless the define forces it). Opening it signs into the preseeded judge account. The public demo stays anonymous until someone signs in. The plaintext password is never written to Postgres; only a bcrypt hash is stored.
 
 ### 29. App shell
 
-Flutter web is the judge target, with the same screens on desktop. The shared theme defines type scale, cards, chips, banners, and drawers, and every screen implements loading, empty, and error states against the gateway job states. With `HACKATHON_MODE` on, the judge is already inside the preseeded account from §28 before a scout starts. The gateway base URL is a compile-time define so local Compose and the production host are a switch.
+Flutter web is the judge target, with the same screens on desktop. The shared theme defines type scale, cards, chips, banners, and drawers, and every screen implements loading, empty, and error states against the gateway job states. With the judges banner on, the judge opens the preseeded account from §28 before a scout starts. The gateway base URL is a compile-time define so local Compose and the production host are a switch.
 
 - [x] Ship Flutter web as the judge target, with the same screens on desktop — one route table serves web and desktop; `flutter build web --release` succeeds
 - [x] Add theme, type scale, cards, chips, banners, and drawers — the evidence drawer is a shared modal sheet; banners cover fixture, degraded, offline, dropped stream, and failed runs
