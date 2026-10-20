@@ -111,6 +111,9 @@ jobs:
             -v "$GITHUB_WORKSPACE:/workspace" \
             -w /workspace/proto \
             bufbuild/buf:1.73.0 generate
+          # The container writes as root. The next steps write into the same
+          # tree as the runner, so hand it back.
+          if [ -d gen ]; then sudo chown -R "$(id -u):$(id -g)" gen; fi
 
       - name: Enforce proto provenance markers
         run: make check-proto-docs
