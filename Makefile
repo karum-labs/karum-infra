@@ -29,7 +29,7 @@ BUF_DOCKER_IMAGE ?= bufbuild/buf:$(BUF_VERSION)
 VENV_PYTHON := $(firstword $(wildcard .venv/Scripts/python.exe) $(wildcard .venv/bin/python))
 PYTHON ?= $(if $(VENV_PYTHON),$(VENV_PYTHON),python)
 
-.PHONY: help up down logs local local-api local-down demo-on demo-off demo-status demo-refresh test prewarm eval lint-proto breaking generate generate-docker check-proto-docs contract-test check-protos redact-fixtures check-fixtures test-fixtures spike
+.PHONY: help up down logs local local-api local-down demo-on demo-off demo-status demo-refresh test prewarm eval lint-proto breaking generate generate-docker check-proto-docs contract-test check-protos redact-fixtures check-fixtures test-fixtures check-presets spike
 
 ## help: list available targets.
 help:
@@ -148,6 +148,12 @@ check-fixtures:
 # The venv python is still required for the pinned protobuf (see versions.env).
 test-fixtures:
 	$(PYTHON) fixtures/tools/run_tests.py
+
+## check-presets: compare the three copies of the locked presets (local; needs the siblings).
+# The recorded scenarios, the gateway's catalogue, and the client's mirror must
+# agree. A source that is not checked out is skipped, never guessed.
+check-presets:
+	$(PYTHON) fixtures/tools/check_presets.py
 
 ## spike ARGS="key": run the Qloo spike runner (see spike/README.md).
 spike:

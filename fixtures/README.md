@@ -73,6 +73,35 @@ fixture mode replays). Seed counts respect the four-entity cap (PLAN.md §26);
 the Brooklyn recording session used a fifth signal (Kinfolk, now an alternate)
 and the divergence is documented in the preset notes.
 
+## The three copies of a preset
+
+A preset is written down three times, and each copy has a different owner:
+
+| Copy | Owner | What it is |
+| --- | --- | --- |
+| `fixtures/presets/<id>.json` | the pack | the scenario of record: the seed, the point, the radii, the tags, and the outcome that was recorded |
+| `karum-server/internal/presets/presets.go` | the gateway | the catalogue the gateway runs |
+| `karum-client/lib/src/data/presets.dart` | the client | the mirror the client renders and that "Inspect this seed" copies into the free-entry form |
+
+Nothing kept them in step, so a preset could drift: the gateway runs one
+scenario while the client shows another. `tools/check_presets.py` compares all
+three against the record and against the pack's own recorded request:
+
+```sh
+python fixtures/tools/check_presets.py    # make check-presets
+```
+
+It reports a missing checkout rather than guessing, and it needs the sibling
+repositories, so it is a local check rather than a CI one. The rules it holds:
+
+- the seed entities, the tags, the point, the radius, the mode, and the city
+  are the same in all three;
+- the gateway's seed holds no signal the recording never had — the four-entity
+  cap may only *trim* signals, never invent one;
+- the gateway's skip batch is the batch the recording scored, so every
+  recorded skip can be reproduced;
+- the client's doors radius is the recorded one, not the heatmap's.
+
 ## Regenerating and verifying
 
 ```sh
