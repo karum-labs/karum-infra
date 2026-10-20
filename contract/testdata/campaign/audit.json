@@ -56,7 +56,7 @@
     }
   ],
   "attribution": {
-    "modelId": "gemini-2.5-flash",
+    "modelId": "gemini-3.8-flash",
     "promptVersion": "audit-menu@v1",
     "evidenceIds": ["ev-0001", "ev-0005"],
     "ungrounded": false

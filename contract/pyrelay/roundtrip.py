@@ -67,7 +67,7 @@ def assert_audit(msg) -> str:
     assert first.incumbents[0].name == "Del Maguey Single Village Mezcal"
     assert first.competitor_count == 1
     assert second.shelf_unknown
-    assert msg.attribution.model_id == "gemini-2.5-flash"
+    assert msg.attribution.model_id == "gemini-3.8-flash"
     return f"{len(msg.results)} results, model {msg.attribution.model_id}"
 
 

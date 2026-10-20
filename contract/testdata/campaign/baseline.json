@@ -2,7 +2,7 @@
   "text": "For a mezcal brand entering Austin, start with well-known agave-friendly cocktail bars downtown and on East Sixth, and consider experiential retail on South Congress. Wide-band advice; verify local demand directly.",
   "venueNames": ["La Condesa", "Suerte", "Tommy's Mexican Restaurant"],
   "attribution": {
-    "modelId": "gemini-2.5-flash",
+    "modelId": "gemini-3.8-flash",
     "promptVersion": "llm-only-baseline@v1",
     "evidenceIds": [],
     "ungrounded": true

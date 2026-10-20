@@ -149,7 +149,7 @@ enum TraceStatus {
 
 // ModelAttribution travels on every AI response (PLAN.md §3).
 message ModelAttribution {
-  // Input: the model id that wrote the response, e.g. "gemini-2.5-flash"; on
+  // Input: the model id that wrote the response, e.g. "gemini-3.8-flash"; on
   // a degraded run it is "template", naming the deterministic fallback.
   string model_id = 1;
 
@@ -239,7 +239,9 @@ message GroundingSource {
 
 // Incumbent is a competitor the audit found on the live menu or shelf. It is
 // named only when a grounding source or the Qloo payload contains it
-// (PLAN.md §16).
+// (PLAN.md §16). The service drops an unsourced name and recomputes
+// `O_shelf`; the gateway supplies the payload names as
+// `MenuAuditTarget.qloo_incumbent_names`.
 message Incumbent {
   // Google fact: the competitor name, present in the grounding sources.
   string name = 1;
@@ -264,6 +266,13 @@ message MenuAuditTarget {
   // Input: true when the target is a skip candidate the skip rule might
   // cite, not a board door.
   bool skip_candidate = 4;
+
+  // Qloo fact: the competitor names the Qloo payload already carries for this
+  // campaign — the resolved seed entity names and the resolved skip-candidate
+  // names. A competitor the model names is kept only when a grounding source
+  // or one of these names carries it (PLAN.md §16); an unsourced name is
+  // dropped and `O_shelf` is recomputed.
+  repeated string qloo_incumbent_names = 5;
 }
 
 // MenuAuditResult is one venue's shelf read.
@@ -379,6 +388,12 @@ message DraftDoorPitchRequest {
   // Input: a hard word cap per text so a judge can finish the read
   // (PLAN.md §17).
   int32 max_words = 6;
+
+  // Input: the evidence ids of the run, e.g. "ev-0001". This is the
+  // allow-set the citation filter checks against: a sentence that states a
+  // number and cites an id outside this set is dropped, and an empty set
+  // drops every sentence that states a number (PLAN.md §17, §18).
+  repeated string evidence_ids = 7;
 }
 
 // DraftDoorPitchResponse returns the script and its supporting texts.
