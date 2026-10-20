@@ -54,7 +54,9 @@ overrides = {
     "TASTE_ADDR": "127.0.0.1:8081",
     "AI_ADDR": "127.0.0.1:8082",
     "TASTE_PORT": "8081",
+    "TASTE_HOST": "127.0.0.1",
     "AI_PORT": "8082",
+    "AI_HOST": "127.0.0.1",
     "TASTE_REDIS_ADDR": "",
 }
 seen = set()
@@ -148,8 +150,8 @@ PY
   echo "started $name (pid $!, log .local/logs/$name.log)"
 }
 
-launch taste "$ROOT/karum-service-taste" uv run uvicorn karum_service_taste.main:app --host 127.0.0.1 --port 8081
-launch ai "$ROOT/karum-service-ai" uv run uvicorn karum_service_ai.main:app --host 127.0.0.1 --port 8082
+launch taste "$ROOT/karum-service-taste" uv run python -m karum_service_taste
+launch ai "$ROOT/karum-service-ai" uv run python -m karum_service_ai
 launch gateway "$ROOT/karum-server" go run ./cmd/gateway
 GATEWAY_PID=$(tail -n 1 "$RUN/pids")
 

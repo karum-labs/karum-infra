@@ -29,7 +29,7 @@ Python (uv-managed) gRPC service. Stubs come from `karum-infra/proto/` via buf. 
 
 ### service-ai
 
-Python (uv-managed) gRPC service using `google-genai` on Vertex AI (`vertexai=True`, `gemini-2.5-flash`) and Pydantic response models. Every response carries `model_id`, `prompt_version`, and cited evidence ids.
+Python (uv-managed) gRPC service using `google-genai` — Gemini AI Studio when `AI_GEMINI_API_KEY` is set, Vertex AI (`vertexai=True`) otherwise — on `gemini-3.8-flash`, with Pydantic response models. Every response carries `model_id`, `prompt_version`, and cited evidence ids.
 
 - **Menu audit.** `AuditMenu` attaches Google Search grounding and reads the venue's live menu, shelf, or delivery listings. It returns whether the audit succeeded, whether an incumbent competitor is stocked, the competitor names, a short menu summary, the shelf-opportunity inputs, and the grounding URLs. Grounding runs on the working shortlist, not on every raw candidate.
 - **Pitch.** `DraftDoorPitch` writes the shopkeeper script, the displacement battlecard when an incumbent is present, the SKU picked from the brand's own list using the door's taste tags, and the collab proposal or site-brief paragraph when the mode asks for it. Numbers in the prose cite evidence ids.

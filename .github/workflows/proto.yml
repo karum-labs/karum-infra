@@ -103,7 +103,7 @@ jobs:
       - name: Install protobuf runtime
         run: python -m pip install --disable-pip-version-check -r contract/pyrelay/requirements.txt
 
-      # PLAN.md §1.4: the generate step runs inside Docker so laptop and CI
+      # PLAN.md §4: the generate step runs inside Docker so laptop and CI
       # stubs match. The image tag tracks BUF_VERSION in versions.env.
       - name: Generate stubs inside Docker
         run: |

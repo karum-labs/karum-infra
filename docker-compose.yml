@@ -52,6 +52,7 @@ services:
       TASTE_REDIS_ADDR: redis:6379
       TASTE_LOG_LEVEL: ${TASTE_LOG_LEVEL:-INFO}
       TASTE_GRPC_PORT: "9091"
+      TASTE_SERVICE_NAME: service-taste
     depends_on:
       redis:
         condition: service_healthy
@@ -79,12 +80,16 @@ services:
     environment:
       AI_PORT: "8082"
       AI_MODE: ${AI_MODE:-fixture}
-      GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY in .env}
+      # A Studio key and a Vertex project are two ways to reach the model, not
+      # two requirements: set one of them. The service refuses to start with
+      # neither, and never sends a credential to the browser.
+      AI_GEMINI_API_KEY: ${AI_GEMINI_API_KEY:-${GEMINI_API_KEY:-}}
       AI_GCP_PROJECT_ID: ${AI_GCP_PROJECT_ID:-}
       AI_GCP_LOCATION: ${AI_GCP_LOCATION:-us-central1}
-      AI_GEMINI_MODEL: ${AI_GEMINI_MODEL:-gemini-2.5-flash}
+      AI_GEMINI_MODEL: ${AI_GEMINI_MODEL:-gemini-3.8-flash}
       AI_LOG_LEVEL: ${AI_LOG_LEVEL:-INFO}
-      GRPC_PORT: "9092"
+      AI_GRPC_PORT: "9092"
+      AI_SERVICE_NAME: service-ai
     healthcheck:
       test:
         [

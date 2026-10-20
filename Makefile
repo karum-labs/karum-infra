@@ -4,11 +4,11 @@
 # Docker Compose is only what `make demo-refresh` runs on the demo VM.
 #
 # The prewarm and eval targets are stubs until the sample-block fixtures and
-# the leave-one-out harness land (PLAN.md epics 7 and 5).
+# the leave-one-out harness land (PLAN.md §39 and §40).
 #
 # Proto tooling: `make generate` emits the Go and Python stubs; `make
 # check-protos` runs lint, the provenance-marker check, and the cross-language
-# contract test. CI runs the generate step inside Docker (PLAN.md §1.4);
+# contract test. CI runs the generate step inside Docker (PLAN.md §4);
 # `make generate-docker` is the local equivalent.
 #
 # Fixture tooling: `make redact-fixtures` regenerates the redacted pack from
@@ -29,7 +29,7 @@ BUF_DOCKER_IMAGE ?= bufbuild/buf:$(BUF_VERSION)
 VENV_PYTHON := $(firstword $(wildcard .venv/Scripts/python.exe) $(wildcard .venv/bin/python))
 PYTHON ?= $(if $(VENV_PYTHON),$(VENV_PYTHON),python)
 
-.PHONY: help up down logs local local-api local-down demo-on demo-off demo-status demo-refresh test prewarm eval lint-proto breaking generate generate-docker check-proto-docs contract-test check-protos redact-fixtures check-fixtures test-fixtures check-presets spike
+.PHONY: help up down logs local local-api local-down demo-on demo-off demo-status demo-refresh test prewarm eval lint-proto breaking generate generate-docker generate-stubs check-proto-docs contract-test check-protos redact-fixtures check-fixtures test-fixtures check-presets spike
 
 ## help: list available targets.
 help:
@@ -79,13 +79,13 @@ logs:
 
 ## test: run the smoke test against the running stack (fixture mode).
 test:
-	@echo "TODO(smoke): post the sample vacancy in fixture mode and assert a 5-item shortlist."
+	@echo "TODO(smoke): post the Austin preset in fixture mode and assert a door list, a skip list, and a route."
 	@echo "Stack status:"
 	@$(COMPOSE) ps
 
 ## prewarm: run all four presets end-to-end on the deployed gateway and refresh
 ## the stored runs so a preset click serves the newest ready stored run
-## (PLAN.md sections 13, 37, and 39). Requires PREWARM_TOKEN: a judge session
+## (PLAN.md §13, §25, and §39). Requires PREWARM_TOKEN: a judge session
 ## token from POST /api/v1/auth/judge (or /auth/login) on the target gateway.
 ## Set GATEWAY_URL for the deployed host; the laptop default is localhost:8080.
 prewarm:
@@ -98,7 +98,7 @@ prewarm:
 ## eval: run the leave-one-out harness across ~20 blocks.
 eval:
 	@echo "TODO(eval): run Karum vs LlmOnlyBaseline on ~20 blocks and write the table."
-	@echo "Not implemented until the scoring rubric and baseline land (epic 5)."
+	@echo "Not implemented until the scoring rubric and baseline land (PLAN.md §40)."
 
 ## lint-proto: lint the shared protos with buf.
 lint-proto:
@@ -111,6 +111,14 @@ breaking:
 ## generate: emit Go and Python stubs from the shared protos (pinned BSR plugins).
 generate:
 	cd proto && $(BUF) generate
+
+## generate-stubs: refresh the committed stubs in the sibling repos.
+# The stubs that ship in karum-server/internal/pb, karum-service-ai/src, and
+# karum-service-taste/src come from karum-server/buf.gen.yaml, so the command
+# runs from that checkout. `make generate` in this repo writes a throwaway
+# copy under gen/ for the contract test.
+generate-stubs:
+	cd ../karum-server && $(BUF) generate
 
 ## generate-docker: emit stubs inside the pinned buf container (the CI path).
 generate-docker:

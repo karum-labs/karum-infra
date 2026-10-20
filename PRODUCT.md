@@ -158,7 +158,7 @@ To keep the architecture modular, scalable, and clean for multi-person parallel 
 #### 5. `service-ai` (Vertex AI & Live Web Grounding Microservice)
 - **Framework:** **Python 3.11+** running **gRPC** + **FastAPI**.
 - **Role:** The reasoning, live verification, and copywriting engine.
-  - Uses the official **`google-genai` SDK** authenticated via **Vertex AI (`vertexai=True`)** on `gemini-2.5-flash`.
+  - Uses the official **`google-genai` SDK**: a **Gemini AI Studio** key (`AI_GEMINI_API_KEY`) when one is set, and **Vertex AI (`vertexai=True`)** on the configured project otherwise, on `gemini-3.8-flash`.
   - Attaches native **Google Search Grounding** (`types.Tool(google_search=types.GoogleSearch())`) to audit live venue menus, cocktail lists, and retail shelves for incumbent competitors.
   - Synthesizes Qloo's explainability tags + live menu findings into tailored B2B outreach emails, door-knocking scripts, SKU recommendations, and LLM-only counterfactual baselines.
 - **Key Libraries:** `google-genai`, `pydantic`, `grpcio`.
@@ -184,7 +184,7 @@ To keep the architecture modular, scalable, and clean for multi-person parallel 
        │       └── Verifies store is OPEN, fetches exact address, website URL, & coordinates
        │
        ├──► 4. gRPC: AuditMenu → DraftDoorPitch ─► [ `service-ai` (Python) ]
-       │                                            ├── Calls Gemini 2.5 Flash + Google Search Grounding
+        │                                            ├── Calls Gemini Flash + Google Search Grounding
        │                                            ├── Inspects venue's live menu / stockists for competitors
        │                                            ├── Recommends specific Brand SKU per venue
        │                                            └── Drafts custom B2B pitch + Displacement Battlecard
@@ -340,7 +340,7 @@ Every paid cloud dependency runs inside a single Google Cloud Project linked to 
 | Service | GCP / External Product | Authentication Method | Estimated Hackathon Spend |
 | :--- | :--- | :--- | :--- |
 | **Cultural Graph** | Qloo Hackathon API | `X-Api-Key` header (`10,000` req/mo quota) | **\$0.00** (Free Hackathon Key) |
-| **Agent Brain** | Vertex AI (`gemini-2.5-flash`) | Application Default Credentials (ADC) / Service Account | **≈ \$1.50** (Serverless token billing) |
+| **Agent Brain** | Gemini (`gemini-3.8-flash`), AI Studio or Vertex AI | AI Studio key, or Application Default Credentials (ADC) / Service Account | **≈ \$1.50** (Serverless token billing) |
 | **Live Web Scraping** | Vertex AI Search Grounding | Native `google_search` tool in `google-genai` | **≈ \$2.00** (Covered by Free Tier / Trial Credit) |
 | **Venue Metadata** | Google Maps Places API (New) | GCP Maps API Key | **≈ \$3.00** (Covered by Maps Credit / Trial Credit) |
 | **Route Optimization** | Google Maps Routes API | GCP Maps API Key | **≈ \$1.50** (Covered by Trial Credit) |
@@ -447,7 +447,7 @@ Rather than showing an opaque number, Karum computes a transparent composite fro
 | :--- | :--- | :--- | :--- |
 | **Phase 1: Contracts & Infra** | Oct 17 – Oct 18 | Both (`infra`) | Finalize `taste.proto` and `agent.proto`; write `Makefile` for Go & Python stub generation; set up `docker-compose.yml`. |
 | **Phase 2: Qloo Microservice** | Oct 18 – Oct 21 | Backend / Qloo (`service-taste`) | Implement `/search`, `/v2/tags`, `/v2/insights` (Places, Tags, Heatmap, Demographics), `feature.explainability=true`, and Redis parameter-hash caching with the in-process fallback. |
-| **Phase 3: Vertex AI & Grounding** | Oct 18 – Oct 21 | AI / Agent (`service-ai`) | Implement `google-genai` client (`vertexai=True`, `gemini-2.5-flash`) with `GoogleSearch` tool; build structured Pydantic output parsers for menu verification, SKU selection, and pitch drafting. |
+| **Phase 3: Gemini & Grounding** | Oct 18 – Oct 21 | AI / Agent (`service-ai`) | Implement `google-genai` client (`gemini-3.8-flash`, AI Studio with a key and Vertex otherwise) with `GoogleSearch` tool; build structured Pydantic output parsers for menu verification, SKU selection, and pitch drafting. |
 | **Phase 4: Go Gateway & Maps** | Oct 21 – Oct 23 | Backend (`server`) | Build Gin REST API, wire gRPC clients to `service-taste` and `service-ai`, integrate Google Places API (New) and Google Routes API waypoint optimization. |
 | **Phase 5: Flutter Web UI** | Oct 21 – Oct 26 | Frontend (`client`) | Build brand seed selector, streaming trace log, interactive map (route polylines + heatmap), door cards with 3 sub-score bars, evidence drawer, "Doors to Skip", and LLM comparison toggle. |
 | **Phase 6: Pre-Warm & Cloud Run** | Oct 26 – Oct 28 | Both (`infra` / all) | Prewarm the four preset runs (Austin, Brooklyn flagship + collab, Mumbai Colaba) end-to-end and store them; deploy `server`, `service-taste`, `service-ai`, and `client` to Google Cloud Run; verify MIT licenses on all 5 GitHub repos. |

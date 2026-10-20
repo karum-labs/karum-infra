@@ -155,18 +155,30 @@ def _recorded(preset: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _compare(name: str, recorded: dict[str, Any], other: dict[str, Any]) -> list[str]:
+def _compare(
+    name: str,
+    recorded: dict[str, Any],
+    other: dict[str, Any],
+    required: set[str] | None = None,
+) -> list[str]:
     """The differences between the record and one catalogue.
 
     The record's ``label`` and ``brand`` are prose — "composite seed — Muji
     (design brand) plus ceramics-studio and matcha vibes" — where the
     catalogues carry a short display name, so they are not comparable and are
     not checked.
+
+    A field in ``required`` must be present in the catalogue. A catalogue that
+    leaves one out is reported rather than skipped: a mirror that stops
+    pinning the radius must not pass the check by saying nothing.
     """
     problems: list[str] = []
     for field in ("seed", "tags", "point", "radius", "mode", "city"):
         want = recorded.get(field)
         got = other.get(field)
+        if required and field in required and got is None:
+            problems.append(f"{name}: the catalogue does not pin the {field}")
+            continue
         if want is None or got is None:
             continue
         if field == "seed":
@@ -304,7 +316,17 @@ def main() -> int:
             if name not in catalogue:
                 problems.append(f"{label}: the preset {name} is missing from the catalogue")
                 continue
-            problems.extend(_compare(f"{label} {name}", _recorded(document), catalogue[name]))
+            problems.extend(
+                _compare(
+                    f"{label} {name}",
+                    _recorded(document),
+                    catalogue[name],
+                    # The client mirror must pin the radius it recorded: a
+                    # missing radius would otherwise skip the rule and let a
+                    # widened search through.
+                    required={"radius"} if label == "client" else None,
+                )
+            )
             if label == "gateway":
                 problems.extend(_skip_coverage(name, document, catalogue[name]))
                 problems.extend(_request_fits_the_pack(name, pack, catalogue[name]))
