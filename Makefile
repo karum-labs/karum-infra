@@ -3,8 +3,9 @@
 # `make local` starts taste, AI, the gateway, and Flutter on this machine.
 # Docker Compose is only what `make demo-refresh` runs on the demo VM.
 #
-# The prewarm and eval targets are stubs until the sample-block fixtures and
-# the leave-one-out harness land (PLAN.md §39 and §40).
+# The eval target is a stub until the leave-one-out harness lands (PLAN.md
+# §40); `make prewarm` is real and posts the gateway's /api/v1/prewarm on the
+# target host (PREWARM_TOKEN required).
 #
 # Proto tooling: `make generate` emits the Go and Python stubs; `make
 # check-protos` runs lint, the provenance-marker check, and the cross-language
@@ -13,8 +14,8 @@
 #
 # Fixture tooling: `make redact-fixtures` regenerates the redacted pack from
 # local recordings (spike/out/, git-ignored); `make check-fixtures` verifies
-# hashes and preset schemas without recordings; `make test-fixtures` runs the
-# projection tests.
+# hashes, preset schemas, and the AI pack's derivation; `make test-fixtures`
+# runs the projection tests.
 
 include versions.env
 
@@ -32,8 +33,10 @@ PYTHON ?= $(if $(VENV_PYTHON),$(VENV_PYTHON),python)
 .PHONY: help up down logs local local-api local-down demo-on demo-off demo-status demo-refresh test prewarm eval lint-proto breaking generate generate-docker generate-stubs check-proto-docs contract-test check-protos redact-fixtures check-fixtures test-fixtures check-presets spike
 
 ## help: list available targets.
+# A target's description may span several `## ` lines; they are merged into one
+# entry so the list reads as a list of targets, not as a list of fragments.
 help:
-	@python -c "import re,sys;print(*re.findall(r'^## (.*)',open(sys.argv[1],encoding='utf-8').read(),re.M),sep=chr(10))" "$(firstword $(MAKEFILE_LIST))"
+	@$(PYTHON) scripts/help.py $(firstword $(MAKEFILE_LIST))
 
 ## local: start taste, AI, the gateway, and Flutter on this machine (no Docker).
 local:
@@ -77,11 +80,13 @@ down:
 logs:
 	$(COMPOSE) logs -f
 
-## test: run the smoke test against the running stack (fixture mode).
+## test: smoke the running stack (fixture mode) and assert the judge journey.
+# Posts the Austin preset, waits for a terminal state, and asserts a ranked
+# door board, a skip list with reasons, a per-door pitch, and a route. The
+# JSON report lands in contract/.out/smoke.json. Point GATEWAY_URL at the
+# stack under test; the default is the laptop gateway on port 8080.
 test:
-	@echo "TODO(smoke): post the Austin preset in fixture mode and assert a door list, a skip list, and a route."
-	@echo "Stack status:"
-	@$(COMPOSE) ps
+	@$(PYTHON) scripts/smoke.py $(GATEWAY_URL)
 
 ## prewarm: run all four presets end-to-end on the deployed gateway and refresh
 ## the stored runs so a preset click serves the newest ready stored run
@@ -144,9 +149,10 @@ check-protos: lint-proto check-proto-docs contract-test
 redact-fixtures:
 	$(PYTHON) fixtures/tools/redact.py
 
-## check-fixtures: verify fixture hashes and preset schemas (CI-safe; no recordings needed).
+## check-fixtures: verify fixture hashes, preset schemas, and the AI pack (CI-safe; no recordings needed).
 check-fixtures:
 	$(PYTHON) fixtures/tools/redact.py --verify
+	$(PYTHON) fixtures/tools/build_ai_pack.py --check
 
 ## test-fixtures: unit-test the redaction projections.
 # Invoke a script (fixtures/tools/run_tests.py) instead of `python -c "..."`:

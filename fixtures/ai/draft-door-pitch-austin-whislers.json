@@ -1,0 +1,38 @@
+{
+  "fixture_version": 1,
+  "source": {
+    "recording": "contract/testdata/campaign/pitch.json",
+    "derived": "2026-10-21",
+    "label": "draft-door-pitch-austin-whislers",
+    "note": "The demo pitch. It cites ev-0001/ev-0003/ev-0004, which the Austin replay's evidence set carries, and ev-0006, which it does not — so the citation filter drops that talking point on replay, exactly as it would on a live call (§17)."
+  },
+  "response": {
+    "script": "You already pour Del Maguey; Ilegal sits right beside it in your guests' taste. Whisler's ranks first of 25 for this brand's profile in Austin (affinity 0.87; ev-0001) and shares the room's top tags: bars and cocktail culture (ev-0004). Take the Espadín Joven on a six-bottle trial and park it next to the Montelobos on the back bar; the smoky-sweet profile matches your 25–34 core (demographic index 0.82; ev-0003). If it sits, we collect it.",
+    "battlecard": {
+      "headline": "Displace without changing the shelf",
+      "incumbentName": "Del Maguey Single Village Mezcal",
+      "talkingPoints": [
+        "Whisler's mezcal shelf is single-brand anchored (ev-0006)",
+        "Ilegal's taste overlap with this room beats the incumbent's (ev-0004)"
+      ],
+      "compareSummary": "Overlap tags: Bars, Cocktail Bars — the door's audience and Ilegal share two of the top three tags; the incumbent shares one."
+    },
+    "recommendedSku": {
+      "id": "sk-ilegal-espadin-750",
+      "name": "Ilegal Mezcal Espadín Joven 750ml"
+    },
+    "attribution": {
+      "modelId": "gemini-3.8-flash",
+      "promptVersion": "draft-door-pitch@v1",
+      "evidenceIds": [
+        "ev-0001",
+        "ev-0003",
+        "ev-0004",
+        "ev-0006"
+      ],
+      "ungrounded": false
+    },
+    "errorCode": "ERROR_CODE_UNSPECIFIED",
+    "modeParagraph": ""
+  }
+}

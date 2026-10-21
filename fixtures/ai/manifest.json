@@ -1,0 +1,83 @@
+{
+  "fixture_version": 1,
+  "recorded": "2026-10-21",
+  "note": "Derived from contract/testdata/campaign (hand-written fixtures), not a live model session: the model quota was exhausted when the pack was built (K-01). Replace with real recordings when quota returns; keep the manifest's key rule.",
+  "entries": [
+    {
+      "id": "audit-menu-austin-whislers",
+      "method": "audit_menu",
+      "file": "audit-menu-austin-whislers.json",
+      "key": "audit_menu:1893e975c97c730c",
+      "request": {
+        "mode": "wholesale",
+        "targets": [
+          {
+            "door": {
+              "id": "1F0E9D8C-7B6A-4593-8C2D-1E0F2A3B4C10",
+              "type": "urn:entity:place",
+              "name": "Whisler's",
+              "city": "Austin"
+            }
+          },
+          {
+            "door": {
+              "id": "2A1B0C3D-4E5F-4A6B-9C8D-7E6F5A4B3C20",
+              "type": "urn:entity:place",
+              "name": "Here Nor There",
+              "city": "Austin"
+            }
+          }
+        ]
+      },
+      "match": {
+        "city": "Austin",
+        "door": "Whisler's"
+      },
+      "note": "The Austin wholesale shortlist's rank-1 door. The recording answers with the two doors the contract fixtures cover; any further door keeps its Qloo row and lands shelf-unknown."
+    },
+    {
+      "id": "draft-door-pitch-austin-whislers",
+      "method": "draft_door_pitch",
+      "file": "draft-door-pitch-austin-whislers.json",
+      "key": "draft_door_pitch:1cc5a416943001af",
+      "request": {
+        "brand": {
+          "name": "Ilegal Mezcal"
+        },
+        "city": "Austin",
+        "mode": "wholesale",
+        "door": {
+          "audit": {
+            "door": {
+              "name": "Whisler's"
+            }
+          }
+        }
+      },
+      "match": {
+        "city": "Austin",
+        "brand": "Ilegal Mezcal",
+        "door": "Whisler's"
+      },
+      "note": "The demo pitch. It cites ev-0001/ev-0003/ev-0004, which the Austin replay's evidence set carries, and ev-0006, which it does not — so the citation filter drops that talking point on replay, exactly as it would on a live call (§17)."
+    },
+    {
+      "id": "llm-only-baseline-austin-ilegal",
+      "method": "llm_only_baseline",
+      "file": "llm-only-baseline-austin-ilegal.json",
+      "key": "llm_only_baseline:0c4aec58eccbec83",
+      "request": {
+        "brand": {
+          "name": "Ilegal Mezcal"
+        },
+        "city": "Austin",
+        "mode": "wholesale"
+      },
+      "match": {
+        "city": "Austin",
+        "brand": "Ilegal Mezcal"
+      },
+      "note": "The ungrounded counterfactual; its venue names source no preset run."
+    }
+  ]
+}

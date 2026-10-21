@@ -2,11 +2,11 @@
 
 This is the build checklist for the whole system. The product is the brand-operated expansion agent in [PRODUCT.md](PRODUCT.md). The shape is the five-repo split in [TECH.md](TECH.md): Flutter client, Go gateway, `service-taste`, `service-ai`, and this infra repo for protos, Compose, and Cloud Run.
 
-This plan is current as of 20 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Feature freeze is 27 Oct, the public build is up on 28 Oct with the hackathon banner signing judges into the preseeded account, and the submission goes in on 29 Oct. Cloud Run and the pre-warmed cache stay up through 23 Nov; judging runs 2–16 Nov.
+This plan is current as of 21 Oct 2026. The Devpost deadline is 30 Oct 2026, 11:45pm EDT. Feature freeze is 27 Oct, the public build is up on 28 Oct with the hackathon banner signing judges into the preseeded account, and the submission goes in on 29 Oct. Cloud Run and the pre-warmed cache stay up through 23 Nov; judging runs 2–16 Nov.
 
 On 17 Oct the product became the brand agent: a brand seed and a city go in, and doors, flagship corridors, collab partners, skip reasons, menu audits, and a field route come out. This checklist is that build. Platform work finished before the pivot stays ticked. The domain protos and the stub toolchain landed 18 Oct (sections 1–4); service-taste now resolves seeds, tags, doors, scores, heatmaps, and compare, and the gateway, the AI service, and the product screens are built and tracked in the sections below. [DECISIONS.md](DECISIONS.md) records the earlier leasing shape; where it disagrees with this file, this file wins. Qloo parameter facts stay in [QLOO_APIS.md](QLOO_APIS.md) and [spike/RECORDING.md](spike/RECORDING.md) — that catalogue still cites the old epic numbers, so new work cites section numbers and DI ids.
 
-**Status — 20 Oct 2026.** The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done for all five: MIT licences, READMEs, gitignores, CI, gitleaks, toolchain pins in `versions.env`, `GET /health` on the three backends, and Dockerfiles. Compose is gateway, taste, AI, Redis, and Caddy; Postgres is the required `POSTGRES_DSN` URI, not a container. **Verified complete:** infra sections 1–3 and 6, plus the stub and fixture tooling in §4 except the AI fixture replay; taste sections 7–12 and 14; service-ai §15–§18; gateway §19–§26 — scout jobs, geocoding, score assembly, Places, Routes, PDFs, Postgres snapshots, the resilience controls, the judge account with its sessions, and the prewarm target. Taste and AI serve those RPCs over gRPC beside their HTTP health ports. The client carries the official brand foundation, the judge sign-in flow, the seed builder, the live trace, the map, the door board with its evidence drawer, the pitch, and the run-sheet actions (§27–§38, minus the items still listed below). §30 is now audited and recorded in `karum-client/ACCESSIBILITY.md`: the keyboard path from the seed builder to the pitch, the guide's focus ring, every control's accessible name, and the computed contrast table. **Still open on purpose:** §4 AI fixture replay, §5 `make test`, §13 the end-to-end prewarm run, §27 the screen mockups, §34 the `GET /entities` hydration, §38 the read-throughs, §39 the deploy-time prewarm and the latency numbers, §40 the Compose smoke script, §41 the failure drills, §42 the honesty audit, and the ship work in §43–§47. The protos, the Go and Python stubs, and both Python services are now generated from one pinned `buf` plugin set, and the `protobuf` runtime is pinned to match the generated code. Every repo's own CI gate is green: `buf lint`, `buf breaking`, the contract round-trip, the fixture pack, `go test ./...`, 357 taste tests, 48 AI tests, and 54 Flutter tests. The five repos are committed on `main`; nothing has been pushed.
+**Status — 21 Oct 2026.** The five repos exist as private `karum-labs` repositories; local folders carry the `karum-` prefix (`karum-infra`, `karum-server`, `karum-service-taste`, `karum-service-ai`, `karum-client`). Done for all five: MIT licences, READMEs, gitignores, CI, gitleaks, toolchain pins in `versions.env`, `GET /health` on the three backends, and Dockerfiles. Compose is gateway, taste, AI, Redis, and Caddy; Postgres is the required `POSTGRES_DSN` URI, not a container. **Verified complete:** infra sections 1–3 and 6, §4's stub and fixture tooling (service-ai now replays the shipped AI pack offline on the recorded path) and §5's one-command fixture smoke (`make test`); taste sections 7–12 and 14; service-ai §15–§18; gateway §19–§26 — scout jobs, geocoding, score assembly, Places, Routes, PDFs, Postgres snapshots, the resilience controls, the judge account with its sessions, and the prewarm target. Taste and AI serve those RPCs over gRPC beside their HTTP health ports. The client carries the official brand foundation, the judge sign-in flow, the seed builder, the live trace, the map, the door board with its evidence drawer, the pitch, and the run-sheet actions (§27–§38, minus the items still listed below). §30 is now audited and recorded in `karum-client/ACCESSIBILITY.md`: the keyboard path from the seed builder to the pitch, the guide's focus ring, every control's accessible name, and the computed contrast table. **Still open on purpose:** §13 the end-to-end prewarm run, §27 the screen mockups, §34 the `GET /entities` hydration, §38 the read-throughs, §39 the deploy-time prewarm and the latency numbers, §41 the failure drills, §42 the honesty audit, the ship work in §43–§47, and the audit items §48 still lists as open — the Gemini billing block (K-01), the brand fonts (K-13), and the tracked remainder. The protos, the Go and Python stubs, and both Python services are now generated from one pinned `buf` plugin set, and the `protobuf` runtime is pinned to match the generated code. Every repo's own CI gate is green: `buf lint`, `buf breaking`, the contract round-trip, the fixture pack, `go test ./...`, 362 taste tests, 63 AI tests, and 57 Flutter tests. The five repos are committed and pushed on `main`; the audit fixes in §48 were committed and pushed on 21 Oct.
 
 | Window | Sections | Outcome |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ In `karum-infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `k
 - [x] Generate inside Docker so local and CI stubs match — CI runs the pinned `bufbuild/buf` container (`make generate-docker` is the local equivalent)
 - [x] Pin the `protobuf` runtime to the generator, so the generated code and the runtime cannot drift — the `protocolbuffers/python:v36.2` plugin emits gencode 7.36.2, which refuses to load on an older runtime; both Python services now declare `protobuf==7.36.2` in `pyproject.toml` and lock it in `uv.lock`, matching `contract/pyrelay/requirements.txt`
 - [x] Ship a redacted fixture pack for the four presets (three cities; Brooklyn carries flagship and collab) — `fixtures/` holds 76 redacted recordings plus the four preset payloads and a sha256 manifest; `make check-fixtures` / `make test-fixtures` verify (CI job `Fixture Pack`)
-- [ ] Add a fixture mode that serves those recordings with no network — service-taste replays the pack; service-ai reports `fixture` mode but has no replay, so the stack cannot yet serve `AuditMenu` or a draft offline
+- [x] Add a fixture mode that serves those recordings with no network — service-taste replays the pack; service-ai replays the shipped AI pack (`fixtures/ai/`, `AI_FIXTURES_DIR`) on the recorded path — the Austin preset's first stop serves `AuditMenu` and a draft offline — and returns typed misses for unrecorded requests; re-recording the full pack is blocked on the Gemini billing fix (§48, K-01)
 - [x] Add a contract test that round-trips a campaign through both stubs — `make contract-test` round-trips six Austin payloads through the Go and Python stubs (`contract/`); the verifier is itself tested against corruption
 
 ### 5. Local Compose
@@ -92,7 +92,7 @@ In `karum-infra/proto`, beside `karum/health/v1`, define `karum.taste.v1` and `k
 - [x] Compose gateway, taste, AI, Redis, and Caddy — the database is the required `POSTGRES_DSN` URI
 - [x] Add healthchecks and a deterministic startup order
 - [x] Add `.env.example` listing every variable and which process reads it — every variable the three services read is listed, and each service reads only its own namespace; a test in service-ai pins that the bare `PORT`, `MODE`, and `LOG_LEVEL` spellings are ignored
-- [ ] Add one command that runs the Austin preset on fixtures and prints the campaign JSON — `make test` is still a TODO; `POST /api/v1/scout` exists, the one-command fixture run does not
+- [x] Add one command that runs the Austin preset on fixtures and prints the campaign JSON — `make test` runs `scripts/smoke.py` against the running stack: it posts the Austin preset, waits for a terminal state, asserts the door board, a skip list with reasons, a pitch, a route, and the idempotent replay, and writes `contract/.out/smoke.json`
 - [x] Document ports, logs, and how Flutter web points at the gateway
 
 ## 2. Sample campaigns
@@ -508,7 +508,7 @@ Run the prewarm for all four presets after each deploy: the Make `prewarm` targe
 - [x] Keep AI schema tests and fallback tests in `service-ai` — `tests/test_audit.py` and `tests/test_draft.py` cover the Pydantic schemas, the grounding tool, and citation enforcement; `tests/test_resilience.py` covers the template fallback; `tests/test_vertex_client.py` covers the retry on invalid JSON and the timeout and token caps
 - [x] Add gateway tests with fake taste and AI — `internal/orchestrator/runner_test.go` drives `fakeTaste` and `fakeAgent` in-process and asserts job state, score assembly, and error mapping; `internal/httpapi/scout_test.go` covers the HTTP surface
 - [x] Add Flutter tests for the seed builder, the trace, the board, and errors — model/gateway unit tests plus widget tests for the preset judge path, free-entry validation, SSE fallback, narrow layout, and the board
-- [ ] Add a Compose smoke script for the Austin preset
+- [x] Add a Compose smoke script for the Austin preset — `make test` runs `scripts/smoke.py`: GET /health dependency check, POST the Austin preset, wait for a terminal state, assert doors, a skip list with reasons, a pitch, a route, and the idempotent replay; exits non-zero on the first missing output
 
 ### 41. Failure drills
 
@@ -585,3 +585,81 @@ Re-run seed resolution against the live hackathon key for all three presets and 
 - [ ] Check the Brooklyn collab toggle and one free-entry city
 - [ ] Keep a rollback to the previous Cloud Run revision
 - [ ] Leave the demo live through 16 Nov 2026, with the hackathon banner on the preseeded account
+
+## 10. Product audit resolution
+
+### 48. Karum Product Audit — Issue Resolution and Quality Improvements
+
+A read-only audit of all five repos on 20–21 Oct produced a register of 38 functional issues (`K-01`–`K-38`), 21 cross-service contract gaps (`X-01`–`X-21`), 16 client issues (`UX-01`–`UX-16`), and 13 reliability and security risks (`S-01`–`S-13`); the full report with file-and-line evidence is `~/.local/share/kilo/plans/1792584297688-karum-audit-report.md`. This section is the resolution ledger. Of the 88 register rows, 48 are fixed and verified, 33 remain open or partial in the tracked list below, 5 are accepted as demo risks, and 2 rows describe one blocked issue — the Gemini billing failure (`K-01`/`S-01`). A fix is ticked only when the code, its test, and its doc all agree; a blocked item is named, not ticked; an accepted risk says so. Resolution order was Critical → High → UI/UX → reliability → polish, building on the in-flight fixes already in the working trees rather than discarding them. The fixes in this ledger are committed and pushed on `main` (21 Oct).
+
+**Resolved and verified**
+
+- [x] **K-03/X-01 · skip list** — `ScoutDoorsRequest` now carries the skip candidates, the gateway forwards them, service-taste probes them, and `reason_detail`/`floor` reach `SkipItem`; a fixture-mode Austin run returns a populated skip list with reasons
+- [x] **K-04/UX-16 · failed-run reason** — the scout-failure and empty-doors paths set `error_code`/`error_message`, and the client's failed banner shows the typed reason instead of an empty string
+- [x] **K-05 · drafting cost** — drafting is capped to the audited working shortlist (5 doors) and the cap is surfaced as a run warning; drafting remains serial by design, noted in §39
+- [x] **K-06/UX-14 · client timeouts** — every gateway call applies `Future.timeout` with its declared window (10/15/20/75/120 s), so the timeout copy is reachable
+- [x] **K-07 · Vertex failures** — a missing credential or fixture pack re-raises as a typed failure and returns `ERROR_CODE_UPSTREAM`, not a gRPC `UNKNOWN`
+- [x] **K-08/K-23/X-08 · provenance** — `model_id`, `prompt_version`, and `ungrounded` are overwritten with service-resolved values on every path, and incumbent validation keys off the request target
+- [x] **K-09 · citation filter** — the evidence-id pattern matches the gateway's actual ids and guards every numeric-bearing field (headline, compare summary, mode paragraph, baseline)
+- [x] **K-10/S-03 · prompt injection** — `menu_summary` no longer enters the draft prompt, so untrusted web content cannot reshape the pitch
+- [x] **K-11/X-13 · demo env** — `make demo-refresh` accepts the documented `AI_GEMINI_API_KEY` spelling as well as the legacy one
+- [x] **K-12 · make test** — `make test` runs `scripts/smoke.py` against the running stack: it posts the Austin preset, asserts the door board, a skip list with reasons, a pitch, a route, and the idempotent replay, writes `contract/.out/smoke.json`, and exits non-zero on the first missing output
+- [x] **K-14/S-10 · regenerate** — the door-pitch regenerate path goes through `callAI` like every other AI call, so it inherits the deadline and the circuit breaker
+- [x] **K-15 · retries** — `callAI` retries a transient gRPC failure once with a jittered backoff
+- [x] **K-16 · hydration** — `hydrate()` restores the last 10 runs per campaign, so older runs survive a gateway restart
+- [x] **K-17/S-05 · SQL writes** — write failures are logged at ERROR instead of being dropped silently
+- [x] **K-19/S-07 · regenerate limit** — `POST .../drafts/doors/:doorID` is rate-limited and returns 429 on a burst; the per-IP limiter map now evicts
+- [x] **K-20/UX-09/UX-10 · narrow layout** — the 320 px overflows are fixed (a flexible hero row at the 480 px `markOnlyBelow` breakpoint, a flexible badge and board header) and pinned by `test/narrow_layout_test.dart`
+- [x] **K-21/UX-04/X-12/X-14/X-16/X-17/X-18/X-20 · docs** — the client README describes the real journey; the taste README lists the real RPCs and its cache block; the server README separates gRPC addresses from HTTP health addresses (X-16 verified as correct: the README shows the binary's `dev` default, `.env.example` documents the `local` override); the infra README's bogus `.envrc` path is gone; `.env.example` documents `TASTE_HOST`/`AI_HOST` as standalone-run overrides
+- [x] **K-24/UX-15 · client statuses** — the client documents all three gateway statuses (200 preset replay, 201 synchronous completion, 202 running)
+- [x] **K-35/X-11 · stubs** — `agent_pb2.pyi` is regenerated and matches the runtime descriptor
+- [x] **K-36 · make help** — continuation lines no longer print as separate targets, and the Makefile header matches the Compose-only statement
+- [x] **K-34/S-13 · logging docs** — both services' logging docstrings now describe the plain-text formatter they actually install (one line per record: timestamp, level, logger, message); `structlog` remains declared but unused in service-taste (removal needs a dependency re-lock)
+- [x] **S-06/X-19 · health** — both services report a truthful `degraded` status when the fixture pack or live credential is missing while still answering HTTP 200 for probes
+- [x] **S-11 · error text** — the upstream Vertex detail forwarded to the client is sanitized (`Vertex call failed (ClientError, HTTP 402)`); the raw body stays in the server log
+- [x] **UX-06 · skip tab** — with K-03 fixed the Skip tab renders real rows instead of the "Nothing was skipped" empty state
+- [x] **K-02 · AI replay (recorded path)** — `karum-infra/fixtures/ai/` ships the recorded pack with provenance and a manifest check (`build_ai_pack.py --check`), `AI_FIXTURES_DIR` is wired through Compose and `.env.example`, and `test_fixtures.py` replays the shipped pack with no network — the Austin preset's first stop (menu audit and door pitch for Whisler's, plus a baseline) replays and unrecorded requests return typed misses. Re-recording the full pack is blocked on K-01
+
+**Open**
+
+- [ ] **K-13/UX-01 · brand fonts** — the `fonts:` block is still commented out and `assets/fonts/` is empty, so the whole type scale resolves to the platform default
+- [ ] **K-22/X-10 · stub drift** — nothing in CI diffs the locally generated stubs against the committed ones, so `make contract-test` can validate an older contract
+- [ ] **K-25 · job states** — `orchestrator.StateResolving` is never assigned, and `"canceling"`/`"absent"` are strings outside the proto `JobState` enum
+- [ ] **K-26 · dead persistence** — `SaveDraft` has no callers and the `drafts` table is never written; the vendored health pb is unused
+- [ ] **K-27 · re-rank** — the gateway re-ranks doors in `pipeline.go` and overwrites service-taste's frozen rank, contradicting the proto comment and the client README's "no re-sorting" claim
+- [ ] **K-28/UX-07 · baseline toggle** — the toggle reveals the baseline already in the payload instead of requesting `LlmOnlyBaseline`
+- [ ] **K-29/UX-13 · run history** — no run-history or campaign-list screen; `/campaigns/:id` is deep-link only
+- [ ] **K-30 · share path** — no Web Share or public-link path
+- [ ] **K-31/UX-02/UX-03 · tokens** — `KarumLayout.contentMaxWidth` and nine other tokens are dead, and raw font sizes and `Colors.transparent` still bypass the token system
+- [ ] **K-32 · dead config and code** — `AI_PROBE_BUDGET` is never read, `render_sentence` is only exercised by its own test, and the vendored `karum/taste/**` and `karum/health/**` packages are unused in service-ai
+- [ ] **K-33 · cache key** — the Qloo cache key excludes the mode and base URL, so a fixture-populated Redis can be served to a live process
+- [ ] **K-37/UX-05 · tile UA** — the OSM tile User-Agent is still the `com.karum.app` placeholder, which violates OSM's tile usage policy
+- [ ] **K-38 · screen reader** — no screen-reader pass yet (self-documented in `karum-client/ACCESSIBILITY.md`)
+- [ ] **UX-08 · hero claims** — the landing hero's static "Yes, Austin / Brooklyn / Colaba" claims cannot be reconciled with a degraded run
+- [ ] **UX-11 · info rows** — `_InfoRow`'s two non-flexible `Text`s can overflow on a long gateway version
+- [ ] **UX-12/§34 · hydration** — the board's hydratable fields stay "explicitly unknown" until the `GET /entities` hydration lands
+- [ ] **X-02 · mode to taste** — the campaign mode never reaches `ScoutDoorsRequest`; collab mode relies on category tags alone
+- [ ] **X-03 · request meta** — `RequestMeta` is never set on any RPC, so AI logs carry no trace or job id (ties into §45)
+- [ ] **X-04 · word caps** — `MaxWords` is never set and the cap is prompt-only, so the documented length is unenforced
+- [ ] **X-05 · dropped evidence** — `explainability`, `demographics`, and `distance_meters` are dropped at the gateway boundary, so the "How we know" tab loses its Qloo evidence
+- [ ] **X-06 · skip detail (partial)** — `reason_detail` and `floor` now reach the client, but `SkipItem.competitor_count` is still never set by service-taste
+- [ ] **X-07 · sub-score source** — `common.SubScore.source` is never set (every sub-score ships `EVIDENCE_SOURCE_UNSPECIFIED`), and the HTTP layer hard-codes `"qloo_fact"` regardless
+- [ ] **X-09 · JSON surface** — the Flutter gateway contract is a second, unpinned JSON surface with known drift from the proto
+- [ ] **X-15 · local cache** — `scripts/local-up.sh` clears `TASTE_REDIS_ADDR` while Compose uses Redis, so cache behaviour differs local vs demo
+- [ ] **X-21 (rest) · make eval** — the `eval` target is still a stub
+- [ ] **S-12 · log hygiene** — the redaction filter blanks record attributes only, not formatted message text, and untrusted names are logged raw
+
+**Blocked**
+
+- [ ] **K-01/S-01 · Gemini billing** — every live Gemini call returns 402 (credits depleted), so the live pitch, grounded menu audit, and baseline degrade to template output, and the full AI pack cannot be re-recorded. External: restore billing/quota on the key and rotate it into the deployment path, then verify with one live run (`pitch.template == false`, non-empty `sources[]`). Nothing in this epic fakes a live result around it; §47's preset verification waits on the same
+
+**Accepted for the demo (documented, not fixed)**
+
+- **K-18/S-02/S-04 · plaintext gRPC** — taste and AI publish no host ports (only Caddy publishes 80/443), so the Compose network isolates their plaintext gRPC from the VM's public interface; accepted for a single-VM demo, revisit before any wider deployment
+- **S-08/S-09 · demo secrets and session token** — the judge password and API keys live in a git-ignored `.env` copied to the VM at mode 600, and the session token stays in `localStorage`; accepted for the hackathon demo, with gitleaks on every push
+
+**Acceptance criteria**
+
+- [ ] No Critical or High issue is silently open: K-01 is blocked with a named external dependency, K-13 is open and tracked above, and every other Critical or High item is fixed and verified
+- [x] The regression gate is green after the fixes: `go test ./...`, service-taste 362 tests, service-ai 63 tests, Flutter analyze clean with 57 tests, and the infra fixture checks (21 Oct)
+- [x] Fixes land with their tests and docs, and anything unverified stays unticked in this ledger

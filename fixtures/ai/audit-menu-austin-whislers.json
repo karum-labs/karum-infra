@@ -1,0 +1,77 @@
+{
+  "fixture_version": 1,
+  "source": {
+    "recording": "contract/testdata/campaign/audit.json",
+    "derived": "2026-10-21",
+    "label": "audit-menu-austin-whislers",
+    "note": "The Austin wholesale shortlist's rank-1 door. The recording answers with the two doors the contract fixtures cover; any further door keeps its Qloo row and lands shelf-unknown."
+  },
+  "response": {
+    "results": [
+      {
+        "door": {
+          "id": "1F0E9D8C-7B6A-4593-8C2D-1E0F2A3B4C10",
+          "type": "urn:entity:place",
+          "name": "Whisler's",
+          "city": "Austin"
+        },
+        "succeeded": true,
+        "shelfUnknown": false,
+        "incumbents": [
+          {
+            "name": "Del Maguey Single Village Mezcal",
+            "sources": [
+              {
+                "url": "https://www.whislersaustin.com/menu",
+                "title": "Whisler's menu — Del Maguey Single Village Mezcal"
+              }
+            ]
+          }
+        ],
+        "competitorCount": 1,
+        "shelfOpportunity": 0.75,
+        "menuSummary": "Agave-forward cocktail menu; Del Maguey and Montelobos anchor the mezcal shelf. No single-village espadín-forward joven listed.",
+        "sources": [
+          {
+            "url": "https://www.whislersaustin.com/menu",
+            "title": "Whisler's — Menu"
+          },
+          {
+            "url": "https://maps.google.com/?q=Whisler's+Austin",
+            "title": "Whisler's on Google Maps"
+          }
+        ]
+      },
+      {
+        "door": {
+          "id": "2A1B0C3D-4E5F-4A6B-9C8D-7E6F5A4B3C20",
+          "type": "urn:entity:place",
+          "name": "Here Nor There",
+          "city": "Austin"
+        },
+        "succeeded": true,
+        "shelfUnknown": true,
+        "incumbents": [],
+        "competitorCount": 0,
+        "shelfOpportunity": 0.0,
+        "menuSummary": "No readable public menu (social pages only). Shelf unknown — the Qloo rank is kept and the composite renormalises over affinity and demographics.",
+        "sources": [
+          {
+            "url": "https://www.here-nor-there.com",
+            "title": "Here Nor There"
+          }
+        ]
+      }
+    ],
+    "attribution": {
+      "modelId": "gemini-3.8-flash",
+      "promptVersion": "audit-menu@v1",
+      "evidenceIds": [
+        "ev-0001",
+        "ev-0005"
+      ],
+      "ungrounded": false
+    },
+    "errorCode": "ERROR_CODE_UNSPECIFIED"
+  }
+}

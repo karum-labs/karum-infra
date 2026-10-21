@@ -340,6 +340,10 @@ message SkipItem {
   // Model inference: the direct niche competitors the audit counted, when the
   // reason is competitor saturation.
   int32 competitor_count = 5;
+
+  // Model inference: the affinity floor the candidate was measured against;
+  // zero when no floor could be established.
+  double floor = 6;
 }
 
 // ScoutDoorsRequest fans out the verified insights calls for a confirmed seed.
@@ -367,6 +371,14 @@ message ScoutDoorsRequest {
   // Input: the door-shaping category tags applied as `filter.tags`; collab
   // mode sends the non-competing tags on the same call (PLAN.md §10).
   repeated karum.common.v1.Tag category_tags = 6;
+
+  // Input: the skip candidates as verified Qloo entity ids; the presets send
+  // them, so the skip batch can score them against the shortlist floor.
+  repeated string skip_candidate_ids = 7;
+
+  // Input: the skip candidates as venue names; free entry sends the baseline
+  // venue names, and the service resolves them to place ids.
+  repeated string skip_candidate_names = 8;
 }
 
 // ScoutDoorsResponse returns the door board inputs, the skip list,
@@ -392,6 +404,11 @@ message ScoutDoorsResponse {
 
   // Input: the call records for the evidence drawer.
   repeated karum.common.v1.EvidenceCall evidence = 6;
+
+  // Input: the relative affinity floor the skip rule measured against: the
+  // minimum of the ranked pool, or the door board when the pool was
+  // unavailable. Zero when no floor could be established.
+  double affinity_floor = 7;
 }
 
 // HeatmapPoint is one density cell of the flagship heatmap; the spike observed

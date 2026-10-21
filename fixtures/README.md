@@ -6,6 +6,10 @@ and committed with the sha256 manifest CI verifies. Raw payloads stay local in
 `spike/out/` (git-ignored). Public repositories carry only this pack — never
 raw Qloo JSON ([QLOO_APIS.md](../QLOO_APIS.md) §1, [PLAN.md](../PLAN.md) §4).
 
+`ai/` is the model half of the same idea: the recorded answers
+`karum-service-ai` replays in fixture mode, derived from the hand-written
+contract campaign fixtures (see [ai/README.md](ai/README.md) for provenance).
+
 ## Layout
 
 | Path | What it is |
@@ -14,6 +18,7 @@ raw Qloo JSON ([QLOO_APIS.md](../QLOO_APIS.md) §1, [PLAN.md](../PLAN.md) §4).
 | `qloo/<preset>/…` | Redacted recordings per preset: `search`, `insights` (doors, skip pools), `heatmap`, `locality`, `demographics`, `compare`. |
 | `qloo/tags/…` | Tag catalogues (`bar`, `cafe`, `ceramics`, `gallery`) that produced the category URNs. |
 | `qloo/misses/` | Recorded coverage misses, kept as honesty evidence (PLAN.md §40). |
+| `ai/…` | The recorded model replay for `karum-service-ai` (manifest, one envelope per RPC, README with provenance). |
 | `manifest.json` | sha256 + byte size per file, with the source recording name. Generated. |
 | `tools/redact.py` | The redactor: regenerates the pack and verifies it (`--verify`). |
 | `tools/test_redact.py` | Unit tests for the row projections. |

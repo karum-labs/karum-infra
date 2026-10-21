@@ -68,7 +68,7 @@ make local-down
 
 Logs are `.local/logs/`. `make local` opens Flutter itself, with `GATEWAY_URL=http://127.0.0.1:8080`.
 
-ADC comes from `~/Projects/Karum/.envrc` (`GOOGLE_APPLICATION_CREDENTIALS`). `make demo-on` also points the gcloud CLI at project `karum-512016` before it touches the VM.
+ADC comes from the `GOOGLE_APPLICATION_CREDENTIALS` path in this repo's `.env` (or from your shell, if you export it before running the commands). `make demo-on` also points the gcloud CLI at project `karum-512016` before it touches the VM.
 
 ## Demo VM
 
