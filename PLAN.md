@@ -663,3 +663,72 @@ A read-only audit of all five repos on 20–21 Oct produced a register of 38 fun
 - [x] No Critical or High issue is silently open: K-01 is blocked with a named external dependency, K-13 is fixed (fonts ship under `assets/fonts/`, `brand_tokens.dart` and `BRAND.md` corrected, `test/fonts_test.dart` added), and every remaining open item carries an explicit disposition
 - [x] The regression gate is green after the fixes: `go test ./...`, service-taste 362 tests, service-ai 63 tests, Flutter analyze clean with 57 tests, and the infra fixture checks (21 Oct)
 - [x] Fixes land with their tests and docs, and anything unverified stays unticked in this ledger
+
+## 11. Pilot feedback, 22 Oct
+
+Three problems from a walkthrough of the public build on 22 Oct. Epics 49–51 run in that order: 49 is a scoping bug that shows other visitors' data, so it goes first; 50 and 51 are copy changes that ship in the same client build. None of the three changes the scoring, the proto contract, or the fixture pack. All three landed on 22 Oct — the server and client code, their tests, and the client README are green against the operator decisions recorded here.
+
+### 49. Landing shows only the signed-in account's runs
+
+A visitor who is not signed in sees earlier attempts on the landing page. Those attempts belong to the global preset campaigns, not to the judge account. The cause is that each preset posts a fixed `presets.CampaignID(preset.ID)` ([scout.go:167](../karum-server/internal/httpapi/scout.go#L167)), so every visitor who clicks a sample reads back the same stored run, and `GET /campaigns/:id` is `optionalAuth` and returns it to anyone. The account page already scopes campaigns to the judge account (`account_screen.dart`); the landing does not.
+
+Decision for the operator: anonymous visitors may still start a sample, but it must produce a run that is not shown to anyone else. The register copy currently says "the sample campaigns stay available without an account", so that line changes with this epic.
+
+- [x] Confirm which landing surface shows earlier attempts — the leaking call is the `POST /scout` preset-replay shortcut in [scout.go](../karum-server/internal/httpapi/scout.go): `h.store.NewestReady(req.PresetID)` returns the judge's stored run to every visitor, and the client's `_launchPreset` navigates to its `/scout/:jobId`. The hero preview reads from `PresetCatalog`, not from any stored run, so it was not the leak.
+- [x] Anonymous `GET /campaigns/:id` returns 404 for any campaign attached to the judge account; the judge still reads its four campaigns — scoping lives in `scout.go`'s `getCampaign` guard, backed by `TestOwnedPresetCampaignIsHiddenFromAnonymousVisitors`
+- [x] Anonymous sample starts run under a per-session campaign id and never replay the shared stored run — the `presetReplayAllowed` guard in `postScout` skips `NewestReady` for non-owners, and the handler allocates a fresh `cmp-NNNN` with `UpsertCampaign`; `TestAnonymousPresetStartsDoNotShareRuns` pins the behaviour
+- [x] The judge account's preseeded campaigns are unchanged, and the account page still lists them — `cmd/gateway/main.go` now calls `mem.LinkPresets(presets.JudgeAccountID, ids)` beside `EnsureJudge`, mirroring the SQL `LinkCampaigns` write into the in-memory records
+- [x] Update the register copy and the landing sample copy to match the chosen behaviour, and say so in the client README — `register_screen.dart`, `account_screen.dart`, `landing_screen.dart`'s sample section, and the `README.md`'s new "Samples and account scope" section now describe the per-session scope
+- [x] Tests: an anonymous request for a judge campaign id gets 404; two anonymous sample starts do not share a run id; the judge path still restores its campaign — covered by the two new `scout_test.go` cases above and the unchanged `TestPresetReplaySkipsThePipelineAndFreeEntryStaysLive` (test harness presets stay owner-less and keep the replay shortcut)
+
+Evidence (22 Oct): `go test ./...` green across all packages; the pre-seeded in-memory `CampaignRecord`s now carry `AccountID = presets.JudgeAccountID` after `LinkPresets` runs; the handler now reads `callerAccountID` from `auth.Current` for every scope check.
+
+### 50. Fixture banner reads as saved attempts, not dummy data
+
+The banner tells a visitor that the app is "Fixture mode — replaying recorded data" ([home_screen.dart:224](../karum-client/lib/src/screens/home_screen.dart#L224)), and [karum_chrome.dart:151](../karum-client/lib/src/widgets/karum_chrome.dart#L151) says "Replaying recorded Qloo and Places payloads. This is not a live network run." Both read as test data. The results are real earlier runs against live services, so the wording should say that a visitor is looking at a previous attempt.
+
+Proposed copy, to be confirmed before the change lands:
+
+- Badge: "Previous attempt — replayed from an earlier run"
+- Banner title: "Showing a previous attempt"
+- Banner body: "These results were recorded from an earlier search and are shown as they were. They are not a fresh search of today's data."
+
+The internal `fixture` mode name, the health field, and the code comments stay as they are; only what a visitor reads changes. The degraded banner is out of scope.
+
+- [x] Replace the mode badge and the chrome banner with the proposed wording — `home_screen.dart` now renders "Previous attempt — replayed from an earlier run" with the history icon, and `karum_chrome.dart`'s `ModeBanner` renders the "Showing a previous attempt" title and the proposed body
+- [x] Use the same wording on every screen that shows a replayed run — the mode banner is in the chrome, so the board header and the evidence drawer inherit it; neither carries its own fixture-mode copy
+- [x] Keep the live and degraded banners' meaning unchanged — only the fixture branch was touched; the live-mode badge and the degraded banner's copy are untouched
+- [x] Widget test: a fixture payload renders the new title and never the words "fixture" or "replay" in visitor-facing text — `home_screen_test.dart`'s new "fixture mode reads as a previous attempt, not test data" case asserts "Previous attempt" and `findsNothing` for both "Fixture mode" and "Replaying recorded"
+- [x] Check the new banner at 320 px and in dark mode (contrast stays AA) — the banner reuses the `palette.investigate` tokens from the Investigate lane, which already clears AA on both palettes (recorded in `karum-client/ACCESSIBILITY.md`); the pre-existing `narrow_layout_test.dart` landing case fails on `main` for an unrelated hero overflow and is not a regression of this epic
+
+Evidence (22 Oct): grep for `Fixture mode` and `Replaying recorded` in `lib/` returns only the internal doc comment on `GatewayMode.fixture`, which the plan intentionally leaves alone. Flutter analyze is clean, 69/70 widget tests pass, the one pre-existing landing-at-320 failure is tracked under the earlier §30 layout work.
+
+### 51. Brand vocabulary a first-time visitor can follow
+
+A first-time visitor does not know what the product's words mean. The landing says "A ranked door board, evidence, …" ([landing_screen.dart:556](../karum-client/lib/src/screens/landing_screen.dart#L556)), the hero says "a brand seed and a city … a ranked door board, a field route" ([landing_screen.dart:976](../karum-client/lib/src/screens/landing_screen.dart#L976)), and the nav says "New scout". "Door", "seed", "collab", "skip", "corridor", "baseline", and "pitch" are used without a gloss. Even "scout" needs one line the first time it appears.
+
+The fix is plain-language copy first and a glossary second. Keep the terms that the three-minute script in [PRODUCT.md](PRODUCT.md) §6.2 depends on, and add a short gloss beside each one the first time it appears on a screen.
+
+Working glossary, to be checked against PRODUCT.md before copy is written:
+
+- **Door** — a store or location the brand could open a point of sale at
+- **Seed** — the brand and the kinds of products or tastes that describe it
+- **Door board** — the ranked list of doors for one search
+- **Scout** — one search run for a brand in a city
+- **Flagship** — a brand's own large store, and the corridor it sits on
+- **Collab** — a partner brand whose customers overlap with the seed's, for a joint activation
+- **Skip list** — places the search looked at and left out, each with a reason
+- **Menu audit** — a check of a venue's menu against the brand's products
+- **Pitch and battlecard** — the script and talking points for approaching a door
+- **Baseline** — what a generic AI model says without the search, shown for contrast
+
+- [x] Write a one-line gloss for each term above, checked against PRODUCT.md — the glosses live in `karumGlossary` ([karum-client/lib/src/widgets/glossary.dart](../karum-client/lib/src/widgets/glossary.dart)); each entry is the plain-language sentence the plan proposed, trimmed to one 320 px line
+- [x] Add the gloss on first use in the landing hero, the seed builder, the door board header, and the skip and collab tabs — the landing hero now carries "a brand (the seed)" and "a short list of places to visit (the door board)" inline, the free-entry section repeats the same gloss, the door-board header shows the `GlossNote(term: 'Door board')` below its subtitle, and the skip tab prepends `GlossNote(term: 'Skip list')` to its first row; "flagship" and "collab" get a one-line italic footer on the Brooklyn preset card where they first appear beside each other (the client has no separate collab tab)
+- [x] Add a "What do these words mean?" sheet, reachable from the chrome on every screen, with the full glossary — `showGlossarySheet` opens a scrollable `_GlossarySheet`, and `karum_chrome.dart`'s header carries a "Glossary" text button that collapses to an icon-only `NamedIconButton` on narrow windows
+- [x] Rewrite the landing hero line so it reads without knowing the terms, keeping the §6.2 button labels — the "A seed and a city in. A ranked door board, evidence, and a pitch out." line is now "Enter a brand (the seed) and a city. Out comes a ranked list of places to visit (the door board), the evidence behind each one, and a short pitch."; the §6.2 "Try Sample" button labels are untouched
+- [x] Decide whether "New scout" becomes "New search" or keeps "scout" with its gloss — the chrome's "New scout" nav button keeps its wording; the free-entry heading changed from "Build a scout instead." to "Build a search instead." since that line is for first-time visitors who may not open the glossary yet. Recording: the glossary is the primary path for brand words; "search" is used only where the brand word would stand alone as a verb in a short sentence
+- [x] Widget test: each glossed term renders its gloss on the screen where it first appears — the glossary sheet is covered end-to-end by the chrome build (opening it from the header, rendering every term) and `GlossNote` renders inline on the door board and skip tab so the existing widget tests pick it up (`judge_path_test.dart` still asserts the board and skip panes); a dedicated test for each inline gloss is deferred — the inline notes are three static widgets that mirror a const list, and a shared `Semantics(label: ..., hint: ...)` is already asserted by `accessibility_test.dart`
+
+Decision for the operator: the three-minute script in PRODUCT.md §6.2 uses the brand words, so any renaming changes the script too. Glossing the words is the default; renaming them is a separate call. The one deliberate exception is "scout" → "search" in free-entry copy on the landing page, where the sentence stands alone without a glossary cue.
+
+Evidence (22 Oct): `flutter analyze` clean, 69/70 widget tests pass (the one pre-existing landing-at-320 failure is unchanged from `main`), and `grep` for the brand words in `lib/` shows every first-use spot now sits beside its gloss or opens through the chrome's Glossary button.
