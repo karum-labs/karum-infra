@@ -27,10 +27,51 @@ BUF_DOCKER_IMAGE ?= bufbuild/buf:$(BUF_VERSION)
 
 # Prefer the repo venv for the Python half of the contract test when it exists
 # (protobuf==7.36.2 lives there; see contract/pyrelay/requirements.txt).
-VENV_PYTHON := $(firstword $(wildcard .venv/Scripts/python.exe) $(wildcard .venv/bin/python))
-PYTHON ?= $(if $(VENV_PYTHON),$(VENV_PYTHON),python)
+#
+# The venv is host-specific: .venv/Scripts/python.exe is a Windows venv and
+# .venv/bin/python is a POSIX one. Under WSL and on Linux the repo venv may
+# not be usable, so `make venv` builds one under KARUM_VENV with the pinned
+# protobuf.
+KARUM_VENV ?= $(HOME)/.cache/karum-infra-venv
 
-.PHONY: help up down logs local local-api local-down demo-on demo-off demo-status demo-refresh test prewarm eval lint-proto breaking generate generate-docker generate-stubs check-proto-docs contract-test check-protos redact-fixtures check-fixtures test-fixtures check-presets spike
+ifeq ($(OS),Windows_NT)
+  VENV_PYTHON := $(firstword $(wildcard .venv/Scripts/python.exe))
+  DEFAULT_PYTHON := python
+else
+  VENV_PYTHON := $(firstword $(wildcard $(KARUM_VENV)/bin/python) $(wildcard .venv/bin/python))
+  # python3 is the name on Linux and WSL; python is the fallback for hosts
+  # that only ship the unversioned one.
+  DEFAULT_PYTHON := $(firstword $(shell command -v python3 2>/dev/null) $(shell command -v python 2>/dev/null) python3)
+endif
+
+PYTHON ?= $(if $(VENV_PYTHON),$(VENV_PYTHON),$(DEFAULT_PYTHON))
+
+# The shell scripts run under WSL when make runs on Windows. WSL carries the
+# whole laptop toolchain (bash, uv, go, flutter), so `make local` starts the
+# same stack on either host. On a POSIX host (Linux, WSL, macOS) they run under
+# the local shell.
+#
+# WSL_RUN holds the command prefix; POSIX_PYTHON is the interpreter the
+# delegated commands use (a WSL-side python, not the Windows one).
+ifeq ($(OS),Windows_NT)
+  WSL ?= wsl.exe
+  WSL_RUN = $(WSL) --cd "$(CURDIR)" -- bash -lc
+  POSIX_PYTHON ?= python3
+  # Windows environment variables do not cross into WSL unless WSLENV lists
+  # them; the prewarm target needs the judge token on the WSL side. A
+  # trailing ";" in WSLENV makes WSL drop the whole list, so the value is
+  # replaced rather than appended to.
+  WSL_ENV = set "WSLENV=PREWARM_TOKEN" &&
+else
+  WSL_RUN = bash -lc
+  POSIX_PYTHON ?= $(PYTHON)
+  WSL_ENV =
+endif
+
+# The toolchain lives on the user's PATH: a login shell (bash -lc) picks up
+# ~/.profile, which is where uv (~/.local/bin) and Flutter are installed.
+
+.PHONY: help up down logs local local-api local-down local-status venv demo-on demo-off demo-status demo-refresh test prewarm eval lint-proto breaking generate generate-docker generate-stubs check-proto-docs contract-test check-protos redact-fixtures check-fixtures test-fixtures check-presets spike
 
 ## help: list available targets.
 # A target's description may span several `## ` lines; they are merged into one
@@ -40,31 +81,53 @@ help:
 
 ## local: start taste, AI, the gateway, and Flutter on this machine (no Docker).
 local:
-	./scripts/local-up.sh
+	$(WSL_RUN) "bash ./scripts/local-up.sh"
 
 ## local-api: same backends, without opening the Flutter client.
 local-api:
-	NO_CLIENT=1 ./scripts/local-up.sh
+	$(WSL_RUN) "NO_CLIENT=1 bash ./scripts/local-up.sh"
 
 ## local-down: stop the processes `make local` started.
 local-down:
-	./scripts/local-down.sh
+	$(WSL_RUN) "bash ./scripts/local-down.sh"
+
+## local-status: print the state of the local stack and its health endpoints.
+local-status:
+	$(WSL_RUN) "bash ./scripts/local-status.sh"
+
+## venv: build the Python environment the proto contract test needs.
+# On a POSIX host (Linux, WSL, macOS) this creates KARUM_VENV with the pinned
+# protobuf, using uv when it is installed and the stdlib venv otherwise. The
+# Windows repo venv (.venv/Scripts) already has it.
+ifeq ($(OS),Windows_NT)
+venv:
+	@echo "The Windows repo venv (.venv/Scripts/python.exe) already carries protobuf==7.36.2."
+else
+venv:
+	@if command -v uv >/dev/null 2>&1; then \
+		uv venv --python 3.13 $(KARUM_VENV); \
+		uv pip install --python $(KARUM_VENV)/bin/python -r contract/pyrelay/requirements.txt; \
+	else \
+		$(DEFAULT_PYTHON) -m venv $(KARUM_VENV); \
+		$(KARUM_VENV)/bin/python -m pip install --quiet -r contract/pyrelay/requirements.txt; \
+	fi
+endif
 
 ## demo-on: start the demo VM. Docker brings the containers back.
 demo-on:
-	./scripts/demo.sh on
+	$(WSL_RUN) "bash ./scripts/demo.sh on"
 
 ## demo-off: stop the demo VM. CPU billing stops; the disk and IP remain.
 demo-off:
-	./scripts/demo.sh off
+	$(WSL_RUN) "bash ./scripts/demo.sh off"
 
 ## demo-status: print RUNNING or STOPPED.
 demo-status:
-	./scripts/demo.sh status
+	$(WSL_RUN) "bash ./scripts/demo.sh status"
 
 ## demo-refresh: sync this checkout and .env onto the VM, rebuild containers, publish the client.
 demo-refresh:
-	./scripts/demo.sh refresh
+	$(WSL_RUN) "bash ./scripts/demo.sh refresh"
 
 ## up: build the demo Compose stack. Used on the VM, not for laptop development.
 up:
@@ -85,8 +148,17 @@ logs:
 # door board, a skip list with reasons, a per-door pitch, and a route. The
 # JSON report lands in contract/.out/smoke.json. Point GATEWAY_URL at the
 # stack under test; the default is the laptop gateway on port 8080.
+#
+# The smoke runs next to the stack: inside WSL on Windows, so it reaches the
+# gateway on 127.0.0.1.
 test:
-	@$(PYTHON) scripts/smoke.py $(GATEWAY_URL)
+	@$(WSL_RUN) "$(POSIX_PYTHON) scripts/smoke.py $(GATEWAY_URL)"
+
+## routes-check: prove the field route works on this host. Fixture mode does
+## not call Google, so this is the only way to verify the key, that the Routes
+## API is enabled on it, and the timeout budget before the demo.
+routes-check:
+	cd ../karum-server && $(GO) run ./cmd/routescheck
 
 ## prewarm: run all four presets end-to-end on the deployed gateway and refresh
 ## the stored runs so a preset click serves the newest ready stored run
@@ -94,11 +166,7 @@ test:
 ## token from POST /api/v1/auth/judge (or /auth/login) on the target gateway.
 ## Set GATEWAY_URL for the deployed host; the laptop default is localhost:8080.
 prewarm:
-	@test -n "$(PREWARM_TOKEN)" || { echo "prewarm: set PREWARM_TOKEN to a judge session token"; exit 1; }
-	@echo "Prewarming the four presets on ${GATEWAY_URL:-http://localhost:8080} ..."
-	@curl -fsS -X POST "${GATEWAY_URL:-http://localhost:8080}/api/v1/prewarm?refresh=true" \
-		-H "Authorization: Bearer $(PREWARM_TOKEN)"
-	@echo "Pre-warm complete; preset clicks serve the newest ready stored run."
+	@$(WSL_ENV) $(WSL_RUN) "bash ./scripts/prewarm.sh"
 
 ## eval: run the leave-one-out harness across ~20 blocks.
 eval:
@@ -111,7 +179,7 @@ lint-proto:
 
 ## breaking: check the protos against origin/main for breaking changes.
 breaking:
-	@python scripts/breaking.py --buf "$(BUF)"
+	@$(PYTHON) scripts/breaking.py --buf "$(BUF)"
 
 ## generate: emit Go and Python stubs from the shared protos (pinned BSR plugins).
 generate:
@@ -131,13 +199,13 @@ generate-docker:
 
 ## check-proto-docs: enforce the Qloo-fact / model-inference markers on every domain field.
 check-proto-docs:
-	@python -c "import pathlib; pathlib.Path('gen').mkdir(exist_ok=True)"
+	@$(PYTHON) scripts/mkdir_p.py gen
 	cd proto && $(BUF) build --as-file-descriptor-set -o ../gen/descriptor.binpb
 	$(GO) run ./tools/doccheck gen/descriptor.binpb
 
 ## contract-test: round-trip the sample campaign through the Go and Python stubs (needs `make generate`).
 contract-test:
-	@python -c "import pathlib; pathlib.Path('$(CONTRACT_OUT)').mkdir(parents=True, exist_ok=True)"
+	@$(PYTHON) scripts/mkdir_p.py $(CONTRACT_OUT)
 	$(GO) run ./contract/roundtrip emit contract/testdata/campaign $(CONTRACT_OUT)
 	$(PYTHON) contract/pyrelay/roundtrip.py contract/testdata/campaign $(CONTRACT_OUT)
 	$(GO) run ./contract/roundtrip verify contract/testdata/campaign $(CONTRACT_OUT)
@@ -171,4 +239,4 @@ check-presets:
 
 ## spike ARGS="key": run the Qloo spike runner (see spike/README.md).
 spike:
-	python spike/run_spike.py $(ARGS)
+	$(PYTHON) spike/run_spike.py $(ARGS)

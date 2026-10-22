@@ -115,7 +115,9 @@ def main() -> int:
     if state not in TERMINAL:
         failures.append(f"the run did not reach a terminal state within {TIMEOUT}s (last: {state!r})")
 
-    campaign = run.get("campaign") or {}
+    # The gateway returns the campaign fields at the top level of the run
+    # payload; older payloads nested them under "campaign".
+    campaign = run.get("campaign") or run
     doors = campaign.get("doors") or []
     skips = campaign.get("skip_list") or []
     route = campaign.get("route") or {}

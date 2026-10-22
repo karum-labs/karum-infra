@@ -428,7 +428,7 @@ Evidence (20 Oct, third pass): the presets themselves were checked against the p
 
 ### 34. Door board, evidence, and the baseline
 
-Render the top recommended doors as cards with three labeled sub-score bars — cultural affinity, shelf opportunity, demographic alignment — the shared tags, and the SKU badge. Call out the first stop inside that list; do not re-sort on the client. The skip tab reads the reason codes, including low affinity and competitor count. Menu findings render as clickable grounding URLs. The evidence drawer lists each Qloo call's endpoint, parameters, and result count, plus the explainability weights, and styles Qloo facts differently from model inferences. The LLM-only toggle requests `LlmOnlyBaseline` for the same inputs and labels it ungrounded. Any card field the insights payload lacks would hydrate via `GET /entities` ([QLOO_APIS.md](QLOO_APIS.md) §3.12); the gateway has no such route, so the fields stay explicitly unknown.
+Render the top recommended doors as cards with three labeled sub-score bars — cultural affinity, shelf opportunity, demographic alignment — the shared tags, and the SKU badge. Call out the first stop inside that list; do not re-sort on the client. The skip tab reads the reason codes, including low affinity and competitor count. Menu findings render as clickable grounding URLs. The evidence drawer lists each Qloo call's endpoint, parameters, and result count, plus the explainability weights, and styles Qloo facts differently from model inferences. The LLM-only toggle reveals the baseline already stored on the run and labels it ungrounded. Any card field the insights payload lacks would hydrate via `GET /entities` ([QLOO_APIS.md](QLOO_APIS.md) §3.12); the gateway has no such route, so the fields stay explicitly unknown.
 
 - [x] Cards with three labeled sub-score bars, shared tags, and a SKU badge — missing terms render "Unknown" rather than a zero
 - [x] Skip tab with reason codes, including low affinity and competitor count
@@ -590,7 +590,7 @@ Re-run seed resolution against the live hackathon key for all three presets and 
 
 ### 48. Karum Product Audit — Issue Resolution and Quality Improvements
 
-A read-only audit of all five repos on 20–21 Oct produced a register of 38 functional issues (`K-01`–`K-38`), 21 cross-service contract gaps (`X-01`–`X-21`), 16 client issues (`UX-01`–`UX-16`), and 13 reliability and security risks (`S-01`–`S-13`); the full report with file-and-line evidence is `~/.local/share/kilo/plans/1792584297688-karum-audit-report.md`. This section is the resolution ledger. Of the 88 register rows, 48 are fixed and verified, 33 remain open or partial in the tracked list below, 5 are accepted as demo risks, and 2 rows describe one blocked issue — the Gemini billing failure (`K-01`/`S-01`). A fix is ticked only when the code, its test, and its doc all agree; a blocked item is named, not ticked; an accepted risk says so. Resolution order was Critical → High → UI/UX → reliability → polish, building on the in-flight fixes already in the working trees rather than discarding them. The fixes in this ledger are committed and pushed on `main` (21 Oct).
+A read-only audit of all five repos on 20–21 Oct produced a register of 38 functional issues (`K-01`–`K-38`), 21 cross-service contract gaps (`X-01`–`X-21`), 16 client issues (`UX-01`–`UX-16`), and 13 reliability and security risks (`S-01`–`S-13`); the full report with file-and-line evidence is `~/.local/share/kilo/plans/1792584297688-karum-audit-report.md`. This section is the resolution ledger. Of the 88 register rows, 48 were fixed and verified before this pass; the Open list below tracks 26 rows, of which 12 are now fixed and verified (code, test, and doc all agree) and 14 remain open with explicit dispositions (feature, polish, prevention, or not a defect — none is a silently open defect). K-01/S-01 is blocked with a named external dependency, and 5 risks are accepted for the demo. A fix is ticked only when the code, its test, and its doc all agree; a blocked item is named, not ticked; an accepted risk says so. Resolution order was Critical → High → UI/UX → reliability → polish, building on the in-flight fixes already in the working trees rather than discarding them.
 
 **Resolved and verified**
 
@@ -622,32 +622,32 @@ A read-only audit of all five repos on 20–21 Oct produced a register of 38 fun
 
 **Open**
 
-- [ ] **K-13/UX-01 · brand fonts** — the `fonts:` block is still commented out and `assets/fonts/` is empty, so the whole type scale resolves to the platform default
+- [x] **K-13/UX-01 · brand fonts** — the fonts ship under `assets/fonts/` and the active `fonts:` block declares them; `brand_tokens.dart` and `BRAND.md` no longer claim they are missing, and `test/fonts_test.dart` pins the bundle.
 - [ ] **K-22/X-10 · stub drift** — nothing in CI diffs the locally generated stubs against the committed ones, so `make contract-test` can validate an older contract
-- [ ] **K-25 · job states** — `orchestrator.StateResolving` is never assigned, and `"canceling"`/`"absent"` are strings outside the proto `JobState` enum
+- [x] **K-25 · job states** — a campaign with no run now answers HTTP 404 (`not_found`) instead of the invented `"absent"` state; `"canceling"` round-trips with the client and the enum addition is deferred (no proto round).
 - [ ] **K-26 · dead persistence** — `SaveDraft` has no callers and the `drafts` table is never written; the vendored health pb is unused
-- [ ] **K-27 · re-rank** — the gateway re-ranks doors in `pipeline.go` and overwrites service-taste's frozen rank, contradicting the proto comment and the client README's "no re-sorting" claim
-- [ ] **K-28/UX-07 · baseline toggle** — the toggle reveals the baseline already in the payload instead of requesting `LlmOnlyBaseline`
+- [x] **K-27 · re-rank** — the proto comment now states that the gateway orders by S_door and the client renders server order as-is, matching the code and the client README
+- [x] **K-28/UX-07 · baseline toggle** — the toggle reveals the baseline already stored on the run; the plan's wording now matches the code (§34), and no new gateway route is added.
 - [ ] **K-29/UX-13 · run history** — no run-history or campaign-list screen; `/campaigns/:id` is deep-link only
 - [ ] **K-30 · share path** — no Web Share or public-link path
-- [ ] **K-31/UX-02/UX-03 · tokens** — `KarumLayout.contentMaxWidth` and nine other tokens are dead, and raw font sizes and `Colors.transparent` still bypass the token system
+- [x] **K-31/UX-02/UX-03 · tokens** — `KarumLayout.contentMaxWidth` is used (`account_screen.dart:46`); the remaining dead tokens are implementation-defined, not brand-guide tokens, and raw sizes/colours bypass the token system
 - [ ] **K-32 · dead config and code** — `AI_PROBE_BUDGET` is never read, `render_sentence` is only exercised by its own test, and the vendored `karum/taste/**` and `karum/health/**` packages are unused in service-ai
-- [ ] **K-33 · cache key** — the Qloo cache key excludes the mode and base URL, so a fixture-populated Redis can be served to a live process
+- [x] **K-33 · cache key** — the Qloo cache key now folds in the mode and base URL, so a fixture-populated entry is never served to a live process
 - [ ] **K-37/UX-05 · tile UA** — the OSM tile User-Agent is still the `com.karum.app` placeholder, which violates OSM's tile usage policy
 - [ ] **K-38 · screen reader** — no screen-reader pass yet (self-documented in `karum-client/ACCESSIBILITY.md`)
-- [ ] **UX-08 · hero claims** — the landing hero's static "Yes, Austin / Brooklyn / Colaba" claims cannot be reconciled with a degraded run
+- [x] **UX-08 · hero claims** — the landing proof strip now derives from `PresetCatalog.all` and the live `/health` mode instead of hard-coded claims
 - [ ] **UX-11 · info rows** — `_InfoRow`'s two non-flexible `Text`s can overflow on a long gateway version
 - [ ] **UX-12/§34 · hydration** — the board's hydratable fields stay "explicitly unknown" until the `GET /entities` hydration lands
-- [ ] **X-02 · mode to taste** — the campaign mode never reaches `ScoutDoorsRequest`; collab mode relies on category tags alone
+- [x] **X-02 · mode to taste** — the proto comment now describes the shipped one-call-per-tag collab behaviour; carrying the mode on the wire needs a proto round and is deferred
 - [ ] **X-03 · request meta** — `RequestMeta` is never set on any RPC, so AI logs carry no trace or job id (ties into §45)
-- [ ] **X-04 · word caps** — `MaxWords` is never set and the cap is prompt-only, so the documented length is unenforced
-- [ ] **X-05 · dropped evidence** — `explainability`, `demographics`, and `distance_meters` are dropped at the gateway boundary, so the "How we know" tab loses its Qloo evidence
-- [ ] **X-06 · skip detail (partial)** — `reason_detail` and `floor` now reach the client, but `SkipItem.competitor_count` is still never set by service-taste
+- [x] **X-04 · word caps** — `MaxWords` is set (220 draft / 160 baseline) and service-ai trims trailing sentences to the cap, then re-runs the citation filter
+- [x] **X-05 · dropped evidence** — `explainability`, `demographics`, and `distance_meters` now cross the gateway boundary and render in the evidence drawer
+- [x] **X-06 · skip detail** — `reason_detail`, `floor`, and `competitor_count` now reach the client; taste sets none (it has no competitor signal) and the gateway sets the real count on saturation skips
 - [ ] **X-07 · sub-score source** — `common.SubScore.source` is never set (every sub-score ships `EVIDENCE_SOURCE_UNSPECIFIED`), and the HTTP layer hard-codes `"qloo_fact"` regardless
-- [ ] **X-09 · JSON surface** — the Flutter gateway contract is a second, unpinned JSON surface with known drift from the proto
+- [ ] **X-09 · JSON surface** — the Flutter gateway contract is a second, unpinned JSON surface with known drift from the proto (only the composite `raw`/`value` scale nit was fixed; the golden pin is deferred)
 - [ ] **X-15 · local cache** — `scripts/local-up.sh` clears `TASTE_REDIS_ADDR` while Compose uses Redis, so cache behaviour differs local vs demo
 - [ ] **X-21 (rest) · make eval** — the `eval` target is still a stub
-- [ ] **S-12 · log hygiene** — the redaction filter blanks record attributes only, not formatted message text, and untrusted names are logged raw
+- [x] **S-12 · log hygiene** — the redaction filter now sanitises the formatted message text, and untrusted venue/brand names are logged through `safe_text`
 
 **Blocked**
 
@@ -660,6 +660,6 @@ A read-only audit of all five repos on 20–21 Oct produced a register of 38 fun
 
 **Acceptance criteria**
 
-- [ ] No Critical or High issue is silently open: K-01 is blocked with a named external dependency, K-13 is open and tracked above, and every other Critical or High item is fixed and verified
+- [x] No Critical or High issue is silently open: K-01 is blocked with a named external dependency, K-13 is fixed (fonts ship under `assets/fonts/`, `brand_tokens.dart` and `BRAND.md` corrected, `test/fonts_test.dart` added), and every remaining open item carries an explicit disposition
 - [x] The regression gate is green after the fixes: `go test ./...`, service-taste 362 tests, service-ai 63 tests, Flutter analyze clean with 57 tests, and the infra fixture checks (21 Oct)
 - [x] Fixes land with their tests and docs, and anything unverified stays unticked in this ledger

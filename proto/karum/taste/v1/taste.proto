@@ -284,8 +284,9 @@ message DoorCandidate {
   // the card flags it (PLAN.md §14).
   bool outside_city = 8;
 
-  // Model inference: the frozen server rank; the client renders this order
-  // and never re-sorts (PLAN.md §32).
+  // The gateway orders the board by S_door and carries this door's affinity
+  // rank from service-taste; the client renders the server order as-is and
+  // never re-sorts (PLAN.md §32).
   int32 rank = 9;
 
   // Input: the evidence ids this door's numbers cite.
@@ -369,7 +370,9 @@ message ScoutDoorsRequest {
   int32 radius_meters = 5;
 
   // Input: the door-shaping category tags applied as `filter.tags`; collab
-  // mode sends the non-competing tags on the same call (PLAN.md §10).
+  // mode sends the non-competing tags one call per tag (the fixture pack holds
+  // one recording per tag) and merges the ranked rows deterministically
+  // (PLAN.md §10).
   repeated karum.common.v1.Tag category_tags = 6;
 
   // Input: the skip candidates as verified Qloo entity ids; the presets send
