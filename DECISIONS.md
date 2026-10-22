@@ -17,7 +17,7 @@ Every PRODUCT.md **must-build** has exactly one owning service. Other repos cont
 | Three-part score and ranking | `service-taste` | `ScoreCandidates`: catchment fit, co-tenancy complement, cannibalisation penalty, deterministic ties |
 | "Do not lease" list | `service-taste` | machine-readable reason codes; `client` renders the column from those codes |
 | Evidence drawer and call trace | `server` | taste returns the `EvidenceCall` records, server freezes the snapshot and streams trace events over SSE, `client` renders the drawer |
-| Map with pins | `client` | OSM/CARTO tiles, radius ring, optional heatmap and site-visit polyline |
+| Map with pins | `client` | Google Maps (`google_maps_flutter`, Maps JavaScript API) when `GOOGLE_MAPS_WEB_KEY` is set; CARTO/OSM tiles otherwise. Radius ring, optional heatmap, and site-visit polyline |
 | LLM-only comparison panel | `service-ai` | `LlmOnlyBaseline` on the same inputs; `client` labels it ungrounded |
 | Memo PDF and outreach email | `service-ai` | draft text comes from `DraftMemo` / `DraftOutreach` / `DraftListing`; `server` renders the PDF, `client` offers the actions |
 | Two pre-warmed sample blocks | `infra` | fixture pack, seed ids, Makefile `prewarm`; `service-taste` serves the prewarm RPC — first block anchored 16 Oct: Mumbai Colaba (carries all spike evidence); the second locks with the Western demo city in epic 10 |
@@ -31,7 +31,7 @@ These depart from PRODUCT.md's sketch and are settled:
 
 1. **Flutter web** (not Next.js) as the judge target, with the same screens on desktop.
 2. **Server-rendered PDF** for the memo, produced by the Go gateway, not a client-side renderer.
-3. **Map tiles in the client** — the Flutter client draws OSM/CARTO tiles directly.
+3. **Map in the client** — `google_maps_flutter` draws the basemap from the Maps JavaScript API. The browser key is `GOOGLE_MAPS_WEB_KEY`, restricted to that API. With the key unset, the client falls back to CARTO tiles of OpenStreetMap data.
 4. **Google Places as pin enrichment only**, and only when a key is set.
 5. **Google Routes as an optional broker site visit**, skipped when the key or stop count is insufficient.
 

@@ -134,7 +134,7 @@ To keep the architecture modular, scalable, and clean for multi-person parallel 
 - **Framework:** **Flutter** (Dart 3.x), compiled to **Flutter Web** for frictionless judge access (and native iOS/Android/macOS ready).
 - **Key Packages:**
   - `flutter_bloc` or `flutter_riverpod`: Reactive state management for streaming agent traces and map states.
-  - `google_maps_flutter` / `flutter_map`: Renders interactive store pins, Qloo affinity heatmaps, and turn-by-turn field sales polylines.
+  - `google_maps_flutter`: Renders the Google basemap, store pins, Qloo affinity circles, locality polygons, and the field-sales route. `flutter_map` is the fallback when `GOOGLE_MAPS_WEB_KEY` is unset.
   - `dio`: REST HTTP client with streaming/SSE support for real-time agent progress updates from the Go gateway.
 
 #### 3. `server` (Core Backend & API Gateway Repository)

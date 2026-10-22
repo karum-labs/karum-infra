@@ -50,7 +50,7 @@ Go 1.22+ Gin gateway. It is the only public HTTP surface.
 
 Flutter web is the judge target; the same screens run on desktop. There is no login. The gateway base URL is `--dart-define=GATEWAY_URL`.
 
-The screen is a mode switcher and three preset buttons, a seed builder with a live trace, a map, and a door board. The map has three layers: numbered field-route stops, the heatmap, and red skip pins. The board shows the top recommended doors with three sub-score bars, the SKU badge, menu citations, the evidence drawer, the skip list, and the LLM-only toggle. The client draws OSM or CARTO tiles itself; the gateway supplies the pins, the cells, and the route legs, with Google attribution on Places and Routes data.
+The screen is a mode switcher and three preset buttons, a seed builder with a live trace, a map, and a door board. The map has three layers: numbered field-route stops, the heatmap, and red skip pins. The board shows the top recommended doors with three sub-score bars, the SKU badge, menu citations, the evidence drawer, the skip list, and the LLM-only toggle. The client draws the basemap with `google_maps_flutter` (Maps JavaScript API, key `GOOGLE_MAPS_WEB_KEY`). The gateway supplies the pins, the cells, and the route legs. Places and Routes stay server-side. With the browser key unset, the client falls back to CARTO tiles.
 
 ## Campaign modes
 
