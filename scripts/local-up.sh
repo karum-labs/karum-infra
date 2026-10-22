@@ -186,4 +186,14 @@ fi
 
 echo "This terminal stays attached. Ctrl+C stops the client and the backends."
 cd "$ROOT/karum-client"
-"${FLUTTER[@]}" run -d chrome --dart-define=GATEWAY_URL=http://127.0.0.1:8080
+maps_define=()
+if [[ -n "${GOOGLE_MAPS_WEB_KEY:-}" ]]; then
+  maps_define+=(--dart-define=GOOGLE_MAPS_WEB_KEY="$GOOGLE_MAPS_WEB_KEY")
+fi
+# Google's referrer check does not treat a port wildcard as a port, so the
+# Maps key allows this fixed origin. Gateway stays on 8080.
+"${FLUTTER[@]}" run -d chrome \
+  --web-hostname=localhost \
+  --web-port=8090 \
+  --dart-define=GATEWAY_URL=http://127.0.0.1:8080 \
+  "${maps_define[@]}"

@@ -42,9 +42,26 @@ deploy_client() {
   mkdir -p "$TMPDIR"
   (
     cd "$client"
+    maps_key=""
+    if [[ -f "$infra/.env" ]]; then
+      maps_key="$(python3 - "$infra/.env" << 'PY'
+import sys
+from pathlib import Path
+for line in Path(sys.argv[1]).read_text().splitlines():
+    if line.startswith("GOOGLE_MAPS_WEB_KEY="):
+        print(line.split("=", 1)[1].strip().strip('"').strip("'"))
+        break
+PY
+)"
+    fi
+    maps_define=()
+    if [[ -n "$maps_key" ]]; then
+      maps_define+=(--dart-define=GOOGLE_MAPS_WEB_KEY="$maps_key")
+    fi
     "${flutter[@]}" build web \
       --dart-define=GATEWAY_URL="https://${host}" \
-      --dart-define=SHOW_JUDGES_BANNER=true
+      --dart-define=SHOW_JUDGES_BANNER=true \
+      "${maps_define[@]}"
     if command -v firebase >/dev/null 2>&1; then
       firebase use "$PROJECT"
       firebase deploy --only hosting --project "$PROJECT"
