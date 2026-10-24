@@ -700,8 +700,9 @@ The internal `fixture` mode name, the health field, and the code comments stay a
 - [x] Keep the live and degraded banners' meaning unchanged — only the fixture branch was touched; the live-mode badge and the degraded banner's copy are untouched
 - [x] Widget test: a fixture payload renders the new title and never the words "fixture" or "replay" in visitor-facing text — `home_screen_test.dart`'s new "fixture mode reads as a previous attempt, not test data" case asserts "Previous attempt" and `findsNothing` for both "Fixture mode" and "Replaying recorded"
 - [x] Check the new banner at 320 px and in dark mode (contrast stays AA) — the banner reuses the `palette.investigate` tokens from the Investigate lane, which already clears AA on both palettes (recorded in `karum-client/ACCESSIBILITY.md`); the pre-existing `narrow_layout_test.dart` landing case fails on `main` for an unrelated hero overflow and is not a regression of this epic
+- [x] Second pass, 23 Oct: a visitor screenshot caught a badge the first sweep missed — the landing hero's static preview card (`_HeroPreview` in [landing_screen.dart:1117](../karum-client/lib/src/screens/landing_screen.dart#L1117)) carried its own "RECORDED RUN" label, independent of `ModeBanner`. The three door names shown (Mezcalería Tobalá, Midnight Cowboy, Clark's Oyster Bar) are the real top-3 from the recorded Austin preset's `door_board.top` (`karum-infra/fixtures/presets/austin-wholesale.json`), hand-copied into a static widget rather than fetched — so the content was truthful, only the label read as test data. Changed to "FROM A PREVIOUS SEARCH" to match the banner's wording.
 
-Evidence (22 Oct): grep for `Fixture mode` and `Replaying recorded` in `lib/` returns only the internal doc comment on `GatewayMode.fixture`, which the plan intentionally leaves alone. Flutter analyze is clean, 69/70 widget tests pass, the one pre-existing landing-at-320 failure is tracked under the earlier §30 layout work.
+Evidence (22–23 Oct): grep for `Fixture mode`, `Replaying recorded`, `RECORDED RUN`, `dummy`, `mock data`, `test data`, and `fabricat` in `lib/` returns no visitor-facing matches — only the internal doc comment on `GatewayMode.fixture`, which the plan intentionally leaves alone. Flutter analyze is clean, 69/70 widget tests pass, the one pre-existing landing-at-320 failure is tracked under the earlier §30 layout work.
 
 ### 51. Brand vocabulary a first-time visitor can follow
 
@@ -732,3 +733,100 @@ Working glossary, to be checked against PRODUCT.md before copy is written:
 Decision for the operator: the three-minute script in PRODUCT.md §6.2 uses the brand words, so any renaming changes the script too. Glossing the words is the default; renaming them is a separate call. The one deliberate exception is "scout" → "search" in free-entry copy on the landing page, where the sentence stands alone without a glossary cue.
 
 Evidence (22 Oct): `flutter analyze` clean, 69/70 widget tests pass (the one pre-existing landing-at-320 failure is unchanged from `main`), and `grep` for the brand words in `lib/` shows every first-use spot now sits beside its gloss or opens through the chrome's Glossary button.
+
+### 52. Serve the sample catalogue from the gateway instead of hardcoding it in the client
+
+A visitor screenshot on 23 Oct surfaced a second landing-hero label ("RECORDED RUN") that read as dummy data even though its content was a real recorded result (door_board.top from the Austin preset fixture). Tracing that down surfaced the real issue underneath it: the four sample cards' data — brand names, Qloo seed entity ids, SKUs, button copy — lived as hand-maintained Dart constants in `karum-client/lib/src/data/presets.dart`, duplicating `karum-server/internal/presets`. Nothing forced the two copies to agree, and a visitor has no way to tell that a value on screen is sourced data versus a client-side guess. The fix is structural: the client fetches the catalogue from the gateway, like any other screen's data, instead of carrying its own copy.
+
+- [x] Extend `karum-server/internal/presets.Preset` with the copy fields the client used to hardcode — `ButtonLabel`, `Description`, `GroupID`, `GroupLabel`, `GroupDescription`, `SKUs` — so the Go struct is the one place this data is authored
+- [x] Add `GET /api/v1/presets`, public and unauthenticated (the catalogue is identical for every visitor, unlike the account-scoped `GET /campaigns/:id` from §49) — [presets.go](../karum-server/internal/httpapi/presets.go)
+- [x] Replace `karum-client`'s `PresetCatalog` constants with a runtime model: `KarumPreset.fromJson`, `PresetCatalog.fromJson`/`fromPresets` (groups a flat list by `groupId`, preserving server order — this is how Brooklyn's flagship and collab buttons still land on one card), and `GatewayClient.fetchPresets()`
+- [x] Wire the fetch through `AppScope`/`main.dart` alongside the existing health fetch (`Future.wait([_refreshHealth(), _refreshPresets()])`), with its own loading and error state so a presets outage doesn't take down the rest of the app
+- [x] Give the landing page's sample section and the account page's campaign grid their own `LoadingState`/`ErrorState` (with retry) instead of assuming the catalogue is always present
+- [x] Fix the landing hero's "RECORDED RUN" label while in the area — reworded to "PREVIOUS SEARCH" (shortened from the first draft "FROM A PREVIOUS SEARCH," which overflowed the card's header row at narrow widths) and wrapped in `Expanded` with `TextOverflow.ellipsis` so a future wording change can't reintroduce the overflow
+- [x] Tests: `TestGetPresetsServesTheLockedCatalogue` (server, asserts the Brooklyn group ties two variants together), `fetchPresets parses the catalogue, including a Brooklyn group` (client `gateway_client_test.dart`), and the existing `FakeGateway`/`auth_flow_test.dart` harnesses now serve `/api/v1/presets` so every widget test that drives the full `KarumApp` exercises the fetched path, not a fallback
+
+Scope decision: the seed builder's four category-tag chips (`Bars & restaurants`, `Cafés`, `Galleries`, `Ceramics`) stay a client-side constant — they are free-entry UI options the fixture pack verifies, not preset data, so moving them to the gateway would widen this epic without closing a drift risk. `PresetCatalog.categoryTags` is unchanged.
+
+Not done in this pass: a "run again" action on a sample that forces a live run past the replay shortcut (bypassing `NewestReady`, equivalent to the server's existing `rerun: true` flag). Raised as an idea during this work, not requested as a requirement; it would hit live Qloo/Gemini credentials, and K-01 (§48) still has Gemini billing blocked, so a live rerun button would error out today. Left for a separate decision once K-01 clears.
+
+Evidence (23 Oct): `go build ./... && go test ./...` green across all `karum-server` packages (13 packages); `flutter analyze` clean and `flutter test` green across 71 widget/unit tests in `karum-client` (70 before this epic, +1 for `fetchPresets`).
+
+### 53. Hero buttons point where their labels say
+
+A screenshot on 24 Oct caught the hero's two buttons pointing at the wrong targets for what they said: "Load a sample" scrolled to the free-entry builder at the bottom of the page, and "How it works" scrolled up to the sample cards — neither label matched its destination.
+
+- [x] Renamed "Load a sample" to "Try now" and pointed it at the sample cards (`_scrollToPresets`) — the middle-of-page section a first click should land on
+- [x] Renamed "How it works" to "New scout" and pointed it at "Build a search instead." (`_scrollToBuilder`), matching the header's own "New scout" button so the two controls agree
+- [x] `_Hero`'s constructor fields renamed `onTryNow`/`onNewScout` to match, so the swap can't silently regress again
+- [x] Updated `test/narrow_layout_test.dart`'s button-text assertions to the new labels
+
+Evidence (24 Oct): `flutter analyze` clean; `flutter test` green, 71/71.
+
+### 54. Equal-height previous-run cards, and drop "sample" from every visitor-facing string
+
+Two follow-ups from the 23 Oct feedback thread: the three landing cards had visibly different heights (the two-button Brooklyn card ran taller than Austin and Colaba), and the word "sample" still appeared throughout the landing page and account screens even after §52 and §53 — it carries the same dummy-data connotation the banner wording in §50 was fixed to avoid. The operator asked to drop "sample" from the product's vocabulary entirely and use "previous run" instead.
+
+- [x] Wrapped the desktop (≥1000 px) card row in `IntrinsicHeight` with `CrossAxisAlignment.stretch`, so all three cards take the tallest one's natural height instead of their own content height
+- [x] Gave `_PresetCard` a `Spacer()` between the description and the button block, active only when the card is given a bounded height to expand into (`equalizeHeight: true`, passed only by the desktop row) — the narrow single-column layout keeps each card's own natural height, since a `Spacer` there has nothing to expand into and crashed the layout (`RenderFlex children have non-zero flex but incoming height constraints are unbounded`); the regression was caught by the existing `narrow_layout_test.dart` before this shipped
+- [x] Renamed every visitor-facing use of "sample" to "previous run" across `karum-client`: the section label ("Start from a previous run"), its supporting paragraph, the loading/error states, the hero preview's day and index pills, the preset-card index pill, the account page's empty-campaigns copy, the register screen's anonymous-use copy, and the judge entry screen's banner copy
+- [x] Renamed the server-authored button labels in `karum-server/internal/presets.go` from "Try Sample: …" to "Try: …", since those strings are served data (§52), not client-side copy — updated the matching test and fixture assertions in both repos
+- [x] Renamed the hero preview's "SAMPLE 01" pill to "RUN 01" rather than "PREVIOUS RUN 01" — it sits directly beside the "PREVIOUS SEARCH" title (§50), so repeating "previous" in both would read as a stutter; the index number next to a previous-run heading already reads as "run one of this previous search"
+- [x] Swept and updated internal doc comments in both repos for consistency, leaving one unrelated generic example in `async_states.dart` ("Try a sample block") untouched since it has nothing to do with this product's previous-run cards
+
+Evidence (24 Oct): `go build ./... && go test ./...` green across all `karum-server` packages; `flutter analyze` clean and `flutter test` green, 71/71, in `karum-client`. `grep -rniE '\bsample'` over both repos' visitor-facing code returns no matches outside the one noted unrelated doc comment.
+
+### 55. One button theme for every button kind
+
+A screenshot on 24 Oct caught "Try now" (FilledButton) and "New scout" (TextButton) with visibly different corner radii and heights side by side. Tracing it to the theme: only `filledButtonTheme` in `app_theme.dart` carried the brand's control radius (`KarumRadius.control`, already documented in `brand_tokens.dart` as the radius for "inputs, buttons, and banners") and a 48 px minimum size. `OutlinedButton` and `TextButton` had no theme entry at all, so they fell back to Material 3's own defaults — a fully-rounded stadium shape and a 40 px minimum — and read as a different design system beside a themed button on the same row. Separately, a `TextButton` carries no fill and, unthemed, no border either, so against the dark page it read as a floating label rather than a control.
+
+- [x] Added `outlinedButtonTheme` and `textButtonTheme` to `AppTheme._build()`, both sharing the same `RoundedRectangleBorder(KarumRadius.control)` shape and `Size(48, 48)` minimum as `filledButtonTheme` — one shape and tap-target size for every button kind, light and dark
+- [x] Gave `OutlinedButton` and `TextButton` a border that always matches their own text colour — `scheme.primary` when enabled, `scheme.onSurface` at the same 38% disabled opacity Material already uses for disabled text — so an unfilled button is never a floating label; implementation, since the guide draws no secondary or "ghost" button (recorded in `BRAND.md`)
+- [x] Verified no call site overrides a `TextButton`/`OutlinedButton`'s own `style` (all 19 usages in the client rely on the theme default), so the fix is theme-only and touches no call site
+- [x] New `test/app_theme_test.dart`: pins the shared shape, the shared minimum size, and the enabled/disabled border colour across both the light and dark themes — eight cases total
+
+Evidence (24 Oct): `flutter analyze` clean; `flutter test` green, 79/79 (71 before this epic, +8 for `app_theme_test.dart`).
+
+### 56. Move the run detail off the button, shorten it to "Run again", move inspect to a top-right icon
+
+Feedback on 24 Oct: the previous-run cards' button text repeated the brand and city already shown in the card's own title and subtitle ("Try: Sola Yuzu Mezcal in Austin, TX" sat under a card already titled "Sola in Austin" / "Sola · Austin, TX"), making the button itself carry more text than a button should. The fix moves that detail into the card body as its own line, shortens every button to "Run again," and moves "Inspect this seed" from a bottom text button to a top-right icon button.
+
+- [x] `_PresetCard._runDetail` strips the server's "Try: " prefix from `KarumPreset.buttonLabel`, so the distinguishing part of the server-authored label (e.g. "Sola Yuzu Mezcal in Austin, TX", or "Ceramics & Matcha — Flagship" for Brooklyn's two variants) renders as its own line directly above the button it belongs to
+- [x] Every run button now reads "Run again" — the detail line beside each one is what disambiguates which one a visitor is about to click, not the button label
+- [x] "Inspect this seed" moved from a bottom-of-card `TextButton` to a `NamedIconButton` (tune icon) in the card's top-right corner, replacing the purely decorative arrow icon that sat there; same handler, same destination (the free-entry builder, pre-filled with this run's seed, city, radius, and tags)
+- [x] Updated `test/judge_path_test.dart` and `test/accessibility_test.dart`: the Austin card is now located by its unique detail text, then its own "Run again" button within that card (`find.ancestor`/`find.descendant`, since three cards now share the literal string "Run again"); "Inspect this seed" is found by `find.byTooltip`, since it is no longer a visible `Text` widget
+
+Evidence (24 Oct): `flutter analyze` clean; `flutter test` green, 79/79.
+
+### 57. Header nav spacing and icon consistency
+
+A screenshot on 24 Oct caught the header's "New scout," "Glossary," and "Status" buttons touching with no gap between them, and only two of the three carrying an icon. The three were written as separate sibling `if`s in `KarumHeader.build()` with no `SizedBox` between them — each custom caller-supplied action in `actions` got a spacer before it, but the three built-in buttons never did. "Status" was a plain `TextButton` with no icon, next to two `TextButton.icon`s.
+
+- [x] Extracted `KarumHeader._navButtons()`, returning New scout, Glossary, and Status as a list filtered to whichever apply at the current width; the `Row` now spaces whichever of them render with the same `KarumSpacing.sm` gap the custom `actions` list already used, instead of three ungapped conditionals
+- [x] Gave "Status" an icon (`Icons.monitor_heart_outlined`) so all three nav buttons are icon-and-label, not two-out-of-three
+
+Evidence (24 Oct): `flutter analyze` clean; `flutter test` green, 79/79 — unchanged count, since this was a layout-only fix with no new test surface beyond the existing header/nav coverage.
+
+### 58. Clear button for the free-entry builder
+
+The "Build a search instead." section had no way to reset a half-filled form short of reloading the page.
+
+- [x] `_hasFreeEntryInput` getter: true once any field (city, brand, vibe/SKU text including text typed but not yet committed to a chip, seeds, fallbacks, SKUs, a non-default tag set, mode, radius, or a loaded previous run's point) differs from the form's blank starting state
+- [x] A "Clear" `OutlinedButton` appears to the left of "Run this scout" only while `_hasFreeEntryInput` is true, and resets every one of those fields back to its starting value
+- [x] Added `onChanged` handlers to the vibe-chip and SKU text fields (they previously only reacted on submit), so the Clear button appears as soon as a visitor starts typing, not only after they press Enter
+- [x] Both buttons sit in a `Wrap`, not a fixed `Row`, so narrow windows wrap the pair instead of overflowing
+- [x] New test in `judge_path_test.dart`: Clear is absent on a blank form, appears once the city field has text, and both the field and the button itself clear on tap
+
+Evidence (24 Oct): `flutter analyze` clean; `flutter test` green, 80/80.
+
+### 59. Sign-in screen: link-style secondary actions, and a real (environment) note on judge sign-in
+
+Two problems surfaced from a screenshot of `/login`: "Create an account" and "Continue without signing in" rendered as boxed, bordered buttons crammed against plain text with no spacing — a side effect of §55's button-theme fix, which gave every `TextButton` a border so it would not blend into the page. That border is right for nav actions (New scout, Glossary, Status) but wrong for a secondary sign-in link, which every other site renders as plain underlined text, not a second button beside the primary one.
+
+- [x] New `LinkButton` widget in `widgets/common.dart`: no fill, no border, underlined text in the button's own colour (muted when disabled), wrapped in the same `FocusRing` every other control carries, with an explicit `Semantics(button: true)` since a plain `InkWell` does not advertise a button role on its own — implementation decision, recorded in `BRAND.md` alongside the rest of §55's button rules
+- [x] `judge_entry_screen.dart`: "Create an account" and "Continue without signing in" are now `LinkButton`s, with the "New here?" row and the line below given their own spacing instead of sitting flush against each other
+- [x] `register_screen.dart`: "Already have an account? Sign in" carries the same fix — it was the identical pattern on the opposite screen
+
+**Judge sign-in error ("the judge account is not configured") is not a client bug.** It's the server's own typed error (`internal/httpapi/auth.go`: `postJudgeLogin` returns `auth_not_configured` / "the judge account is not configured" when `h.auth == nil || !h.auth.Enabled()`), and `auth.Service` is only constructed when a Postgres connection is live (`cmd/gateway/main.go`'s `buildDeps`). The client is correctly surfacing a server-reported state: this environment's gateway has no reachable Postgres, so `EnsureJudge` never ran and no judge account exists to sign into. Fixing it is an operational step, not a code change: set `POSTGRES_DSN` to a reachable database and `JUDGE_EMAIL`/`JUDGE_PASSWORD` (see `karum-server/.env.example`), then restart the gateway so `buildDeps` seeds the judge account on boot.
+
+Evidence (24 Oct): `flutter analyze` clean; `flutter test` green, 80/80 (`find.text('Continue without signing in')`/`find.text('Create an account')` still resolve and tap correctly, since `LinkButton` still renders the label as a plain `Text`).
