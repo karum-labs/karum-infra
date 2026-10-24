@@ -830,3 +830,13 @@ Two problems surfaced from a screenshot of `/login`: "Create an account" and "Co
 **Judge sign-in error ("the judge account is not configured") is not a client bug.** It's the server's own typed error (`internal/httpapi/auth.go`: `postJudgeLogin` returns `auth_not_configured` / "the judge account is not configured" when `h.auth == nil || !h.auth.Enabled()`), and `auth.Service` is only constructed when a Postgres connection is live (`cmd/gateway/main.go`'s `buildDeps`). The client is correctly surfacing a server-reported state: this environment's gateway has no reachable Postgres, so `EnsureJudge` never ran and no judge account exists to sign into. Fixing it is an operational step, not a code change: set `POSTGRES_DSN` to a reachable database and `JUDGE_EMAIL`/`JUDGE_PASSWORD` (see `karum-server/.env.example`), then restart the gateway so `buildDeps` seeds the judge account on boot.
 
 Evidence (24 Oct): `flutter analyze` clean; `flutter test` green, 80/80 (`find.text('Continue without signing in')`/`find.text('Create an account')` still resolve and tap correctly, since `LinkButton` still renders the label as a plain `Text`).
+
+### 60. Judge account not seeded on a slow Postgres boot
+
+The judge sign-in returned "the judge account is not configured" even with `.env` complete. The gateway logged `postgres unavailable; campaigns stay in memory` with `timeout: context deadline exceeded`. Measured against the configured database: connect was under a second and the connection was fine, but `persist.Open` took about 21 s, almost all of it in hydrate (19.4 s), which reads every stored run payload (46 rows, 18 MB, the largest 2.7 MB). `buildDeps` gave connect, migrate, seed, and hydrate one shared 20 s budget, so the deadline expired before `EnsureJudge` ran. With no auth service, the judge route correctly reported that it was not configured.
+
+- [x] Raised the shared startup budget in `cmd/gateway/main.go`'s `buildDeps` from 20 s to 90 s, with a comment recording the measured hydrate cost
+- [x] Verified: a gateway booted from the same `.env` logs `judge account ready` (4 campaigns) and `POST /api/v1/auth/judge` returns 200 with a session
+- [ ] Follow-up, not done here: hydrate loads every run payload eagerly, so boot time grows with each flagship run. Options are a lighter hydrate query or lazy payload loading.
+
+Evidence (24 Oct): `go vet ./cmd/gateway` clean; `go test ./...` green across all server packages.
