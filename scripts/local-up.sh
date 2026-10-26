@@ -78,6 +78,9 @@ set -a
 source "$RUN/env"
 set +a
 
+# Flutter web dev server port. Override with WEB_PORT=8091 if 8090 is in use.
+WEB_PORT="${WEB_PORT:-8090}"
+
 if [[ -z "${POSTGRES_DSN:-}" ]]; then
   echo "POSTGRES_DSN is empty in $INFRA/.env" >&2
   exit 1
@@ -194,6 +197,6 @@ fi
 # Maps key allows this fixed origin. Gateway stays on 8080.
 "${FLUTTER[@]}" run -d chrome \
   --web-hostname=localhost \
-  --web-port=8090 \
+  --web-port="$WEB_PORT" \
   --dart-define=GATEWAY_URL=http://127.0.0.1:8080 \
   "${maps_define[@]}"

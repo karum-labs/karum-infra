@@ -58,6 +58,9 @@ make local-api
 
 # Stop them.
 make local-down
+
+# What is running right now.
+make local-status
 ```
 
 | Process | URL |
@@ -69,6 +72,47 @@ make local-down
 Logs are `.local/logs/`. `make local` opens Flutter itself, with `GATEWAY_URL=http://127.0.0.1:8080`.
 
 ADC comes from the `GOOGLE_APPLICATION_CREDENTIALS` path in this repo's `.env` (or from your shell, if you export it before running the commands). `make demo-on` also points the gcloud CLI at project `karum-512016` before it touches the VM.
+
+### Windows and WSL
+
+The run path is a shell script, so on Windows the Makefile hands it to WSL, which
+carries the whole toolchain (bash, uv, go, flutter). `make local` from
+PowerShell therefore starts the stack inside WSL:
+
+```powershell
+cd karum-infra
+make local          # taste, AI, the gateway, and Flutter, all inside WSL
+make local-status   # what is running
+make local-down     # stop it
+```
+
+Running the same targets from inside WSL works too, and needs no Windows at
+all:
+
+```bash
+cd /mnt/d/Github/karum/karum-infra
+make local
+```
+
+On a native Linux host the Makefile takes the same POSIX path: the scripts run
+under `bash`, and the Python tooling uses `python3` (or a virtualenv). The
+toolchain has to be on the login shell's `PATH`: `uv`, `go`, `flutter`, `curl`,
+and `ss` (iproute2).
+
+Two things to know:
+
+- The stack binds `127.0.0.1` inside WSL. WSL forwards that port to Windows
+  only when `localhostForwarding` is on (the default in `%UserProfile%\.wslconfig`).
+  With forwarding off, reach the gateway from Windows through the WSL address:
+  `curl http://$(wsl hostname -I | cut -d' ' -f1):8080/health`.
+- The Python tooling (`make help`, `make test`, the proto and fixture targets)
+  runs on the host that runs make. `make test` and `make prewarm` are delegated
+  to WSL as well, because they talk to the gateway on `127.0.0.1`.
+
+`make venv` creates the Python environment the proto contract test needs
+(`protobuf==7.36.2`) for a POSIX host — Linux, WSL, or macOS. It uses `uv` when
+it is installed and the stdlib `venv` otherwise. On Windows the repo venv
+(`.venv/Scripts/python.exe`) already has it.
 
 ## Demo VM
 
