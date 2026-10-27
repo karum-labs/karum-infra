@@ -189,9 +189,19 @@ fi
 
 echo "This terminal stays attached. Ctrl+C stops the client and the backends."
 cd "$ROOT/karum-client"
+# `.dart_tool` is shared with the Windows checkout. A package_config.json
+# written by the Windows Flutter points at C:/ SDK and pub-cache paths that do
+# not exist in WSL; `flutter run` reuses it because it is newer than
+# pubspec.yaml, and the compiler then fails to resolve every Flutter type.
+# Resolve dependencies on the WSL side on every run.
+"${FLUTTER[@]}" pub get
 maps_define=()
 if [[ -n "${GOOGLE_MAPS_WEB_KEY:-}" ]]; then
   maps_define+=(--dart-define=GOOGLE_MAPS_WEB_KEY="$GOOGLE_MAPS_WEB_KEY")
+fi
+places_define=()
+if [[ -n "${GOOGLE_PLACES_API_KEY:-}" ]]; then
+  places_define+=(--dart-define=GOOGLE_PLACES_API_KEY="$GOOGLE_PLACES_API_KEY")
 fi
 # Google's referrer check does not treat a port wildcard as a port, so the
 # Maps key allows this fixed origin. Gateway stays on 8080.
@@ -199,4 +209,5 @@ fi
   --web-hostname=localhost \
   --web-port="$WEB_PORT" \
   --dart-define=GATEWAY_URL=http://127.0.0.1:8080 \
-  "${maps_define[@]}"
+  "${maps_define[@]}" \
+  "${places_define[@]}"
