@@ -840,3 +840,121 @@ The judge sign-in returned "the judge account is not configured" even with `.env
 - [ ] Follow-up, not done here: hydrate loads every run payload eagerly, so boot time grows with each flagship run. Options are a lighter hydrate query or lazy payload loading.
 
 Evidence (24 Oct): `go vet ./cmd/gateway` clean; `go test ./...` green across all server packages.
+
+## 12. Map interaction, 28 Oct
+
+Three changes to how the map and the door panel respond to a tap. They run in this order because 63 builds on the skipped-pin selection that 62 adds, and 61 is the small, self-contained one. None changes scoring, the proto contract, or the gateway's run payload; 63 may add fields to the place-details proxy. All three are open.
+
+### 61. Skipped pins match the recommended pins
+
+The skipped-venue marker is drawn as a hollow ring with a minus ([google_marker_icons.dart](../karum-client/lib/src/maps/google_marker_icons.dart) `_renderSkip`) and is bigger than a recommended door: `skipSize = 46` against `doorSize = 36` (`selectedDoorSize = 44`). A recommended door is a filled-looking numbered disc, so a skipped venue reads as a different, oversized kind of object.
+
+- [x] Draw the skipped marker as a filled disc in the Avoid colour with the minus knocked out in the surface colour, so it is a filled twin of the recommended pin and not an outline — `_renderSkip` in `google_marker_icons.dart`
+- [x] Size it to `doorSize` (36) when idle and `selectedDoorSize` (44) when selected, so the two kinds are the same size at every state; drop `skipSize` — `skipSize` is gone, and `skip()` now takes `selected` (the map passes `false` until 62 adds skip selection)
+- [x] Keep the soft shadow and the 3× render scale the door markers use, so the two look like one family on a high-density display — same shadow and the shared `_render` at 3×
+- [x] The Avoid colour must still clear AA against both map basemap tones; check it on the dark and light palettes and record the ratio in `ACCESSIBILITY.md` — the knocked-out minus is 7.41:1 on the light fill and 7.04:1 on the dark fill, and the dark fill is 7.65:1 on the dark paper; the light pairs were already in the table. Basemap tones themselves were not sampled: the marker carries its own shadow and edge, so it does not depend on the basemap for contrast
+- [x] The colour and the minus remain the only cue for "skipped"; the lane rule in `BRAND.md` says a colour never carries meaning alone, so the minus is not removed
+- [x] Test: the idle skip icon and the idle door icon render at the same pixel size, and the selected pair do too — `test/google_marker_icons_test.dart`
+
+Evidence (28 Oct): `flutter analyze` clean; `flutter test` green apart from `test/workspace_close_test.dart` ("narrow: closing the trace tab removes it and shows a reopen chip"), which fails identically with this change stashed, so it predates 61 and is untouched here. Not verified in a browser: the marker bitmaps are covered by the unit test, but I did not look at the pins on a live Google map.
+
+### 62. Tapping a pin drives the right-hand panel
+
+Today a recommended-door tap calls `onSelectDoor`, and the recommended tab scrolls to the card (`_RecommendedTab.didUpdateWidget`, [door_board.dart](../karum-client/lib/src/widgets/door_board.dart)). A skipped-venue tap does nothing to the panel: skipped markers carry no selection at all, the skip tab is a plain `ListView.separated` with no per-row keys, and the tab selection lives inside `DefaultTabController`, which the map cannot reach.
+
+The behaviour to build: tapping a recommended pin shows the Recommended tab and scrolls to that entry; tapping a skipped pin shows the Skip tab and scrolls to that entry. Whichever tab is showing when the tap lands, it switches.
+
+- [ ] Add a selected-skip id beside `selectedDoorId` in `workspace_screen.dart`, passed down to the map and the board; selecting a door clears the selected skip and the reverse, so exactly one pin is selected at a time
+- [ ] Lift the tab selection out of `DoorBoard`'s private `DefaultTabController` into a controller the workspace can drive, so a pin tap can switch tabs (Recommended, Skip, How we know are index 0, 1, 2)
+- [ ] Give every skip row a `GlobalKey`, as the recommended cards already have, and scroll to the selected one with `Scrollable.ensureVisible`
+- [ ] The skip list is built lazily, so a row far down the list has no built element and `ensureVisible` finds nothing; scroll by computed offset first (or use an indexed scroll list), then refine with `ensureVisible`. A recommended card has the same risk on a long board
+- [ ] Highlight the selected row in both tabs with the same selected treatment, and keep it highlighted after the scroll finishes
+- [ ] The narrow layout shows trace, map, and board as tabs; there a pin tap should also bring the board forward, or at least not lose the selection when the visitor switches over
+- [ ] Skipped markers get the same hover/tap target as door markers; they currently only open a sheet
+- [ ] Tests: tapping a door pin while the Skip tab is showing switches to Recommended and scrolls to that card; tapping a skip pin switches to Skip and scrolls to that row; the last row of a long list is reachable
+
+### 63. One bubble, with everything in it
+
+A pin tap currently opens two surfaces: Google's `InfoWindow` (just the name) and a modal bottom sheet (`PlaceDetailBottomSheet` in [place_detail.dart](../karum-client/lib/src/maps/place_detail.dart): photo, address, phone, rating, three 60-character review fragments). The bottom sheet goes. Everything it showed moves into the bubble, and the bubble carries more.
+
+One constraint shapes the work: the Maps plugin's `InfoWindow` takes only a title and a snippet string, so it cannot hold a photo or any widget. The bubble therefore has to be a Flutter card positioned over the map at the marker's screen position (via the controller's screen-coordinate lookup, repositioned when the map pans or zooms), not the native info window. The native one is switched off for these markers.
+
+- [ ] Build a `PlaceBubble` overlay anchored to the tapped marker, with a tail pointing at it, a close control, dismissal on map tap or Escape, and a reposition on pan, zoom, and resize; remove `showModalBottomSheet` and `PlaceDetailBottomSheet` and the "No place details found" snackbar
+- [ ] Carry over what the sheet showed: photo, address, phone, rating
+- [ ] Add, from the Places response: open-now status and today's hours, website link, price level, place category, rating count beside the rating, a short editorial summary when Places has one, and review excerpts with author and relative time
+- [ ] Add Karum's own facts for the tapped pin, which the sheet never had: for a recommended door its rank, composite score, and the one-line reason; for a skipped venue the skip reason and its detail. These come from the run payload, not from Places
+- [ ] The place-details request asks for `name,formatted_address,formatted_phone_number,rating,reviews,photos`; widen it to the new fields on both the client call (`fetchPlaceDetails`) and the gateway proxy, and confirm the gateway actually forwards the requested field list rather than a fixed one
+- [ ] Show the bubble immediately with the run-payload facts and fill the Places fields in as they arrive, with a skeleton for the photo, so a slow Places call never leaves the tap looking dead; a failed call shows the Karum facts and a quiet "Place details unavailable", not a snackbar
+- [ ] Every Places-sourced field keeps its provenance label (Google fact), per the honesty rules; Karum's score and reason carry their own source badges
+- [ ] Cache details per place for the session so re-tapping does not re-fetch; the proxy already sits behind the gateway's rate limiter
+- [ ] The bubble must stay inside the map on a phone width and must not cover the zoom controls; flip above/below the marker to fit
+- [ ] `map_panel.dart` also renders its own selected-door card (`_selectedDoor`) for the non-Google canvas; decide whether that card and this bubble are the same thing, so a tap never opens a bubble and a card together
+- [ ] Tests: a tap opens exactly one overlay and no bottom sheet; the bubble shows the run-payload facts before the Places response lands; a failed Places call leaves the Karum facts in place
+
+Decision for the operator: the bubble can show a lot, but a card taller than the map's own height is worse than the sheet it replaces. Proposed cap: photo, name, rating and open status, address, phone and website, the Karum line, and two review excerpts; everything else behind a "More" toggle inside the bubble. Say if you want a different split.
+
+## 13. Pitch authoring and outreach, 28 Oct
+
+Four changes to the pitch page. They run in this order: 64 changes what the pitch is, and 65 through 67 all act on that structure. None of the four changes scoring or the run's ranking.
+
+Context from the code. The pitch is written by `_build_pitch_prompt` in `karum-service-ai/src/karum_service_ai/agent/draft.py`, which asks for "a short shopkeeper script" with evidence IDs cited inline, so the output reads as Qloo data. `RegenerateDoor` takes no instructions (`runner.go`, called with `nil` evidence IDs from `postDoorPitch`). The pitch page has no export and no contact action. The Places field mask in `internal/places/places.go` requests `formattedAddress, websiteUri, businessStatus, location, regularOpeningHours`, which has no phone number and no email.
+
+### 64. A real pitch, in sections, with a first-generate step
+
+The pitch page shows the raw script as one block of cited data. A visitor needs a pitch they could read aloud at a door. The page also should not generate a pitch on open; the visitor starts it.
+
+- [ ] Change the AI contract from one `script` string to named sections: opening, why this door (plain-language reasons, with the figures kept but the evidence IDs moved to a source list at the bottom), the pitch itself, the product to lead with, the ask, and the close. Record the section list in the proto comment and `ACCESSIBILITY.md`'s reading order
+- [ ] Rewrite the prompt for a human reader: plain sentences, no bracketed IDs, numbers rounded and attributed in words ("Qloo places it in the top 4% of bars for this brand's audience"); citations go to a separate machine-readable list, not into the prose
+- [ ] Keep the evidence check: every number in the prose must still map to a cited evidence ID before the pitch is stored; if it cannot, drop the sentence rather than ship it
+- [ ] Pitch page on first open: when no pitch is stored for the door, show a "Generate pitch" button and nothing else in the script area, and no model call happens until it is pressed
+- [ ] Generating shows the section skeleton and fills each section as the response arrives, or shows one loading state if streaming is not built
+- [ ] Failure shows the reason and a retry; the page never shows the raw Qloo payload as a fallback
+- [ ] Tests: opening the page with no stored pitch makes zero AI calls; the rendered script has no `ev-` tokens; a generated pitch has every section filled or the section is marked unavailable
+
+### 65. Regenerate with instructions, and attachments on both actions
+
+Once a pitch exists, "Regenerate" should not blindly re-roll. The visitor should be able to say what to change, and to hand the model the brand's own material.
+
+- [ ] "Regenerate" opens a bubble (a dialog anchored over the page, not a route) with a multi-line instruction field, placeholder examples such as "shorter opening, lead with the cold-brew SKU", a character limit, and Generate and Cancel
+- [ ] Carry the instruction through the stack: `postDoorPitch` accepts an optional `instructions` string, `RegenerateDoor` passes it to service-ai, and the prompt treats it as the brand's direction, with the same data-fencing the prompt already uses for untrusted text
+- [ ] Instructions are a request, not a rule the pitch must follow: the evidence check from 64 still applies, so an instruction cannot add an unsupported number
+- [ ] Attach a file on both "Generate pitch" and "Regenerate": PDF, plain text, or Markdown, with a size cap and a type check on the client and again on the server; a file is shown as a removable chip in the bubble
+- [ ] Attached text is extracted server-side and fenced as untrusted brand material; its content can inform the pitch but cannot change the prompt's rules or add evidence
+- [ ] Storage: attachments are kept with the run (or a short-lived store) and deleted when the run is deleted; the regenerate limiter from §26 still applies per request
+- [ ] Decide and record the retention period for uploaded brand files; a company's own documents are not Karum data to keep indefinitely
+- [ ] Tests: instructions reach the model call; an oversized or wrong-type file is refused before upload; a pitch regenerated with an attachment records the attachment's ID in its attribution
+
+### 66. Export the pitch as a PDF
+
+The run-sheet PDF already exists (`internal/pdf`, the "Download run-sheet" action), but it lists doors. A rep needs a one-page pitch for a single door.
+
+- [ ] Add "Export pitch as PDF" on the pitch page, rendering the 64 sections, the source list, and the door's Karum facts, with the brand name, date, and the honesty label ("Generated by Karum; figures cite Qloo and Google Places")
+- [ ] Render server-side in `internal/pdf`, reusing its layout and fonts so the file matches the run-sheet
+- [ ] The export uses the pitch as currently stored, so a regenerate changes the next export and never a file already downloaded
+- [ ] File name follows the run-sheet pattern, with the door name and date
+- [ ] Attachments are not merged into the export; the brand's own file stays separate
+- [ ] Tests: the PDF contains every section heading and no evidence-ID token; the export of a door with no pitch returns a clear error, not an empty file
+
+### 67. Contact the establishment by email or text
+
+A rep should be able to send the pitch to the venue without copying it out. This is the riskiest epic, so it has the most gates.
+
+What the data can and cannot support, checked before any build:
+
+- Google Places can supply a phone number (`nationalPhoneNumber`) and a website. It does not supply an email address for a business.
+- An email therefore has to come from the venue's own website or from the visitor. Scraping a website for an address is a separate decision and is off unless the operator approves it.
+- Sending a text to a business phone number needs a consent and compliance review before it is built (the rules differ by country; the sample businesses are in the US, Mumbai, and Austin).
+
+Work:
+
+- [ ] Widen the Places field mask on the server to `nationalPhoneNumber` and `internationalPhoneNumber`, and surface the phone on the door card as a Google-sourced fact with its source label
+- [ ] Add a "Contact" panel on the pitch page showing the phone number and any email the operator has approved a source for, each labelled with where it came from; if neither exists, say so plainly and offer the export from 66 instead
+- [ ] Email: compose from the pitch's own text with the PDF from 66 attached; the visitor edits the subject and body before sending; a second confirm step before anything leaves the device
+- [ ] Text: compose a short version of the pitch with a link to the full PDF; same edit and confirm steps; disabled until the compliance decision below is recorded
+- [ ] Sending goes through the gateway, not the browser, so the sending credentials never reach the client; the gateway logs each send with the door, the recipient, and the time, and never the message body
+- [ ] Rate-limit sends per visitor and per recipient, so a bad loop cannot spam one venue
+- [ ] Choose the provider (for example a transactional email service) and record the choice and its sending domain in `DECISIONS.md`
+- [ ] Operator decisions required before build: whether emails may be sourced from a venue's website; whether texts are sent at all, and if so the consent basis per country; the retention period for send logs
+- [ ] Tests: no send happens without the confirm step; a door with no contact shows the honest "no contact on file" state; the message body never appears in the server log
+
+Decision for the operator: 67 is the only epic that contacts a real business on the visitor's behalf. Build 64–66 first; leave 67 behind the three decisions above.
