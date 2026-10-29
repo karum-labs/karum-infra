@@ -284,9 +284,9 @@ message DoorCandidate {
   // the card flags it (PLAN.md §14).
   bool outside_city = 8;
 
-  // The gateway orders the board by S_door and carries this door's affinity
-  // rank from service-taste; the client renders the server order as-is and
-  // never re-sorts (PLAN.md §32).
+  // Qloo fact: the gateway orders the board by S_door and carries this door's
+  // affinity rank from service-taste; the client renders the server order as-is
+  // and never re-sorts (PLAN.md §32).
   int32 rank = 9;
 
   // Input: the evidence ids this door's numbers cite.

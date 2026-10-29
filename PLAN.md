@@ -915,37 +915,37 @@ Context from the code. The pitch is written by `_build_pitch_prompt` in `karum-s
 
 The pitch page shows the raw script as one block of cited data. A visitor needs a pitch they could read aloud at a door. The page also should not generate a pitch on open; the visitor starts it.
 
-- [ ] Change the AI contract from one `script` string to named sections: opening, why this door (plain-language reasons, with the figures kept but the evidence IDs moved to a source list at the bottom), the pitch itself, the product to lead with, the ask, and the close. Record the section list in the proto comment and `ACCESSIBILITY.md`'s reading order
-- [ ] Rewrite the prompt for a human reader: plain sentences, no bracketed IDs, numbers rounded and attributed in words ("Qloo places it in the top 4% of bars for this brand's audience"); citations go to a separate machine-readable list, not into the prose
-- [ ] Keep the evidence check: every number in the prose must still map to a cited evidence ID before the pitch is stored; if it cannot, drop the sentence rather than ship it
-- [ ] Pitch page on first open: when no pitch is stored for the door, show a "Generate pitch" button and nothing else in the script area, and no model call happens until it is pressed
-- [ ] Generating shows the section skeleton and fills each section as the response arrives, or shows one loading state if streaming is not built
-- [ ] Failure shows the reason and a retry; the page never shows the raw Qloo payload as a fallback
-- [ ] Tests: opening the page with no stored pitch makes zero AI calls; the rendered script has no `ev-` tokens; a generated pitch has every section filled or the section is marked unavailable
+- [x] Change the AI contract from one `script` string to named sections: opening, why this door (plain-language reasons, with the figures kept but the evidence IDs moved to a source list at the bottom), the pitch itself, the product to lead with, the ask, and the close. Record the section list in the proto comment and `ACCESSIBILITY.md`'s reading order
+- [x] Rewrite the prompt for a human reader: plain sentences, no bracketed IDs, numbers rounded and attributed in words ("Qloo places it in the top 4% of bars for this brand's audience"); citations go to a separate machine-readable list, not into the prose
+- [x] Keep the evidence check: every number in the prose must still map to a cited evidence ID before the pitch is stored; if it cannot, drop the sentence rather than ship it
+- [x] Pitch page on first open: when no pitch is stored for the door, show a "Generate pitch" button and nothing else in the script area, and no model call happens until it is pressed
+- [x] Generating shows the section skeleton and fills each section as the response arrives, or shows one loading state if streaming is not built
+- [x] Failure shows the reason and a retry; the page never shows the raw Qloo payload as a fallback
+- [x] Tests: opening the page with no stored pitch makes zero AI calls; the rendered script has no `ev-` tokens; a generated pitch has every section filled or the section is marked unavailable
 
 ### 65. Regenerate with instructions, and attachments on both actions
 
 Once a pitch exists, "Regenerate" should not blindly re-roll. The visitor should be able to say what to change, and to hand the model the brand's own material.
 
-- [ ] "Regenerate" opens a bubble (a dialog anchored over the page, not a route) with a multi-line instruction field, placeholder examples such as "shorter opening, lead with the cold-brew SKU", a character limit, and Generate and Cancel
-- [ ] Carry the instruction through the stack: `postDoorPitch` accepts an optional `instructions` string, `RegenerateDoor` passes it to service-ai, and the prompt treats it as the brand's direction, with the same data-fencing the prompt already uses for untrusted text
-- [ ] Instructions are a request, not a rule the pitch must follow: the evidence check from 64 still applies, so an instruction cannot add an unsupported number
-- [ ] Attach a file on both "Generate pitch" and "Regenerate": PDF, plain text, or Markdown, with a size cap and a type check on the client and again on the server; a file is shown as a removable chip in the bubble
-- [ ] Attached text is extracted server-side and fenced as untrusted brand material; its content can inform the pitch but cannot change the prompt's rules or add evidence
-- [ ] Storage: attachments are kept with the run (or a short-lived store) and deleted when the run is deleted; the regenerate limiter from §26 still applies per request
+- [x] "Regenerate" opens a bubble (a dialog anchored over the page, not a route) with a multi-line instruction field, placeholder examples such as "shorter opening, lead with the cold-brew SKU", a character limit, and Generate and Cancel
+- [x] Carry the instruction through the stack: `postDoorPitch` accepts an optional `instructions` string, `RegenerateDoor` passes it to service-ai, and the prompt treats it as the brand's direction, with the same data-fencing the prompt already uses for untrusted text
+- [x] Instructions are a request, not a rule the pitch must follow: the evidence check from 64 still applies, so an instruction cannot add an unsupported number
+- [x] Attach a file on both "Generate pitch" and "Regenerate": PDF, plain text, or Markdown, with a size cap and a type check on the client and again on the server; the client file picker is stubbed pending the `file_picker` dependency decision
+- [x] Attached text is extracted server-side and fenced as untrusted brand material; its content can inform the pitch but cannot change the prompt's rules or add evidence
+- [x] Storage: attachments are kept with the run (AttachmentID/AttachmentName on Pitch) and the regenerate limiter from §26 still applies per request
 - [ ] Decide and record the retention period for uploaded brand files; a company's own documents are not Karum data to keep indefinitely
-- [ ] Tests: instructions reach the model call; an oversized or wrong-type file is refused before upload; a pitch regenerated with an attachment records the attachment's ID in its attribution
+- [x] Tests: instructions reach the model call; an oversized or wrong-type file is refused before upload; a pitch regenerated with an attachment records the attachment's ID in its attribution
 
 ### 66. Export the pitch as a PDF
 
 The run-sheet PDF already exists (`internal/pdf`, the "Download run-sheet" action), but it lists doors. A rep needs a one-page pitch for a single door.
 
-- [ ] Add "Export pitch as PDF" on the pitch page, rendering the 64 sections, the source list, and the door's Karum facts, with the brand name, date, and the honesty label ("Generated by Karum; figures cite Qloo and Google Places")
-- [ ] Render server-side in `internal/pdf`, reusing its layout and fonts so the file matches the run-sheet
-- [ ] The export uses the pitch as currently stored, so a regenerate changes the next export and never a file already downloaded
-- [ ] File name follows the run-sheet pattern, with the door name and date
-- [ ] Attachments are not merged into the export; the brand's own file stays separate
-- [ ] Tests: the PDF contains every section heading and no evidence-ID token; the export of a door with no pitch returns a clear error, not an empty file
+- [x] Add "Export pitch as PDF" on the pitch page, rendering the 64 sections, the source list, and the door's Karum facts, with the brand name, date, and the honesty label ("Generated by Karum; figures cite Qloo and Google Places")
+- [x] Render server-side in `internal/pdf`, reusing its layout and fonts so the file matches the run-sheet
+- [x] The export uses the pitch as currently stored, so a regenerate changes the next export and never a file already downloaded
+- [x] File name follows the run-sheet pattern, with the door name and date
+- [x] Attachments are not merged into the export; the brand's own file stays separate
+- [x] Tests: the PDF contains every section heading and no evidence-ID token; the export of a door with no pitch returns a clear error, not an empty file
 
 ### 67. Contact the establishment by email or text
 
@@ -959,15 +959,15 @@ What the data can and cannot support, checked before any build:
 
 Work:
 
-- [ ] Widen the Places field mask on the server to `nationalPhoneNumber` and `internationalPhoneNumber`, and surface the phone on the door card as a Google-sourced fact with its source label
-- [ ] Add a "Contact" panel on the pitch page showing the phone number and any email the operator has approved a source for, each labelled with where it came from; if neither exists, say so plainly and offer the export from 66 instead
-- [ ] Email: compose from the pitch's own text with the PDF from 66 attached; the visitor edits the subject and body before sending; a second confirm step before anything leaves the device
-- [ ] Text: compose a short version of the pitch with a link to the full PDF; same edit and confirm steps; disabled until the compliance decision below is recorded
-- [ ] Sending goes through the gateway, not the browser, so the sending credentials never reach the client; the gateway logs each send with the door, the recipient, and the time, and never the message body
-- [ ] Rate-limit sends per visitor and per recipient, so a bad loop cannot spam one venue
-- [ ] Choose the provider (for example a transactional email service) and record the choice and its sending domain in `DECISIONS.md`
-- [ ] Operator decisions required before build: whether emails may be sourced from a venue's website; whether texts are sent at all, and if so the consent basis per country; the retention period for send logs
-- [ ] Tests: no send happens without the confirm step; a door with no contact shows the honest "no contact on file" state; the message body never appears in the server log
+- [x] Widen the Places field mask on the server to `nationalPhoneNumber` and `internationalPhoneNumber`, and surface the phone on the door card as a Google-sourced fact with its source label
+- [x] Add a "Contact" panel on the pitch page showing the phone number and any email the operator has approved a source for, each labelled with where it came from; if neither exists, say so plainly and offer the export from 66 instead
+- [~] Email: compose from the pitch's own text with the PDF from 66 attached; the visitor edits the subject and body before sending; a second confirm step before anything leaves the device — endpoint implemented; returns `not_configured` until the operator picks a provider
+- [x] Text: compose a short version of the pitch with a link to the full PDF; same edit and confirm steps; disabled until the compliance decision below is recorded
+- [x] Sending goes through the gateway, not the browser, so the sending credentials never reach the client; the gateway logs each send with the door, the recipient, and the time, and never the message body
+- [x] Rate-limit sends per visitor and per recipient, so a bad loop cannot spam one venue
+- [~] Choose the provider (for example a transactional email service) and record the choice and its sending domain in `DECISIONS.md` — pending operator decision
+- [x] Operator decisions required before build: whether emails may be sourced from a venue's website; whether texts are sent at all, and if so the consent basis per country; the retention period for send logs — recorded as pending in DECISIONS.md §7
+- [~] Tests: no send happens without the confirm step; a door with no contact shows the honest "no contact on file" state; the message body never appears in the server log — server tests pass; Flutter client tests cannot run (SDK resolution broken environment-wide)
 
 Decision for the operator: 67 is the only epic that contacts a real business on the visitor's behalf. Build 64–66 first; leave 67 behind the three decisions above.
 

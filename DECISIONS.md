@@ -74,3 +74,13 @@ What it locks for this page:
 - **Compare RPC (epic 16):** parse `results.matchEntities` — the envelope is `{tags, a, b, matchEntities}`, not the `/search` array (DI-22); `model` and `filter.subtype` accepted with identical shape.
 - **Signal hygiene:** `signal.interests.entities.include` is a boolean (DI-23); `resolve_to` literals limited to `urn:reference:brand` / `both` (DI-16); scalar `weight` accepts number/string but showed no observable effect on the spike call — pair any weighting with a diff test. Trending needs ≥ ~6-month windows and stays out of the MVP (spike 20).
 - **Quota:** 144 of the 10,000 monthly requests used (123 spike + 21 extension probes; 9,856 remaining, 17 Oct; the DI-1 prod-host 401 is not metered). The 17 Oct extension verified the brand→place direction and the skip-pool batch probe and found Madre Mezcal absent from Qloo coverage — see [spike/RECORDING.md](spike/RECORDING.md).
+
+## 7. Contact by email (epic 67) — pending operator decision
+
+Email sending goes through the gateway, not the browser, so credentials never reach the client. The gateway logs each send with the door, the recipient, and the time, and never the message body. Sends are rate-limited per visitor and per recipient.
+
+- **Provider:** not yet chosen. A transactional email service (for example SendGrid, Mailgun, or Amazon SES) is the expected shape. Record the choice and its sending domain here when decided.
+- **Sending domain:** not yet set.
+- **Email sourcing from a venue's website:** not yet approved by the operator. Until approved, the Contact panel shows only the Google Places phone number.
+- **Text (SMS) sending:** disabled until the operator records the consent basis per country (the sample businesses are in the US, Mumbai, and Austin).
+- **Retention period for send logs:** not yet recorded.
