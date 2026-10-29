@@ -137,6 +137,20 @@ jobs:
         with:
           python-version: "3.13"
 
+      # The presets have two owners: the recording in fixtures/ and the
+      # gateway catalogue in the private sibling repo. The default token
+      # cannot read a private sibling, so the checkout is allowed to fail;
+      # without it the comparison reports "skipped" and the other fixture
+      # checks still run.
+      - name: Checkout karum-server (preset catalogue)
+        id: server
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: karum-labs/karum-server
+          path: _siblings/karum-server
+          token: ${{ secrets.SERVER_REPO_TOKEN || secrets.FIXTURE_REPO_TOKEN || github.token }}
+
       # The pack is committed; regeneration needs the local recordings, which
       # CI does not have, so it verifies hashes, preset schemas, and the
       # projection unit tests instead.
@@ -145,3 +159,9 @@ jobs:
 
       - name: Verify pack hashes and preset schemas
         run: make check-fixtures
+
+      # Compare the scenario of record with the catalogue the gateway runs.
+      # The script exits non-zero on any drift and skips cleanly when the
+      # sibling is absent.
+      - name: Compare recorded presets with the gateway catalogue
+        run: python fixtures/tools/check_presets.py --repo-root _siblings
