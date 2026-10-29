@@ -628,8 +628,8 @@ A read-only audit of all five repos on 20–21 Oct produced a register of 38 fun
 - [ ] **K-26 · dead persistence** — `SaveDraft` has no callers and the `drafts` table is never written; the vendored health pb is unused
 - [x] **K-27 · re-rank** — the proto comment now states that the gateway orders by S_door and the client renders server order as-is, matching the code and the client README
 - [x] **K-28/UX-07 · baseline toggle** — the toggle reveals the baseline already stored on the run; the plan's wording now matches the code (§34), and no new gateway route is added.
-- [ ] **K-29/UX-13 · run history** — no run-history or campaign-list screen; `/campaigns/:id` is deep-link only
-- [ ] **K-30 · share path** — no Web Share or public-link path
+- [x] **K-29/UX-13 · run history** — `GET /api/v1/account/campaigns` lists the signed-in account's campaigns, owner-scoped and newest first; `CampaignHistoryScreen` restores `/campaigns/:id` or re-runs a preset (29 Oct)
+- [x] **K-30 · share path** — `share.dart` uses the Web Share API with a clipboard fallback, and both the run and door pages share app routes on the running web origin (29 Oct)
 - [x] **K-31/UX-02/UX-03 · tokens** — `KarumLayout.contentMaxWidth` is used (`account_screen.dart:46`); the remaining dead tokens are implementation-defined, not brand-guide tokens, and raw sizes/colours bypass the token system
 - [ ] **K-32 · dead config and code** — `AI_PROBE_BUDGET` is never read, `render_sentence` is only exercised by its own test, and the vendored `karum/taste/**` and `karum/health/**` packages are unused in service-ai
 - [x] **K-33 · cache key** — the Qloo cache key now folds in the mode and base URL, so a fixture-populated entry is never served to a live process
@@ -643,7 +643,7 @@ A read-only audit of all five repos on 20–21 Oct produced a register of 38 fun
 - [x] **X-04 · word caps** — `MaxWords` is set (220 draft / 160 baseline) and service-ai trims trailing sentences to the cap, then re-runs the citation filter
 - [x] **X-05 · dropped evidence** — `explainability`, `demographics`, and `distance_meters` now cross the gateway boundary and render in the evidence drawer
 - [x] **X-06 · skip detail** — `reason_detail`, `floor`, and `competitor_count` now reach the client; taste sets none (it has no competitor signal) and the gateway sets the real count on saturation skips
-- [ ] **X-07 · sub-score source** — `common.SubScore.source` is never set (every sub-score ships `EVIDENCE_SOURCE_UNSPECIFIED`), and the HTTP layer hard-codes `"qloo_fact"` regardless
+- [x] **X-07 · sub-score source** — the gRPC mapper carries `common.SubScore.source` both ways, the runner marks affinity and demographics `qloo_fact`, score assembly marks shelf and composite `model_inference`, the HTTP and PDF layers fall back only for old snapshots, and the client badge reads the returned source (29 Oct)
 - [ ] **X-09 · JSON surface** — the Flutter gateway contract is a second, unpinned JSON surface with known drift from the proto (only the composite `raw`/`value` scale nit was fixed; the golden pin is deferred)
 - [ ] **X-15 · local cache** — `scripts/local-up.sh` clears `TASTE_REDIS_ADDR` while Compose uses Redis, so cache behaviour differs local vs demo
 - [ ] **X-21 (rest) · make eval** — the `eval` target is still a stub
@@ -661,7 +661,7 @@ A read-only audit of all five repos on 20–21 Oct produced a register of 38 fun
 **Acceptance criteria**
 
 - [x] No Critical or High issue is silently open: K-01 is blocked with a named external dependency, K-13 is fixed (fonts ship under `assets/fonts/`, `brand_tokens.dart` and `BRAND.md` corrected, `test/fonts_test.dart` added), and every remaining open item carries an explicit disposition
-- [x] The regression gate is green after the fixes: `go test ./...`, service-taste 362 tests, service-ai 63 tests, Flutter analyze clean with 57 tests, and the infra fixture checks (21 Oct)
+- [x] The regression gate is green after the fixes: `go test ./...` and `gofmt -l .` clean, service-taste 363 tests, service-ai 69 tests, Flutter analyze and format clean with 92 tests, `check_presets.py` 4 recorded presets with 0 problems, and `build_ai_pack.py --check` passing (29 Oct)
 - [x] Fixes land with their tests and docs, and anything unverified stays unticked in this ledger
 
 ## 11. Pilot feedback, 22 Oct
@@ -970,3 +970,61 @@ Work:
 - [ ] Tests: no send happens without the confirm step; a door with no contact shows the honest "no contact on file" state; the message body never appears in the server log
 
 Decision for the operator: 67 is the only epic that contacts a real business on the visitor's behalf. Build 64–66 first; leave 67 behind the three decisions above.
+
+## 14. Fixture coverage audit and the live runbook, 29 Oct
+
+The five repos, the local stack, the fixture packs, and the uncommitted work were
+audited end to end. The product gate is green; the remaining gap is coverage,
+not scoring.
+
+### 68. Current gate and the Unknown fields
+
+- Gate (29 Oct): `go test ./...` and `gofmt -l .` clean; service-taste 363
+  passed; service-ai 69 passed; Flutter `analyze` and `dart format` clean with
+  92 tests; `check_presets.py --repo-root <parent>` reports 4 recorded presets
+  and 0 problems; `build_ai_pack.py --check` passes. `check-presets` now runs in
+  the fixture CI job: it checks out the private server sibling when a token is
+  available and reports `skipped` otherwise.
+- `Shelf opportunity: Unknown` and `Demographic alignment: Unknown` are fixture
+  coverage gaps, not a scoring bug. The Austin AI pack holds Whisler's audit and
+  draft plus the Ilegal baseline only; Whisler's is a skip candidate, not one of
+  the five board doors. The Qloo pack has a seed demographics row and no
+  per-door batch. Production sends the top eight door ids on one demographics
+  call, so a live Qloo run is the only way to verify per-door profiles.
+- `run-0041` is the honest degraded example: 10 doors, 8 warnings, Tobala at raw
+  affinity 0.859 and value 1, a 100 display from a renormalized composite, null
+  shelf and demographics, an empty source list, and a template pitch.
+- The UI now labels a renormalized composite "Partial composite" and the
+  evidence sheet says "(partial)". The missing term stays Unknown; no value is
+  invented.
+- The preset replay now prefers the newest `ready` run over a newer `degraded`
+  one and falls back to `degraded` only when no ready run exists. `NewestReady`
+  is still the single lookup used by the preset shortcut and prewarm.
+- Share links now point at the running web app, not the gateway's JSON API:
+  web builds use the browser origin and the hash route, desktop builds use
+  `--dart-define=PUBLIC_APP_URL`. The account history and share screens are
+  present but uncommitted.
+
+### 69. Staged live verification
+
+Blocked on credentials: `karum-infra/.env` has an empty `TASTE_QLOO_API_KEY`
+and an empty `AI_GEMINI_API_KEY`; the Gemini key in the AI repo's own env is not
+read by the local stack. A minimal generation with `gemini-3.8-flash` hung past
+60 s while the service timeout is 30 s, so live AI is unverified.
+
+Run in this order; do not start with a four-preset live prewarm.
+
+1. Set `TASTE_MODE=live` and a Qloo key, keep `AI_MODE=fixture`, restart, and run
+   one Austin job with `rerun: true`. Verify the top eight doors carry
+   demographics and that no shelf value is fabricated.
+2. Run one service-side Gemini audit and draft. If either fails, keep the AI
+   fixture and the labelled templates.
+3. Run one full Austin live run. Verify `ready`, top-five shelf coverage,
+   top-eight demographics, `pitch.template == false`, and non-empty `sources`.
+4. Re-record the actual top-five audits/drafts and top-eight demographics,
+   update the manifests and hashes, then prewarm. Never invent a fixture answer
+   for a request the live services did not answer.
+5. Against a live stack, run `SMOKE_LIVE=1 make test`. It requires a ready
+   state, the top-five/top-eight coverage, non-template pitches, and a source
+   for every menu that names an incumbent. Relax the thresholds only for a
+   recorded, legitimate miss.
