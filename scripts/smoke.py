@@ -6,14 +6,29 @@ board, a skip list with reasons, a per-door pitch, and a field route. It
 exits non-zero on the first missing output, so ``make test`` fails loudly
 when the core journey breaks.
 
+By default the request carries ``rerun: true`` so the smoke exercises the
+pipeline instead of replaying the newest stored preset run. Set
+``SMOKE_RERUN=0`` to exercise the replay shortcut deliberately.
+
+On a live stack, set ``SMOKE_LIVE=1`` to assert the coverage a live run must
+have: a ``ready`` state, a shelf read on the top five doors, a demographics
+profile on the top eight, no template pitch, and a grounded source for every
+menu that names an incumbent. The minimum counts can be relaxed with
+``SMOKE_MIN_SHELF`` and ``SMOKE_MIN_DEMOGRAPHICS`` when a venue legitimately
+has no readable menu or no Qloo profile; the report still prints the counts.
+
 Usage:
     python scripts/smoke.py [gateway-base] [--preset austin-wholesale]
 
 Environment:
-    GATEWAY_URL     the gateway base URL (default http://127.0.0.1:8080)
-    SMOKE_PRESET    the preset to scout (default austin-wholesale)
-    SMOKE_OUT       where to write the JSON report (default contract/.out/smoke.json)
-    SMOKE_TIMEOUT   seconds to wait for a terminal state (default 180)
+    GATEWAY_URL             the gateway base URL (default http://127.0.0.1:8080)
+    SMOKE_PRESET            the preset to scout (default austin-wholesale)
+    SMOKE_RERUN             true to run the pipeline, false to replay (default true)
+    SMOKE_LIVE              true to require live coverage (default false)
+    SMOKE_MIN_SHELF         top-five shelf reads required in live mode
+    SMOKE_MIN_DEMOGRAPHICS  top-eight profiles required in live mode
+    SMOKE_OUT               where to write the JSON report (default contract/.out/smoke.json)
+    SMOKE_TIMEOUT           seconds to wait for a terminal state (default 180)
 """
 
 from __future__ import annotations
@@ -31,6 +46,18 @@ BASE = os.environ.get("GATEWAY_URL", "http://127.0.0.1:8080").rstrip("/")
 PRESET = os.environ.get("SMOKE_PRESET", "austin-wholesale")
 OUT = Path(os.environ.get("SMOKE_OUT", "contract/.out/smoke.json"))
 TIMEOUT = int(os.environ.get("SMOKE_TIMEOUT", "180"))
+RERUN = os.environ.get("SMOKE_RERUN", "1").strip().lower() not in {"0", "false", "no"}
+LIVE = os.environ.get("SMOKE_LIVE", "").strip().lower() in {"1", "true", "yes"}
+
+
+def _int_env(name: str, default: int) -> int:
+    raw = os.environ.get(name, "").strip()
+    return int(raw) if raw else default
+
+
+# A negative value means "use the live-mode default for this run's door count".
+MIN_SHELF = _int_env("SMOKE_MIN_SHELF", -1)
+MIN_DEMOGRAPHICS = _int_env("SMOKE_MIN_DEMOGRAPHICS", -1)
 TERMINAL = {"ready", "degraded", "failed"}
 
 
@@ -77,6 +104,7 @@ def main() -> int:
         "mode": "wholesale",
         "radius_meters": 8000,
         "category_tags": ["urn:tag:genre:place:restaurant:bar"],
+        "rerun": RERUN,
     }
     headers = {"Content-Type": "application/json", "Idempotency-Key": key}
 
@@ -122,9 +150,25 @@ def main() -> int:
     skips = campaign.get("skip_list") or []
     route = campaign.get("route") or {}
     pitches = [door for door in doors if door.get("pitch")]
+    top_five = doors[:5]
+    top_eight = doors[:8]
+    shelf_top = [door for door in top_five if _has_score(door, "shelf_opportunity")]
+    demo_top = [
+        door for door in top_eight if _has_score(door, "demographic_alignment")
+    ]
+    profiles = [door for door in doors if isinstance(door.get("demographics"), dict)]
+    templated = [
+        door for door in pitches if (door.get("pitch") or {}).get("template") is True
+    ]
+    sourced = [door for door in doors if (door.get("menu") or {}).get("sources")]
     report["doors"] = len(doors)
     report["skips"] = len(skips)
     report["pitches"] = len(pitches)
+    report["shelf_top5"] = len(shelf_top)
+    report["demographics_top8"] = len(demo_top)
+    report["demographic_profiles"] = len(profiles)
+    report["templated_pitches"] = len(templated)
+    report["sourced_menus"] = len(sourced)
     report["route"] = {"skipped": route.get("skipped"), "failed": route.get("failed")}
 
     if not doors:
@@ -144,6 +188,49 @@ def main() -> int:
             f"the run carries an error: {campaign.get('error_code')} {campaign.get('error_message')}"
         )
 
+    if LIVE:
+        if state != "ready":
+            failures.append(f"a live run must reach ready, not {state!r}")
+        required_shelf = MIN_SHELF if MIN_SHELF >= 0 else min(5, len(doors))
+        if len(shelf_top) < required_shelf:
+            failures.append(
+                f"only {len(shelf_top)} of the top {len(top_five)} doors have a "
+                f"shelf read; live mode requires {required_shelf} "
+                "(set SMOKE_MIN_SHELF to relax a known miss)"
+            )
+        required_demo = (
+            MIN_DEMOGRAPHICS if MIN_DEMOGRAPHICS >= 0 else min(8, len(doors))
+        )
+        if len(demo_top) < required_demo:
+            failures.append(
+                f"only {len(demo_top)} of the top {len(top_eight)} doors have a "
+                f"demographic profile; live mode requires {required_demo} "
+                "(set SMOKE_MIN_DEMOGRAPHICS to relax a known miss)"
+            )
+        if len(profiles) > min(8, len(doors)):
+            failures.append(
+                f"the demographics batch returned {len(profiles)} profiles, "
+                "above the top-eight cap"
+            )
+        if len(pitches) < len(doors):
+            failures.append(
+                f"only {len(pitches)} of {len(doors)} doors carry a pitch"
+            )
+        if templated:
+            failures.append(
+                f"{len(templated)} pitch(es) are still templates in a live run"
+            )
+        if not sourced:
+            failures.append("no door carries a grounded menu source")
+        for door in doors:
+            menu = door.get("menu") or {}
+            if menu.get("incumbents") and not menu.get("sources"):
+                failures.append(
+                    f"{door.get('name') or door.get('id')} names an incumbent "
+                    "without a grounding source"
+                )
+                break
+
     _write(report, failures)
     if failures:
         print("smoke: FAILED")
@@ -152,9 +239,18 @@ def main() -> int:
         return 1
     print(
         f"smoke: ok - state={state} doors={len(doors)} skips={len(skips)} "
-        f"pitches={len(pitches)} route={'skipped' if route.get('skipped') else 'built'}"
+        f"pitches={len(pitches)} shelf={len(shelf_top)}/{len(top_five)} "
+        f"demo={len(demo_top)}/{len(top_eight)} templated={len(templated)} "
+        f"sources={len(sourced)} "
+        f"route={'skipped' if route.get('skipped') else 'built'}"
     )
     return 0
+
+
+def _has_score(door: dict[str, Any], name: str) -> bool:
+    """True when the door carries that sub-score object."""
+    scores = door.get("scores")
+    return isinstance(scores, dict) and isinstance(scores.get(name), dict)
 
 
 def _write(report: dict[str, Any], failures: list[str]) -> None:

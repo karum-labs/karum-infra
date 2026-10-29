@@ -150,7 +150,9 @@ logs:
 # stack under test; the default is the laptop gateway on port 8080.
 #
 # The smoke runs next to the stack: inside WSL on Windows, so it reaches the
-# gateway on 127.0.0.1.
+# gateway on 127.0.0.1. Set SMOKE_LIVE=1 against a live stack to require a
+# ready run, top-five shelf reads, top-eight demographic profiles, non-template
+# pitches, and grounded source URLs.
 test:
 	@$(WSL_RUN) "$(POSIX_PYTHON) scripts/smoke.py $(GATEWAY_URL)"
 
@@ -164,6 +166,7 @@ routes-check:
 ## the stored runs so a preset click serves the newest ready stored run
 ## (PLAN.md §13, §25, and §39). Requires PREWARM_TOKEN: a judge session
 ## token from POST /api/v1/auth/judge (or /auth/login) on the target gateway.
+## The script exits non-zero unless every returned row is stored and ready.
 ## Set GATEWAY_URL for the deployed host; the laptop default is localhost:8080.
 prewarm:
 	@$(WSL_ENV) $(WSL_RUN) "bash ./scripts/prewarm.sh"
@@ -231,9 +234,10 @@ check-fixtures:
 test-fixtures:
 	$(PYTHON) fixtures/tools/run_tests.py
 
-## check-presets: compare the three copies of the locked presets (local; needs the siblings).
-# The recorded scenarios, the gateway's catalogue, and the client's mirror must
-# agree. A source that is not checked out is skipped, never guessed.
+## check-presets: compare the recorded presets with the gateway catalogue (local; needs the sibling).
+# The recorded scenarios and the gateway's catalogue must agree. The client
+# fetches GET /api/v1/presets and carries no static mirror (PLAN.md §52). A
+# source that is not checked out is skipped, never guessed.
 check-presets:
 	$(PYTHON) fixtures/tools/check_presets.py
 

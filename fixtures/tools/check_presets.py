@@ -1,19 +1,20 @@
-"""Check that the three copies of the locked presets agree.
+"""Check that the recorded presets and the gateway catalogue agree.
 
-The presets are written down three times, and each copy has a different owner:
+The presets used to be written down three times. Since PLAN.md §52 the client
+fetches the catalogue from ``GET /api/v1/presets`` instead of carrying a mirror,
+so there are now two owners:
 
 - ``fixtures/presets/<id>.json`` — the scenario of record. It carries the seed
   the recording session used, the point, the radii, the tags, and the outcome
   that was recorded (the door board's range, the skip list, the heatmap
   counts). The pack is hash-pinned against this file;
 - ``karum-server/internal/presets/presets.go`` — the catalogue the gateway
-  runs;
-- ``karum-client/lib/src/data/presets.dart`` — the mirror the client renders
-  and that "Inspect this seed" copies into the free-entry form.
+  runs and serves to the client.
 
 Nothing kept them in step, so a preset could drift: the gateway runs one
-scenario while the client shows another, or the pack replays a third. This
-tool compares them and reports every difference.
+scenario while the pack replays another. This tool compares the record and the
+gateway catalogue and reports every difference. The obsolete client mirror is
+reported as skipped, not silently treated as agreement.
 
 Usage::
 
@@ -29,7 +30,6 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import sys
 from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
@@ -75,50 +75,6 @@ def _gateway_catalogue(root: Path) -> dict[str, dict[str, Any]]:
             ],
             "skip": re.findall(rf'"({_UUID})"', skip_block.group(1)) if skip_block else [],
             "tags": re.findall(r'"([^"]+)"', tags_block.group(1)) if tags_block else [],
-            "point": (
-                {"lat": float(point.group(1)), "lon": float(point.group(2))}
-                if point
-                else None
-            ),
-            "radius": int(radius.group(1)) if radius else None,
-            "mode": mode.group(1) if mode else None,
-            "label": label.group(1) if label else None,
-            "brand": brand.group(1) if brand else None,
-            "city": city.group(1) if city else None,
-        }
-    return out
-
-
-def _client_catalogue(root: Path) -> dict[str, dict[str, Any]]:
-    """The client's mirror, parsed from the Dart source."""
-    source = (root / "lib" / "src" / "data" / "presets.dart").read_text(encoding="utf-8")
-    seeds: dict[str, list[dict[str, str]]] = {}
-    for name, block in re.findall(
-        r"static const List<SeedEntity> (\w+) = \[(.*?)\n  \];", source, re.S
-    ):
-        seeds[name] = [
-            {"id": i, "name": n, "type": t}
-            for i, n, t in re.findall(
-                rf"id:\s*'({_UUID})',\s*name:\s*'([^']*)',\s*type:\s*'([^']*)'",
-                block,
-            )
-        ]
-    out: dict[str, dict[str, Any]] = {}
-    for block in re.findall(r"static const KarumPreset \w+ = KarumPreset\((.*?)\n  \);", source, re.S):
-        ident = re.search(r"id:\s*'([a-z0-9-]+)'", block)
-        if ident is None:
-            continue
-        seed_ref = re.search(r"seeds:\s*(\w+)", block)
-        tags = re.findall(r"'urn:tag:[^']+'", re.search(r"categoryTags:\s*\[(.*?)\]", block, re.S).group(1))
-        point = re.search(r"point:\s*GeoPoint\(([-\d.]+),\s*([-\d.]+)\)", block)
-        radius = re.search(r"radiusMeters:\s*(\d+)", block)
-        mode = re.search(r"mode:\s*ScoutMode\.(\w+)", block)
-        label = re.search(r"label:\s*'([^']*)'", block)
-        brand = re.search(r"brand:\s*'([^']*)'", block)
-        city = re.search(r"city:\s*'([^']*)'", block)
-        out[ident.group(1)] = {
-            "seed": seeds.get(seed_ref.group(1), []) if seed_ref else [],
-            "tags": [tag.strip("'") for tag in tags],
             "point": (
                 {"lat": float(point.group(1)), "lon": float(point.group(2))}
                 if point
@@ -296,41 +252,36 @@ def main() -> int:
 
     pack = REPO_ROOT / "fixtures"
     recorded = _preset_files(pack)
-    sources: list[tuple[str, Path]] = [
-        ("gateway", root / "karum-server"),
-        ("client", root / "karum-client"),
-    ]
+    gateway_root = root / "karum-server"
 
     problems: list[str] = []
     checked: list[str] = []
     missing: list[str] = []
-    for label, repo in sources:
-        if not repo.exists():
-            missing.append(f"{label}: {repo} is not checked out")
-            continue
-        if label == "gateway":
-            catalogue = _gateway_catalogue(repo)
-        else:
-            catalogue = _client_catalogue(repo)
+    if not gateway_root.exists():
+        missing.append(f"gateway: {gateway_root} is not checked out")
+    else:
+        catalogue = _gateway_catalogue(gateway_root)
         for name, document in recorded.items():
             if name not in catalogue:
-                problems.append(f"{label}: the preset {name} is missing from the catalogue")
+                problems.append(f"gateway: the preset {name} is missing from the catalogue")
                 continue
             problems.extend(
                 _compare(
-                    f"{label} {name}",
+                    f"gateway {name}",
                     _recorded(document),
                     catalogue[name],
-                    # The client mirror must pin the radius it recorded: a
-                    # missing radius would otherwise skip the rule and let a
-                    # widened search through.
-                    required={"radius"} if label == "client" else None,
                 )
             )
-            if label == "gateway":
-                problems.extend(_skip_coverage(name, document, catalogue[name]))
-                problems.extend(_request_fits_the_pack(name, pack, catalogue[name]))
-        checked.append(f"{label}: {len(catalogue)} presets")
+            problems.extend(_skip_coverage(name, document, catalogue[name]))
+            problems.extend(_request_fits_the_pack(name, pack, catalogue[name]))
+        checked.append(f"gateway: {len(catalogue)} presets")
+
+    client_root = root / "karum-client"
+    if client_root.exists():
+        missing.append(
+            "client: no static preset mirror to compare; the client fetches "
+            "GET /api/v1/presets (PLAN.md §52)"
+        )
 
     for line in missing:
         print(f"skipped {line}")
