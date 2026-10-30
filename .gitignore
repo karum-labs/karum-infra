@@ -43,6 +43,13 @@ contract/.out/
 # Python bytecode
 __pycache__/
 
+# Local scratch files kept around for one-off debugging. Never commit them.
+extract_photo.py
+run_gw.sh
+start_gateway.sh
+scripts/local-status.sh
+.kilo/
+
 # Local virtualenvs (proto contract test, spikes).
 .venv/
 
