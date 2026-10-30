@@ -1152,7 +1152,7 @@ contract unchanged.
 - [~] Add retry with exponential backoff on 429/5xx at the backend layer. *(deferred — §18 contract keeps transport failures non-retried; schema retry remains)*
 - [x] Add fallback chains (`with_fallbacks`) configurable via `AI_FALLBACK_PROVIDERS`.
 - [x] Log token usage (prompt/completion) per call via `UsageMetadataCallbackHandler`; cost estimate TBD.
-- [ ] Document the grounding limitation for non-Gemini providers in the README.
+- [x] Document the grounding limitation for non-Gemini providers in the README.
 
 ### 72. Tests and observability
 
