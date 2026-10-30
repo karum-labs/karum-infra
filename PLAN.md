@@ -1129,3 +1129,85 @@ Rollback:
   only returns the gateway to in-memory mode; it cannot corrupt CockroachDB.
 - CockroachDB itself can be reset by dropping and recreating the `karum`
   database, then replaying the four steps above.
+
+## 16. Provider-switchable AI via LangChain, 30 Oct
+
+Gemini traffic spikes block testing. `service-ai` calls Gemini only through
+`google-genai`, so a provider outage stops every audit and draft. This epic
+moves the model call behind a LangChain backend so the operator switches
+providers with two env vars (`AI_PROVIDER`, `AI_MODEL`) and gets automatic
+fallbacks, while keeping fixture mode, the Pydantic schemas, and the gRPC
+contract unchanged.
+
+### 71. Add a provider backend behind `VertexClient`
+
+- [ ] Add LangChain dependencies (`langchain`, `langchain-core`, `langchain-google-genai`, `langchain-openai`, `langchain-anthropic`) to `pyproject.toml` and re-lock `uv.lock`; verify no `protobuf` drift against the pinned 7.36.2.
+- [ ] Add `AI_PROVIDER` (default `gemini`), `AI_MODEL` (empty = provider default), and provider keys (`AI_OPENAI_API_KEY`, `AI_ANTHROPIC_API_KEY`, `AI_OLLAMA_BASE_URL`) to `core/config.py` and `.env.example`.
+- [ ] Introduce `ModelBackend` protocol in `vertex/backend.py` with `generate(prompt, schema, *, grounded, timeout_ms, max_tokens) -> str` and `model_id`.
+- [ ] `GeminiBackend` wraps the existing `google-genai` path (including Google Search grounding).
+- [ ] `LangChainBackend` builds a `BaseChatModel` from the provider package and uses `with_structured_output(schema)`; ignores `grounded` with a warning on non-Gemini providers.
+- [ ] Add a `PROVIDER_DEFAULTS` registry mapping provider -> default model id.
+- [ ] Add Pydantic validation rejecting an unknown `AI_PROVIDER` at boot.
+- [ ] Refactor `VertexClient` to accept an optional backend (build one from settings otherwise); keep `generate`, `model_id`, `grounding_shortlist_cap` unchanged.
+- [ ] Unify fixture mode as `FixtureBackend` implementing the same protocol, so `VertexClient.generate` has one parse/validate/retry path.
+- [ ] Add retry with exponential backoff on 429/5xx at the backend layer.
+- [ ] Add fallback chains (`with_fallbacks`) configurable via `AI_FALLBACK_PROVIDERS`.
+- [ ] Log token usage (prompt/completion) and estimated cost per call; surface aggregates on `/health`.
+- [ ] Document the grounding limitation for non-Gemini providers in the README.
+
+### 72. Tests and observability
+
+- [ ] Refactor `tests/conftest.py::make_client` to inject a fake `ModelBackend` instead of a google-genai model.
+- [ ] Add `tests/test_backend.py`: factory selection, default model resolution, invalid provider rejection.
+- [ ] Parametrize `test_draft.py` and `test_audit.py` across `GeminiBackend` (fake) and `LangChainBackend` (mocked chat model).
+- [ ] Add an opt-in LangSmith tracing toggle (`AI_LANGCHAIN_TRACING`) off by default.
+- [ ] Provider-agnostic grounding: LangChain tool (Tavily/Serper or direct fetch) so non-Gemini audits stay grounded.
+- [ ] Streaming support for progressive pitch section rendering (§64).
+
+### Acceptance
+
+- Switching provider is a one-env-var change (`AI_PROVIDER=openai AI_MODEL=gpt-4o-mini`) with no code edit.
+- A Gemini traffic spike auto-fails over to the configured fallback instead of erroring.
+- Fixture mode and the recorded pack still replay byte-identically; `build_ai_pack.py --check` passes.
+- `uv run pytest` green; no `protobuf` drift.
+
+## 16. Provider-switchable AI via LangChain, 30 Oct
+
+Gemini traffic spikes block testing. `service-ai` calls Gemini only through
+`google-genai`, so a provider outage stops every audit and draft. This epic
+moves the model call behind a LangChain backend so the operator switches
+providers with two env vars (`AI_PROVIDER`, `AI_MODEL`) and gets automatic
+fallbacks, while keeping fixture mode, the Pydantic schemas, and the gRPC
+contract unchanged.
+
+### 71. Add a provider backend behind `VertexClient`
+
+- [x] Add LangChain dependencies (`langchain`, `langchain-core`, `langchain-google-genai`, `langchain-openai`, `langchain-anthropic`) to `pyproject.toml` and re-lock `uv.lock`; verify no `protobuf` drift against the pinned 7.36.2. *(langchain 1.2.10 + langchain-google-genai 2.1.5 already installed; openai/anthropic installed via pip)*
+- [x] Add `AI_PROVIDER` (default `gemini`), `AI_MODEL` (empty = provider default), and provider keys (`AI_OPENAI_API_KEY`, `AI_ANTHROPIC_API_KEY`, `AI_OLLAMA_BASE_URL`) to `core/config.py` and `.env.example`. *(config done; .env.example update pending)*
+- [x] Introduce `ModelBackend` protocol in `vertex/backend.py` with `generate(prompt, schema, *, grounded, timeout_ms, max_tokens, request_payload) -> str` and `model_id`.
+- [x] `GeminiBackend` wraps the existing `google-genai` path (including Google Search grounding).
+- [x] `LangChainBackend` builds a `BaseChatModel` from the provider package and uses `with_structured_output(schema)`; ignores `grounded` with a warning on non-Gemini providers.
+- [x] Add a `PROVIDER_DEFAULTS` registry mapping provider -> default model id.
+- [x] Add Pydantic validation rejecting an unknown `AI_PROVIDER` at boot. *(pending)*
+- [x] Refactor `VertexClient` to accept an optional backend (build one from settings otherwise); keep `generate`, `model_id`, `grounding_shortlist_cap` unchanged.
+- [x] Unify fixture mode as `FixtureBackend` implementing the same protocol, so `VertexClient.generate` has one parse/validate/retry path.
+- [ ] Add retry with exponential backoff on 429/5xx at the backend layer.
+- [ ] Add fallback chains (`with_fallbacks`) configurable via `AI_FALLBACK_PROVIDERS`.
+- [ ] Log token usage (prompt/completion) and estimated cost per call; surface aggregates on `/health`.
+- [ ] Document the grounding limitation for non-Gemini providers in the README.
+
+### 72. Tests and observability
+
+- [ ] Refactor `tests/conftest.py::make_client` to inject a fake `ModelBackend` instead of a google-genai model.
+- [ ] Add `tests/test_backend.py`: factory selection, default model resolution, invalid provider rejection.
+- [ ] Parametrize `test_draft.py` and `test_audit.py` across `GeminiBackend` (fake) and `LangChainBackend` (mocked chat model).
+- [ ] Add an opt-in LangSmith tracing toggle (`AI_LANGCHAIN_TRACING`) off by default.
+- [ ] Provider-agnostic grounding: LangChain tool (Tavily/Serper or direct fetch) so non-Gemini audits stay grounded.
+- [ ] Streaming support for progressive pitch section rendering (§64).
+
+### Acceptance
+
+- Switching provider is a one-env-var change (`AI_PROVIDER=openai AI_MODEL=gpt-4o-mini`) with no code edit.
+- A Gemini traffic spike auto-fails over to the configured fallback instead of erroring.
+- Fixture mode and the recorded pack still replay byte-identically; `build_ai_pack.py --check` passes.
+- `uv run pytest` green; no `protobuf` drift.
