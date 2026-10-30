@@ -1,0 +1,66 @@
+{
+  "fixture_version": 1,
+  "source": {
+    "recording": "contract/testdata/campaign/audit-tobala.json",
+    "derived": "2026-10-30",
+    "label": "audit-menu-austin-tobala",
+    "note": "Mezcalería Tobalá on East 6th Street: mezcal-forward list with several single-village espadín already on shelf, so the audit succeeds with a moderate shelf opportunity."
+  },
+  "response": {
+    "results": [
+      {
+        "door": {
+          "id": "A29A1AE5-57F9-4C42-95CD-143C90F4B55A",
+          "type": "urn:entity:place",
+          "name": "Mezcalería Tobalá",
+          "city": "Austin"
+        },
+        "succeeded": true,
+        "shelfUnknown": false,
+        "incumbents": [
+          {
+            "name": "Del Maguey Single Village Mezcal",
+            "sources": [
+              {
+                "url": "https://www.whislersaustin.com/menu",
+                "title": "Whisler's menu — Del Maguey Single Village Mezcal"
+              }
+            ]
+          },
+          {
+            "name": "Montelobos Espadín",
+            "sources": [
+              {
+                "url": "https://mezcaleriatobala.com/menu",
+                "title": "Mezcalería Tobalá — Menu"
+              }
+            ]
+          }
+        ],
+        "competitorCount": 2,
+        "shelfOpportunity": 0.55,
+        "menuSummary": "Mezcal shelf is agave-forward with Del Maguey and Montelobos anchoring; single-village espadín joven already listed, so incremental shelf space is limited but a trial placement fits beside the incumbent.",
+        "sources": [
+          {
+            "url": "https://mezcaleriatobala.com/menu",
+            "title": "Mezcalería Tobalá — Menu"
+          },
+          {
+            "url": "https://maps.google.com/?q=Mezcaler%C3%ADa+Tobal%C3%A1+Austin",
+            "title": "Mezcalería Tobalá on Google Maps"
+          }
+        ]
+      }
+    ],
+    "attribution": {
+      "modelId": "gemini-3.8-flash",
+      "promptVersion": "audit-menu@v1",
+      "evidenceIds": [
+        "ev-0001",
+        "ev-0005"
+      ],
+      "ungrounded": false
+    },
+    "errorCode": "ERROR_CODE_UNSPECIFIED"
+  }
+}

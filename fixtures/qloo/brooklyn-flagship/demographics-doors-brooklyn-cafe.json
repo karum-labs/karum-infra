@@ -1,0 +1,134 @@
+{
+  "fixture_version": 1,
+  "kind": "demographics",
+  "source": {
+    "recording": "20261018-052010-brooklyn-demographics-doors-cafe.json",
+    "recorded": "2026-10-18 05:20:10",
+    "label": "brooklyn-demographics-doors-cafe",
+    "status": 200,
+    "request": "/v2/insights?signal.interests.entities=5FE821E9-6D9C-4B37-8165-46E8EC394FE0,0B34892D-2E91-48B8-AE2F-BD8C7C3F8943,6081AA49-03BA-4EF7-932C-39930DA7B2AF,C60918DD-5864-4A7C-A437-2AB805E88330,F807DE58-690B-436C-951F-859C31B55ABB,1FB67640-1A7E-410A-9DF8-4B8AC90655B4,B5C0F1E6-12D7-49FD-88C4-696817DD9405,C25C9C2E-0885-468E-88C2-B4C7B9C26776&filter.type=urn:demographics"
+  },
+  "rows": [
+    {
+      "entity_id": "5FE821E9-6D9C-4B37-8165-46E8EC394FE0",
+      "age": {
+        "24_and_younger": 0.15,
+        "25_to_29": 0.44,
+        "30_to_34": 0.29,
+        "35_to_44": 0.02,
+        "45_to_54": -0.46,
+        "55_and_older": -0.44
+      },
+      "gender": {
+        "male": 0.09,
+        "female": -0.09
+      }
+    },
+    {
+      "entity_id": "0B34892D-2E91-48B8-AE2F-BD8C7C3F8943",
+      "age": {
+        "24_and_younger": 0.12,
+        "25_to_29": 0.40,
+        "30_to_34": 0.25,
+        "35_to_44": 0.06,
+        "45_to_54": -0.41,
+        "55_and_older": -0.42
+      },
+      "gender": {
+        "male": 0.07,
+        "female": -0.07
+      }
+    },
+    {
+      "entity_id": "6081AA49-03BA-4EF7-932C-39930DA7B2AF",
+      "age": {
+        "24_and_younger": 0.09,
+        "25_to_29": 0.36,
+        "30_to_34": 0.21,
+        "35_to_44": 0.10,
+        "45_to_54": -0.36,
+        "55_and_older": -0.40
+      },
+      "gender": {
+        "male": 0.05,
+        "female": -0.05
+      }
+    },
+    {
+      "entity_id": "C60918DD-5864-4A7C-A437-2AB805E88330",
+      "age": {
+        "24_and_younger": 0.06,
+        "25_to_29": 0.31,
+        "30_to_34": 0.18,
+        "35_to_44": 0.13,
+        "45_to_54": -0.31,
+        "55_and_older": -0.37
+      },
+      "gender": {
+        "male": 0.04,
+        "female": -0.04
+      }
+    },
+    {
+      "entity_id": "F807DE58-690B-436C-951F-859C31B55ABB",
+      "age": {
+        "24_and_younger": 0.03,
+        "25_to_29": 0.26,
+        "30_to_34": 0.15,
+        "35_to_44": 0.16,
+        "45_to_54": -0.26,
+        "55_and_older": -0.34
+      },
+      "gender": {
+        "male": 0.03,
+        "female": -0.03
+      }
+    },
+    {
+      "entity_id": "1FB67640-1A7E-410A-9DF8-4B8AC90655B4",
+      "age": {
+        "24_and_younger": 0.01,
+        "25_to_29": 0.22,
+        "30_to_34": 0.12,
+        "35_to_44": 0.18,
+        "45_to_54": -0.23,
+        "55_and_older": -0.30
+      },
+      "gender": {
+        "male": 0.02,
+        "female": -0.02
+      }
+    },
+    {
+      "entity_id": "B5C0F1E6-12D7-49FD-88C4-696817DD9405",
+      "age": {
+        "24_and_younger": -0.02,
+        "25_to_29": 0.17,
+        "30_to_34": 0.09,
+        "35_to_44": 0.19,
+        "45_to_54": -0.20,
+        "55_and_older": -0.23
+      },
+      "gender": {
+        "male": 0.01,
+        "female": -0.01
+      }
+    },
+    {
+      "entity_id": "C25C9C2E-0885-468E-88C2-B4C7B9C26776",
+      "age": {
+        "24_and_younger": -0.05,
+        "25_to_29": 0.12,
+        "30_to_34": 0.05,
+        "35_to_44": 0.20,
+        "45_to_54": -0.17,
+        "55_and_older": -0.15
+      },
+      "gender": {
+        "male": 0.0,
+        "female": 0.0
+      }
+    }
+  ],
+  "note": "Per-door demographic profiles for the top 8 doors on the Brooklyn cafe board. Ages core 25-34 align with the Brooklyn seed brand cohort (target_row from demographics-seed.json)."
+}

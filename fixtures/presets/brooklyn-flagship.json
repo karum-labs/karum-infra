@@ -166,6 +166,7 @@
     "qloo/brooklyn-flagship/insights-skip-batch-probe.json",
     "qloo/brooklyn-flagship/demographics-seed.json",
     "qloo/brooklyn-flagship/demographics-door-batch-probe.json",
+    "qloo/brooklyn-flagship/demographics-doors-brooklyn-cafe.json",
     "qloo/tags/cafe-genre.json"
   ],
   "notes": [

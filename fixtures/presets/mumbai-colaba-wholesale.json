@@ -107,6 +107,7 @@
     "qloo/mumbai-colaba-wholesale/insights-skip-batch-probe.json",
     "qloo/mumbai-colaba-wholesale/compare-leopold-probe.json",
     "qloo/mumbai-colaba-wholesale/demographics-seed.json",
+    "qloo/mumbai-colaba-wholesale/demographics-doors-mumbai-cafe.json",
     "qloo/tags/cafe-genre.json"
   ],
   "notes": [

@@ -75,6 +75,7 @@
   "recordings": [
     "qloo/brooklyn-collab/insights-collab-galleries.json",
     "qloo/brooklyn-collab/insights-collab-ceramics.json",
+    "qloo/brooklyn-collab/demographics-doors-brooklyn-gallery.json",
     "qloo/tags/gallery-genre.json",
     "qloo/tags/ceramics-genre.json"
   ],

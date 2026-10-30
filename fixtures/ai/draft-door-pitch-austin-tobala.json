@@ -1,0 +1,38 @@
+{
+  "fixture_version": 1,
+  "source": {
+    "recording": "contract/testdata/campaign/pitch-tobala.json",
+    "derived": "2026-10-30",
+    "label": "draft-door-pitch-austin-tobala",
+    "note": "Mezcalería Tobalá pitch for Ilegal Mezcal: mezcal-forward room, incumbent Del Maguey already on shelf, six-bottle Espadín Joven trial pitched beside Montelobos."
+  },
+  "response": {
+    "script": "You already pour Del Maguey and Montelobos; Ilegal's Espadín Joven sits between them in taste and price. Mezcalería Tobalá ranks first of 25 for this brand's profile in Austin (affinity 0.84; ev-0001) and the room's core is 25-34 (demographic index 0.79; ev-0003). Take the Espadín Joven on a six-bottle trial and park it beside the Montelobos on the back bar; the smoky-sweet profile matches your 25-34 core. If it sits, we collect it.",
+    "battlecard": {
+      "headline": "Displace without changing the shelf",
+      "incumbentName": "Del Maguey Single Village Mezcal",
+      "talkingPoints": [
+        "Mezcalería Tobalá's mezcal shelf is two-brand anchored (ev-0006)",
+        "Ilegal's taste overlap with this room beats the incumbent's (ev-0004)"
+      ],
+      "compareSummary": "Overlap tags: Bars, Cocktail Bars — the door's audience and Ilegal share two of the top three tags; the incumbent shares one."
+    },
+    "recommendedSku": {
+      "id": "sk-ilegal-espadin-750",
+      "name": "Ilegal Mezcal Espadín Joven 750ml"
+    },
+    "attribution": {
+      "modelId": "gemini-3.8-flash",
+      "promptVersion": "draft-door-pitch@v1",
+      "evidenceIds": [
+        "ev-0001",
+        "ev-0003",
+        "ev-0004",
+        "ev-0006"
+      ],
+      "ungrounded": false
+    },
+    "errorCode": "ERROR_CODE_UNSPECIFIED",
+    "modeParagraph": ""
+  }
+}

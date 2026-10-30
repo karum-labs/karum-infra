@@ -1,0 +1,134 @@
+{
+  "fixture_version": 1,
+  "kind": "demographics",
+  "source": {
+    "recording": "20261018-052010-austin-demographics-doors-bar.json",
+    "recorded": "2026-10-18 05:20:10",
+    "label": "austin-demographics-doors-bar",
+    "status": 200,
+    "request": "/v2/insights?signal.interests.entities=A29A1AE5-57F9-4C42-95CD-143C90F4B55A,0B3E061C-AC7A-4CA9-AD6D-DD10F272F49F,3ED61340-AE80-41F1-892A-165F3B492EF4,2F3A2590-4B4A-4647-BB78-34BDC9EF0E57,547C76F2-35E3-4F4D-B684-AA5A3DE34BC0,573FD11B-DF43-480F-9DA0-7382B1FD1B6A,6601FCAC-C3D8-4323-BFDC-ACD0D8904F05,9AB64C95-6115-4F59-AD9D-63FEC3828DD6&filter.type=urn:demographics"
+  },
+  "rows": [
+    {
+      "entity_id": "A29A1AE5-57F9-4C42-95CD-143C90F4B55A",
+      "age": {
+        "24_and_younger": 0.12,
+        "25_to_29": 0.41,
+        "30_to_34": 0.33,
+        "35_to_44": 0.06,
+        "45_to_54": -0.44,
+        "55_and_older": -0.48
+      },
+      "gender": {
+        "male": 0.08,
+        "female": -0.08
+      }
+    },
+    {
+      "entity_id": "0B3E061C-AC7A-4CA9-AD6D-DD10F272F49F",
+      "age": {
+        "24_and_younger": 0.08,
+        "25_to_29": 0.38,
+        "30_to_34": 0.29,
+        "35_to_44": 0.02,
+        "45_to_54": -0.39,
+        "55_and_older": -0.38
+      },
+      "gender": {
+        "male": 0.06,
+        "female": -0.06
+      }
+    },
+    {
+      "entity_id": "3ED61340-AE80-41F1-892A-165F3B492EF4",
+      "age": {
+        "24_and_younger": 0.05,
+        "25_to_29": 0.32,
+        "30_to_34": 0.24,
+        "35_to_44": 0.11,
+        "45_to_54": -0.31,
+        "55_and_older": -0.41
+      },
+      "gender": {
+        "male": 0.04,
+        "female": -0.04
+      }
+    },
+    {
+      "entity_id": "2F3A2590-4B4A-4647-BB78-34BDC9EF0E57",
+      "age": {
+        "24_and_younger": 0.02,
+        "25_to_29": 0.27,
+        "30_to_34": 0.20,
+        "35_to_44": 0.16,
+        "45_to_54": -0.26,
+        "55_and_older": -0.39
+      },
+      "gender": {
+        "male": 0.03,
+        "female": -0.03
+      }
+    },
+    {
+      "entity_id": "547C76F2-35E3-4F4D-B684-AA5A3DE34BC0",
+      "age": {
+        "24_and_younger": -0.01,
+        "25_to_29": 0.22,
+        "30_to_34": 0.16,
+        "35_to_44": 0.19,
+        "45_to_54": -0.22,
+        "55_and_older": -0.34
+      },
+      "gender": {
+        "male": 0.02,
+        "female": -0.02
+      }
+    },
+    {
+      "entity_id": "573FD11B-DF43-480F-9DA0-7382B1FD1B6A",
+      "age": {
+        "24_and_younger": -0.04,
+        "25_to_29": 0.17,
+        "30_to_34": 0.12,
+        "35_to_44": 0.20,
+        "45_to_54": -0.19,
+        "55_and_older": -0.26
+      },
+      "gender": {
+        "male": 0.01,
+        "female": -0.01
+      }
+    },
+    {
+      "entity_id": "6601FCAC-C3D8-4323-BFDC-ACD0D8904F05",
+      "age": {
+        "24_and_younger": -0.07,
+        "25_to_29": 0.11,
+        "30_to_34": 0.08,
+        "35_to_44": 0.19,
+        "45_to_54": -0.15,
+        "55_and_older": -0.16
+      },
+      "gender": {
+        "male": 0.0,
+        "female": 0.0
+      }
+    },
+    {
+      "entity_id": "9AB64C95-6115-4F59-AD9D-63FEC3828DD6",
+      "age": {
+        "24_and_younger": -0.10,
+        "25_to_29": 0.05,
+        "30_to_34": 0.03,
+        "35_to_44": 0.17,
+        "45_to_54": -0.11,
+        "55_and_older": -0.04
+      },
+      "gender": {
+        "male": -0.02,
+        "female": 0.02
+      }
+    }
+  ],
+  "note": "Per-door demographic profiles for the top 8 doors on the Austin bar board. Ages core 25-34 align with the Ilegal Mezcal brand cohort (target_row from demographics-seed.json)."
+}

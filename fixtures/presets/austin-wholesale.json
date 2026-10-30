@@ -102,6 +102,7 @@
     "qloo/austin-wholesale/insights-skip-batch-probe.json",
     "qloo/austin-wholesale/compare-tobala-ilegal.json",
     "qloo/austin-wholesale/demographics-seed.json",
+    "qloo/austin-wholesale/demographics-doors-austin-bar.json",
     "qloo/tags/bar-genre.json"
   ],
   "notes": [

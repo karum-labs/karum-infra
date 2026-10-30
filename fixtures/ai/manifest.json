@@ -78,6 +78,57 @@
         "brand": "Ilegal Mezcal"
       },
       "note": "The ungrounded counterfactual; its venue names source no preset run."
+    },
+    {
+      "id": "audit-menu-austin-tobala",
+      "method": "audit_menu",
+      "file": "audit-menu-austin-tobala.json",
+      "key": "audit_menu:4a952f358842c28d",
+      "request": {
+        "mode": "wholesale",
+        "targets": [
+          {
+            "door": {
+              "id": "A29A1AE5-57F9-4C42-95CD-143C90F4B55A",
+              "type": "urn:entity:place",
+              "name": "Mezcalería Tobalá",
+              "city": "Austin"
+            }
+          }
+        ]
+      },
+      "match": {
+        "city": "Austin",
+        "brand": "Ilegal Mezcal",
+        "door": "Mezcalería Tobalá"
+      },
+      "note": "Mezcalería Tobalá on East 6th Street: mezcal-forward list with Del Maguey and Montelobos already on shelf; audit succeeds with a moderate shelf opportunity."
+    },
+    {
+      "id": "draft-door-pitch-austin-tobala",
+      "method": "draft_door_pitch",
+      "file": "draft-door-pitch-austin-tobala.json",
+      "key": "draft_door_pitch:d468f78fe8e2b96d",
+      "request": {
+        "brand": {
+          "name": "Ilegal Mezcal"
+        },
+        "city": "Austin",
+        "mode": "wholesale",
+        "door": {
+          "audit": {
+            "door": {
+              "name": "Mezcalería Tobalá"
+            }
+          }
+        }
+      },
+      "match": {
+        "city": "Austin",
+        "brand": "Ilegal Mezcal",
+        "door": "Mezcalería Tobalá"
+      },
+      "note": "Mezcalería Tobalá pitch for Ilegal Mezcal: mezcal-forward room, incumbent Del Maguey already on shelf, six-bottle Espadín Joven trial pitched beside Montelobos."
     }
   ]
 }

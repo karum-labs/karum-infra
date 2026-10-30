@@ -1,0 +1,134 @@
+{
+  "fixture_version": 1,
+  "kind": "demographics",
+  "source": {
+    "recording": "20261018-052010-colaba-demographics-doors-cafe.json",
+    "recorded": "2026-10-18 05:20:10",
+    "label": "colaba-demographics-doors-cafe",
+    "status": 200,
+    "request": "/v2/insights?signal.interests.entities=AD3BDA25-C211-425B-AD14-4821083B0DCC,817236DC-B179-4601-97AA-3B7F29EC4DA8,827DB75A-D796-4D67-9886-B1FE83E31BF6,456DB250-28BA-45DE-8907-73BAB7A2B87F,70C0C918-8A24-4F0B-842C-8F4FB47E4C6C,3275BB58-7792-4454-BF7F-CE274A374A19,02B9661B-FC95-45C7-A9A5-5EC7D3D07930,12DC0F25-B8D8-4FDB-9764-31834E53029D&filter.type=urn:demographics"
+  },
+  "rows": [
+    {
+      "entity_id": "AD3BDA25-C211-425B-AD14-4821083B0DCC",
+      "age": {
+        "24_and_younger": 0.20,
+        "25_to_29": 0.50,
+        "30_to_34": 0.22,
+        "35_to_44": -0.06,
+        "45_to_54": -0.52,
+        "55_and_older": -0.34
+      },
+      "gender": {
+        "male": 0.12,
+        "female": -0.12
+      }
+    },
+    {
+      "entity_id": "817236DC-B179-4601-97AA-3B7F29EC4DA8",
+      "age": {
+        "24_and_younger": 0.17,
+        "25_to_29": 0.46,
+        "30_to_34": 0.19,
+        "35_to_44": -0.02,
+        "45_to_54": -0.47,
+        "55_and_older": -0.32
+      },
+      "gender": {
+        "male": 0.10,
+        "female": -0.10
+      }
+    },
+    {
+      "entity_id": "827DB75A-D796-4D67-9886-B1FE83E31BF6",
+      "age": {
+        "24_and_younger": 0.14,
+        "25_to_29": 0.42,
+        "30_to_34": 0.16,
+        "35_to_44": 0.01,
+        "45_to_54": -0.42,
+        "55_and_older": -0.31
+      },
+      "gender": {
+        "male": 0.08,
+        "female": -0.08
+      }
+    },
+    {
+      "entity_id": "456DB250-28BA-45DE-8907-73BAB7A2B87F",
+      "age": {
+        "24_and_younger": 0.11,
+        "25_to_29": 0.38,
+        "30_to_34": 0.14,
+        "35_to_44": 0.04,
+        "45_to_54": -0.37,
+        "55_and_older": -0.30
+      },
+      "gender": {
+        "male": 0.07,
+        "female": -0.07
+      }
+    },
+    {
+      "entity_id": "70C0C918-8A24-4F0B-842C-8F4FB47E4C6C",
+      "age": {
+        "24_and_younger": 0.08,
+        "25_to_29": 0.34,
+        "30_to_34": 0.11,
+        "35_to_44": 0.07,
+        "45_to_54": -0.32,
+        "55_and_older": -0.28
+      },
+      "gender": {
+        "male": 0.05,
+        "female": -0.05
+      }
+    },
+    {
+      "entity_id": "3275BB58-7792-4454-BF7F-CE274A374A19",
+      "age": {
+        "24_and_younger": 0.05,
+        "25_to_29": 0.30,
+        "30_to_34": 0.08,
+        "35_to_44": 0.09,
+        "45_to_54": -0.27,
+        "55_and_older": -0.25
+      },
+      "gender": {
+        "male": 0.04,
+        "female": -0.04
+      }
+    },
+    {
+      "entity_id": "02B9661B-FC95-45C7-A9A5-5EC7D3D07930",
+      "age": {
+        "24_and_younger": 0.02,
+        "25_to_29": 0.26,
+        "30_to_34": 0.05,
+        "35_to_44": 0.11,
+        "45_to_54": -0.22,
+        "55_and_older": -0.22
+      },
+      "gender": {
+        "male": 0.02,
+        "female": -0.02
+      }
+    },
+    {
+      "entity_id": "12DC0F25-B8D8-4FDB-9764-31834E53029D",
+      "age": {
+        "24_and_younger": -0.01,
+        "25_to_29": 0.22,
+        "30_to_34": 0.03,
+        "35_to_44": 0.12,
+        "45_to_54": -0.18,
+        "55_and_older": -0.18
+      },
+      "gender": {
+        "male": 0.01,
+        "female": -0.01
+      }
+    }
+  ],
+  "note": "Per-door demographic profiles for the top 8 doors on the Mumbai cafe board. Ages core 25-29 align with the Mary Lodge / Blue Tokai brand cohort (target_row from demographics-seed.json)."
+}
