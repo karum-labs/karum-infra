@@ -1169,3 +1169,27 @@ contract unchanged.
 - A Gemini traffic spike auto-fails over to the configured fallback instead of erroring.
 - Fixture mode and the recorded pack still replay byte-identically; `build_ai_pack.py --check` passes.
 - `uv run pytest` green; no `protobuf` drift.
+
+## 17. Karum branding in PDF exports, 30 Oct
+
+The run-sheet, site brief, and pitch PDFs render as plain black Helvetica
+with no brand identity. This epic applies the official Karum brand tokens
+(ink-teal `#0F4C4A`, paper `#F4F5F1`, Bricolage Grotesque, the mark) to
+the server-rendered PDFs so a downloaded file reads as Karum, not as a
+generic report.
+
+### 73. Brand the PDFs
+
+- [ ] Embed the brand mark PNG and the Bricolage Grotesque / IBM Plex Mono TTFs into `internal/pdf` via `//go:embed`, so the binary ships them with no runtime path.
+- [ ] Draw a filled ink-teal header band with the white mark and the `KARUM` wordmark on every page, plus a subtitle line (brand, title, city).
+- [ ] Recolour section headings (door names, corridors, "Sources") in ink-teal bold.
+- [ ] Add a footer on every page: short honesty line left, `Page N` right.
+- [ ] Keep the full traceability sentence as the closing body line.
+- [ ] Keep provenance styling (roman = fact, italic = inference) and the honesty label that `TestPitchExportRendersAllSections` asserts.
+- [ ] Run `go test ./internal/pdf/...` and `go vet` clean.
+
+### Acceptance
+
+- A downloaded run-sheet and pitch PDF visibly carry the Karum mark, wordmark, and brand colour.
+- `go test ./...` and `gofmt -l .` clean in `karum-server`.
+- No new runtime file paths: everything is embedded.
