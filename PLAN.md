@@ -1160,7 +1160,7 @@ contract unchanged.
 - [x] Add `tests/test_backend.py`: factory selection, default model resolution, invalid provider rejection.
 - [ ] Parametrize `test_draft.py` and `test_audit.py` across `GeminiBackend` (fake) and `LangChainBackend` (mocked chat model). *(deferred)*
 - [x] Add an opt-in LangSmith tracing toggle (`AI_LANGCHAIN_TRACING`) off by default. *(config + env wiring done)*
-- [ ] Provider-agnostic grounding: LangChain tool (Tavily/Serper or direct fetch) so non-Gemini audits stay grounded.
+- [x] Provider-agnostic grounding: LangChain backend fetches venue websites directly when grounded.
 - [ ] Streaming support for progressive pitch section rendering (�64).
 
 ### Acceptance
