@@ -225,6 +225,19 @@ message BrandContext {
 
   // Input: the brand's own SKU list, plain text from the seed screen.
   repeated Sku skus = 2;
+
+  // Input: the account's brand profile — what kind of brand it is, e.g.
+  // "craft soft drinks". Empty when the account has no profile.
+  string category = 3;
+
+  // Input: the account's description of the brand and its products.
+  string description = 4;
+
+  // Input: what sets the brand apart; the case a pitch argues from.
+  string positioning = 5;
+
+  // Input: the customers the brand sells to.
+  string audience = 6;
 }
 
 // GroundingSource is one citation the audit found; URLs are citations, never
