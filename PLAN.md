@@ -1028,3 +1028,104 @@ Run in this order; do not start with a four-preset live prewarm.
    state, the top-five/top-eight coverage, non-template pitches, and a source
    for every menu that names an incumbent. Relax the thresholds only for a
    recorded, legitimate miss.
+
+## 15. CockroachDB cutover, 30 Oct
+
+The Neon project behind `POSTGRES_DSN` is quota-blocked at the compute layer:
+every connection, pooled or unpooled, fails with `Your account or project has
+exceeded the quota` (SQLSTATE 53000) before authentication completes. The
+gateway correctly degrades to in-memory campaigns, but that means no stored
+runs, no judge account, and no campaign history across restarts.
+
+The replacement is the supplied CockroachDB CCL cluster
+(`harentortoise-core-16225.j77.cockroachlabs.cloud:26257`, database `karum`).
+The migration is a **code-based rebuild**, not a row-by-row dump: the schema,
+the four preset campaigns, the judge account, and the demo runs are all derived
+from this repo and `karum-server`. The old Neon project stays untouched as cold
+storage in case the historical runs are ever needed.
+
+### 70. Move persistence to CockroachDB
+
+Constraints:
+
+- Keep the existing Go `pgx/v5` store and `pgxpool`; do not introduce GORM or a
+  second database abstraction for a connectivity test.
+- `POSTGRES_DSN` remains the single database setting in every repo. There is no
+  `DATABASE_URL` consumer to update.
+- Preserve the four presets (`austin-wholesale`, `brooklyn-flagship`,
+  `brooklyn-collab`, `mumbai-colaba-wholesale`), the judge account, and the
+  fixture-mode demo path.
+- Do not delete the Neon project. Its URL is the only pointer to the old rows.
+
+Audit (done):
+
+- [x] Confirmed Postgres is the only durable store. Redis holds Qloo/geocode
+      cache entries; the Flutter client persists only the session token in
+      `localStorage`; `service-ai` and `service-taste` keep no database.
+- [x] Inventoried rebuildable state: `campaigns` (four preset rows),
+      `campaigns.account_id`, `accounts` (`acct-judge`), `runs`,
+      `evidence_snapshots`, `trace_events`, and the run-embedded baseline,
+      pitches, heatmap, and route. All are written by startup code, the
+      pipeline, or `POST /api/v1/prewarm`.
+- [x] Confirmed non-rebuildable state is limited to old historical runs, any
+      non-judge accounts, and exact old IDs/timestamps. `drafts` has no writer
+      (`SaveDraft` has no callers, K-26); sessions and idempotency keys are
+      ephemeral.
+- [x] Confirmed the demo only opens the newest `ready` run per campaign, so one
+      fresh prewarm run per preset restores the judge path.
+
+Implementation:
+
+- [x] Fix the one SQL incompatibility: CockroachDB rejects
+      `make_interval(secs => $1)`; replace the idempotency sweep with
+      `created_at < now() - ($1 * interval '1 second')`.
+- [x] Point `.env` at the CockroachDB DSN with
+      `sslmode=verify-full&sslrootcert=system`. Leave `.env.example` generic;
+      never commit the password. Rotate the password after the cutover because
+      it was shared in chat.
+- [x] Prove the app's own migration runner, not just `psql`: create a scratch
+      database, run the `KARUM_TEST_POSTGRES_DSN` integration test against it,
+      and drop the database. CockroachDB auto-commits DDL, so a failed
+      migration can leave partial tables; a scratch database is the only clean
+      retry.
+- [x] Raise the shared startup budget in `cmd/gateway/main.go` from 90 s to
+      5 min. CockroachDB runs DDL as schema-change jobs (about 40–50 s for each
+      multi-statement migration bundle on this cluster); 90 s expired during
+      `0003` and the gateway fell back to memory even though the database was
+      healthy. Later boots skip applied migrations and are fast.
+- [x] Boot the gateway against `karum`. Verify `/health` reports
+      `postgres: live`, `schema_migrations` holds `0001`–`0003`, four preset
+      campaigns exist, and `POST /api/v1/auth/judge` returns a session for
+      `acct-judge`.
+- [x] Run `PREWARM_TOKEN=<judge token> make prewarm`. Require all four rows to
+      be `stored: true` and in a terminal state (`ready` in live mode; `degraded`
+      is expected in fixture mode because the AI fixture pack covers only
+      Whisler's audit/draft and the Ilegal baseline — see §68).
+- [x] Verify `GET /api/v1/account/campaigns` returns four campaigns with
+      `has_run: true`, each campaign opens its stored run, and direct SQL shows
+      one newest run per preset.
+- [x] Run the full gates from a clean shell: `go build ./...` and
+      `go test -race ./...` in `karum-server` (pass); `uv run pytest` in
+      `karum-service-ai` (2 pre-existing citation-stripping test failures) and
+      `karum-service-taste` (363 passed); `flutter analyze` (8 pre-existing
+      warnings in the uncommitted attachment work), `flutter test` (fails to
+      compile web-only `dart:html` screens under the VM, pre-existing),
+      and `flutter build web --no-pub` (pass); then `make test` and
+      `SMOKE_RERUN=0 make test` from this repo (both pass).
+
+Acceptance:
+
+- The gateway starts with no `postgres unavailable` warning and no in-memory
+  fallback.
+- The four preset buttons and the account page serve stored runs (terminal state;
+  `ready` in live mode, `degraded` expected in fixture mode).
+- The migration test passes on CockroachDB and the scratch database is removed.
+- A second gateway boot is idempotent: no duplicate campaigns or judge account.
+
+Rollback:
+
+- Revert the `POSTGRES_DSN` line to the Neon URL and redeploy. The old project
+  is not modified by this cutover. If Neon stays blocked, pointing back at it
+  only returns the gateway to in-memory mode; it cannot corrupt CockroachDB.
+- CockroachDB itself can be reset by dropping and recreating the `karum`
+  database, then replaying the four steps above.
