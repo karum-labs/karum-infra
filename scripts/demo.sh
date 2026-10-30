@@ -80,14 +80,12 @@ import sys
 from pathlib import Path
 
 # Each entry is a group of accepted spellings: the first one that carries a
-# value satisfies the requirement. The model credential accepts both the
-# documented AI_GEMINI_API_KEY and the legacy GEMINI_API_KEY.
+# value satisfies the requirement.
 needed = [
     ("POSTGRES_DSN",),
     ("GOOGLE_PLACES_API_KEY",),
     ("GOOGLE_ROUTES_API_KEY",),
     ("TASTE_QLOO_API_KEY",),
-    ("AI_GEMINI_API_KEY", "GEMINI_API_KEY"),
 ]
 vals = {}
 for line in Path(sys.argv[1]).read_text().splitlines():
@@ -95,6 +93,23 @@ for line in Path(sys.argv[1]).read_text().splitlines():
         continue
     key, value = line.split("=", 1)
     vals[key.strip()] = value.strip().strip("\"'")
+
+# The model credential follows AI_PROVIDER. Fixture mode replays the recorded
+# pack and needs none. The Gemini key accepts both the documented
+# AI_GEMINI_API_KEY and the legacy GEMINI_API_KEY; a Vertex project also works.
+if vals.get("AI_MODE", "fixture").lower() != "fixture":
+    provider = (vals.get("AI_PROVIDER") or "gemini").lower()
+    needed.append(
+        {
+            "openai": ("AI_OPENAI_API_KEY",),
+            "openai-responses": ("AI_OPENAI_API_KEY",),
+            "anthropic": ("AI_ANTHROPIC_API_KEY",),
+            "ollama": ("AI_OLLAMA_BASE_URL",),
+        }.get(
+            provider,
+            ("AI_GEMINI_API_KEY", "GEMINI_API_KEY", "AI_GCP_PROJECT_ID"),
+        )
+    )
 missing = [group for group in needed if not any(vals.get(key) for key in group)]
 if missing:
     print(
