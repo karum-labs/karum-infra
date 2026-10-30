@@ -1161,7 +1161,7 @@ contract unchanged.
 - [ ] Parametrize `test_draft.py` and `test_audit.py` across `GeminiBackend` (fake) and `LangChainBackend` (mocked chat model). *(deferred)*
 - [x] Add an opt-in LangSmith tracing toggle (`AI_LANGCHAIN_TRACING`) off by default. *(config + env wiring done)*
 - [x] Provider-agnostic grounding: LangChain backend fetches venue websites directly when grounded.
-- [ ] Streaming support for progressive pitch section rendering (�64).
+- [~] Streaming support for progressive pitch section rendering (�64).
 
 ### Acceptance
 
