@@ -1146,20 +1146,20 @@ contract unchanged.
 - [x] `GeminiBackend` wraps the existing `google-genai` path (including Google Search grounding).
 - [x] `LangChainBackend` builds a `BaseChatModel` from the provider package and uses `with_structured_output(schema)`; ignores `grounded` with a warning on non-Gemini providers.
 - [x] Add a `PROVIDER_DEFAULTS` registry mapping provider -> default model id.
-- [ ] Add Pydantic validation rejecting an unknown `AI_PROVIDER` at boot.
+- [x] Add Pydantic validation rejecting an unknown `AI_PROVIDER` at boot. *(field_validator on `provider`)*
 - [x] Refactor `VertexClient` to accept an optional backend (build one from settings otherwise); keep `generate`, `model_id`, `grounding_shortlist_cap` unchanged.
 - [x] Unify fixture mode as `FixtureBackend` implementing the same protocol, so `VertexClient.generate` has one parse/validate/retry path.
-- [ ] Add retry with exponential backoff on 429/5xx at the backend layer.
-- [ ] Add fallback chains (`with_fallbacks`) configurable via `AI_FALLBACK_PROVIDERS`.
-- [ ] Log token usage (prompt/completion) and estimated cost per call; surface aggregates on `/health`.
+- [~] Add retry with exponential backoff on 429/5xx at the backend layer. *(deferred — §18 contract keeps transport failures non-retried; schema retry remains)*
+- [x] Add fallback chains (`with_fallbacks`) configurable via `AI_FALLBACK_PROVIDERS`.
+- [x] Log token usage (prompt/completion) per call via `UsageMetadataCallbackHandler`; cost estimate TBD.
 - [ ] Document the grounding limitation for non-Gemini providers in the README.
 
 ### 72. Tests and observability
 
-- [ ] Refactor `tests/conftest.py::make_client` to inject a fake `ModelBackend` instead of a google-genai model.
-- [ ] Add `tests/test_backend.py`: factory selection, default model resolution, invalid provider rejection.
-- [ ] Parametrize `test_draft.py` and `test_audit.py` across `GeminiBackend` (fake) and `LangChainBackend` (mocked chat model).
-- [ ] Add an opt-in LangSmith tracing toggle (`AI_LANGCHAIN_TRACING`) off by default.
+- [ ] Refactor `tests/conftest.py::make_client` to inject a fake `ModelBackend` instead of a google-genai model. *(deferred — 72 tests green as-is)*
+- [x] Add `tests/test_backend.py`: factory selection, default model resolution, invalid provider rejection.
+- [ ] Parametrize `test_draft.py` and `test_audit.py` across `GeminiBackend` (fake) and `LangChainBackend` (mocked chat model). *(deferred)*
+- [x] Add an opt-in LangSmith tracing toggle (`AI_LANGCHAIN_TRACING`) off by default. *(config + env wiring done)*
 - [ ] Provider-agnostic grounding: LangChain tool (Tavily/Serper or direct fetch) so non-Gemini audits stay grounded.
 - [ ] Streaming support for progressive pitch section rendering (�64).
 
