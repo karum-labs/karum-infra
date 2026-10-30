@@ -921,7 +921,7 @@ The pitch page shows the raw script as one block of cited data. A visitor needs 
 - [x] Pitch page on first open: when no pitch is stored for the door, show a "Generate pitch" button and nothing else in the script area, and no model call happens until it is pressed
 - [x] Generating shows the section skeleton and fills each section as the response arrives, or shows one loading state if streaming is not built
 - [x] Failure shows the reason and a retry; the page never shows the raw Qloo payload as a fallback
-- [x] Tests: opening the page with no stored pitch makes zero AI calls; the rendered script has no `ev-` tokens; a generated pitch has every section filled or the section is marked unavailable
+- [~] Tests: opening the page with no stored pitch makes zero AI calls (unverified — architecture guarantees it, no client test); the rendered script has no `ev-` tokens (`scout_models_test.dart`); a generated pitch has every section filled or the section is marked unavailable (unverified)
 
 ### 65. Regenerate with instructions, and attachments on both actions
 
@@ -934,7 +934,7 @@ Once a pitch exists, "Regenerate" should not blindly re-roll. The visitor should
 - [x] Attached text is extracted server-side and fenced as untrusted brand material; its content can inform the pitch but cannot change the prompt's rules or add evidence
 - [x] Storage: attachments are kept with the run (AttachmentID/AttachmentName on Pitch) and the regenerate limiter from §26 still applies per request
 - [ ] Decide and record the retention period for uploaded brand files; a company's own documents are not Karum data to keep indefinitely
-- [x] Tests: instructions reach the model call; an oversized or wrong-type file is refused before upload; a pitch regenerated with an attachment records the attachment's ID in its attribution
+- [~] Tests: instructions reach the model call (`test_draft_door_pitch_receives_instructions_as_data`); an oversized or wrong-type file is refused before upload (`TestValidateAttachment*`, server); a pitch regenerated with an attachment records the attachment's ID on the stored pitch — **no end-to-end test yet** (client picker still stubbed)
 
 ### 66. Export the pitch as a PDF
 
@@ -945,7 +945,7 @@ The run-sheet PDF already exists (`internal/pdf`, the "Download run-sheet" actio
 - [x] The export uses the pitch as currently stored, so a regenerate changes the next export and never a file already downloaded
 - [x] File name follows the run-sheet pattern, with the door name and date
 - [x] Attachments are not merged into the export; the brand's own file stays separate
-- [x] Tests: the PDF contains every section heading and no evidence-ID token; the export of a door with no pitch returns a clear error, not an empty file
+- [~] Tests: the PDF contains every section heading and no evidence-ID token (`TestPitchExportRendersAllSections`); the export of a door with no pitch returns a clear error, not an empty file — **no test yet** for the 400 path
 
 ### 67. Contact the establishment by email or text
 
